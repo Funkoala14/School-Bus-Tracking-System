@@ -12,7 +12,8 @@
         - Or admin could add parents' email in their white list in advance
     - **Login**:
         - Username + password
-        - Parents should select their location on map and be autmatically assigned to the closest stop and route. Have to do it first.
+        - Parents should select their location on map and be autmatically assigned to the closest stop(within 0.5 mile) and route. Have to set location first.
+        - If there isn't a stop near their location, then show waiting for admin to add more stops and assign it.
 
 2. Home Page
 
