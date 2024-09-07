@@ -17,7 +17,7 @@
 2. Home Page
 
     - For Parents:
-        - Route & Bus's detail: - Bus's info (Plate), Route Name
+        - Route & Bus's detail: - Bus's info (Plate, capacity), Route's Name, and time schedule (inboud/outbound)
         - start stop - end stop name and start time and est end time
         - next stop, est and distance
         - user's stop, est and distance
@@ -25,7 +25,6 @@
         - Change address and stop
         - request to change address and bus stop
     - For Admin:
-        - Chose Your School
         - Each route's detail as the parents, but show a list of all routes (Collapsible Lists)
 
 3. Nav Bar
@@ -52,13 +51,19 @@
 
 5. Bus Management
 
-    - Routes list (Card List)
+    - Routes list
     - Each route has different stops and time schedule
     - Each route can be edited, popup card or change to editable card, can change each stop's address, add more stops or delete any stop.
     - Assign buses to routes
     - Buses list, can edit bus's plate, add more busses
 
 6. Tasks
+
     - task list(card list)
     - new account creat request (confirm / deny + reasons)
     - change address request (confirm / deny + reasons)
+
+7. Route tracking API
+    - use Google Maps Directions API
+    - Simulate Bus Position
+    - when bus arrived at parants' stop, notify them
