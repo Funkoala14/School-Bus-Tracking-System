@@ -55,8 +55,8 @@
         - parent's name
         - address
 
-
 5. Bus Management
+
     - Buses list, can edit bus's plate, add/delete busses
     - Routes list
     - Each route has different stops and time schedule
@@ -66,7 +66,7 @@
 6. Tasks
 
     - task list(card list)
-    <!-- - change address request (confirm / deny + reasons) -->
+      <!-- - change address request (confirm / deny + reasons) -->
     - Add Stop Request (if parents' location doesn't have a stop nearby, show recommend route and insert place)
 
 7. My Account (Parents)
@@ -81,3 +81,6 @@
     - use Google Maps Directions API
     - Simulate Bus Position
     - when bus arrived at parants' stop, notify them
+
+Database Design Table:
+`https://docs.google.com/spreadsheets/d/1bPWxjnrWz1DOMNvL5Fm_5Fkph2_n3w6vxKsChmU1tHM/edit?usp=sharing`
