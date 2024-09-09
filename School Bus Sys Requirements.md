@@ -5,19 +5,19 @@
 1. Login/Regirster Page
 
     - **Register**:
-        - Email, phone, password, school, parents of who
+
+        - School code
+        - Email, phone, password, first name, last name, username, password
         - Only for parents, can't register as school's admin account
-        - Select one school
         - After register, will send a notification to admin to verify the parents account
-        - Or admin could add parents' email in their white list in advance
+
     - **Login**:
         - Username + password
-        - Parents should select their location on map and be autmatically assigned to the closest stop(within 0.5 mile) and route. Have to set location first.
-        - If there isn't a stop near their location, then show waiting for admin to add more stops and assign it.
 
 2. Home Page
 
     - For Parents:
+        - check if added address and assigned route & stop
         - Route & Bus's detail: - Bus's info (Plate, capacity), Route's Name, and time schedule (inboud/outbound)
         - start stop - end stop name and start time and est end time
         - next stop, est and distance
@@ -38,17 +38,21 @@
 4. Account Management
 
     - notification (new parent's account, change address request)
-    - parents info table
+    - parents info list table
         - name
         - email
         - phone
         - kid's name
         - address
-        - bus stop
+        - assigned bus stop
         - verify status(if hasn't confirm, show link to tasks tab, otherwise text)
         - edit
-    - edit card
-        - could edit all info about parents
+    - students list table
+        - name
+        - student id
+        - parent's name
+        - address
+
 
 5. Bus Management
 
@@ -64,7 +68,15 @@
     - new account creat request (confirm / deny + reasons)
     - change address request (confirm / deny + reasons)
 
-7. Route tracking API
+7. My Account (Parents)
+
+    - add student (student's last name + student id)
+    - add address: Parents should select their location on map and be autmatically assigned to the closest stop(within 0.5 mile) and route. Have to set location first.
+    - If there isn't a stop near their location, then show waiting for admin to add more stops and assign it.
+    - My info: could edit email & phone-number
+    - Change password
+
+8. Route tracking API
     - use Google Maps Directions API
     - Simulate Bus Position
     - when bus arrived at parants' stop, notify them
