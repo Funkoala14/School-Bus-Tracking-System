@@ -9,7 +9,6 @@
         - School code
         - Email, phone, password, first name, last name, username, password
         - Only for parents, can't register as school's admin account
-        - After register, will send a notification to admin to verify the parents account
 
     - **Login**:
         - Username + password
@@ -17,7 +16,9 @@
 2. Home Page
 
     - For Parents:
-        - check if added address and assigned route & stop
+        - check if added student, address and assigned route & stop, if not, show add student and address(must)
+        - Add student: last name, student id
+        - Add address: show map, choose location, should get lat,long, string detail address
         - Route & Bus's detail: - Bus's info (Plate, capacity), Route's Name, and time schedule (inboud/outbound)
         - start stop - end stop name and start time and est end time
         - next stop, est and distance
@@ -30,7 +31,8 @@
 
 3. Nav Bar
 
-    - home page
+    - home page(Tracking)
+    - My Account (only for parents)
     - parent's account management(only for admin)
     - buses' management(only for admin)
     - Task(only for admin)
@@ -55,22 +57,21 @@
 
 
 5. Bus Management
-
+    - Buses list, can edit bus's plate, add/delete busses
     - Routes list
     - Each route has different stops and time schedule
     - Each route can be edited, popup card or change to editable card, can change each stop's address, add more stops or delete any stop.
     - Assign buses to routes
-    - Buses list, can edit bus's plate, add more busses
 
 6. Tasks
 
     - task list(card list)
-    - new account creat request (confirm / deny + reasons)
-    - change address request (confirm / deny + reasons)
+    <!-- - change address request (confirm / deny + reasons) -->
+    - Add Stop Request (if parents' location doesn't have a stop nearby, show recommend route and insert place)
 
 7. My Account (Parents)
 
-    - add student (student's last name + student id)
+    - add student: (student's last name + student id)
     - add address: Parents should select their location on map and be autmatically assigned to the closest stop(within 0.5 mile) and route. Have to set location first.
     - If there isn't a stop near their location, then show waiting for admin to add more stops and assign it.
     - My info: could edit email & phone-number
