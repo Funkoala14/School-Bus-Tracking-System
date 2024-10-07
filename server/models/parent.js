@@ -1,20 +1,20 @@
-const mongoose = require('mongoose');
+import { Schema } from 'mongoose';
+import Student from './Student.js';
+import Address from './Address.js';
+import User from './User.js';
 
-const parentSchema = new mongoose.Schema({
-    parent_id: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
-    phone_number: { type: String, required: true },
-    address: {
-        address: { type: String, default: null }, // 人类可读地址
-        lat: { type: Number, default: null }, // 纬度
-        long: { type: Number, default: null }, // 经度
+const refType = Schema.Types.ObjectId;
+
+const ParantSchema = new Schema(
+    {
+        address: { type: refType, ref: 'Address' },
+        routes: [{ type: refType, ref: 'Route' }],
+        stop: { type: refType, ref: 'Stop' },
+        children: [{ type: refType, ref: 'Student' }],
     },
-    email: { type: String, unique: true },
-    route: { type: String, default: null }, // 存储路线的 ID
-    stop: { type: String, default: null }, // 存储停靠点的 ID
-    children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'student' }],
-});
+    { timestamps: true }
+);
 
-const Parent = mongoose.model('parent', parentSchema);
+const Parent = User.discriminator('Parent', ParantSchema);
 
-module.exports = Parent;
+export default Parent;
