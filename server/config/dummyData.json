@@ -1,0 +1,124 @@
+{
+    "addresses": [
+        {
+            "street": "14 Richards Street",
+            "city": "Worcester",
+            "state": "MA",
+            "zipcode": "01603",
+            "address": "14 Richards Street, Worcester, MA 01603",
+            "coordinates": {
+                "lat": "42.254101",
+                "long": "71.825506"
+            }
+        },
+        {
+            "street": "299 Highland Street",
+            "city": "Worcester",
+            "state": "MA",
+            "zipcode": "01602",
+            "address": "299 Highland Street, Worcester, MA 01602",
+            "coordinates": {
+                "lat": "42.267482",
+                "long": "71.821990"
+            }
+        },
+        {
+            "street": "35 Nelson Place",
+            "city": "Worcester",
+            "state": "MA",
+            "zipcode": "01605",
+            "address": "35 Nelson Place, Worcester, MA 01605",
+            "coordinates": {
+                "lat": "42.308327",
+                "long": "71.794998"
+            }
+        }
+    ],
+    "schools": [
+        {
+            "code": "GSS123",
+            "name": "Goddard School of Science and Technology",
+            "contactInfo": {
+                "email": "info@goddardschool.org",
+                "numbers": "5087993594",
+                "website": "www.goddardschool.org"
+            }
+        },
+        {
+            "code": "DMHS456",
+            "name": "Doherty Memorial High School",
+            "contactInfo": {
+                "email": "info@dohertyhigh.org",
+                "numbers": "5087993270",
+                "website": "www.dohertyhigh.org"
+            }
+        },
+        {
+            "code": "NPS789",
+            "name": "Nelson Place Elementary School",
+            "contactInfo": {
+                "email": "info@nelsonplace.org",
+                "numbers": "5087993500",
+                "website": "www.nelsonplace.org"
+            }
+        }
+    ],
+    "admins": [
+        {
+            "userName": "goddard_admin",
+            "firstName": "Alice",
+            "lastName": "Johnson",
+            "phone": "5081234567",
+            "email": "alice.johnson@goddardschool.org",
+            "role": "Admin"
+        },
+        {
+            "userName": "doherty_admin",
+            "firstName": "Bob",
+            "lastName": "Smith",
+            "phone": "5082345678",
+            "email": "bob.smith@dohertyhigh.org",
+            "role": "Admin"
+        },
+        {
+            "userName": "nelson_admin",
+            "firstName": "Cathy",
+            "lastName": "Williams",
+            "phone": "5083456789",
+            "email": "cathy.williams@nelsonplace.org",
+            "role": "Admin"
+        }
+    ],
+    "drivers": [
+        {
+            "userName": "goddard_driver",
+            "firstName": "David",
+            "lastName": "Brown",
+            "phone": "5084567890",
+            "email": "david.brown@goddardschool.org",
+            "role": "Driver",
+            "license": "G1234567",
+            "licenseExpiry": "2025-12-31"
+        },
+        {
+            "userName": "doherty_driver",
+            "firstName": "Eva",
+            "lastName": "Davis",
+            "phone": "5085678901",
+            "email": "eva.davis@dohertyhigh.org",
+            "role": "Driver",
+            "license": "D2345678",
+            "licenseExpiry": "2025-11-30"
+        },
+        {
+            "userName": "nelson_driver",
+            "firstName": "Frank",
+            "lastName": "Miller",
+            "phone": "5086789012",
+            "email": "frank.miller@nelsonplace.org",
+            "role": "Driver",
+            "license": "N3456789",
+            "licenseExpiry": "2026-01-15"
+        }
+    ]
+}

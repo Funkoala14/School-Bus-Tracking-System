@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
-const { MONGO_URI } = process.env.MONGO_URI;
+import config from './config.js';
+
+const { MONGO_URI } = config;
 
 mongoose.set('strictQuery', false);
 mongoose

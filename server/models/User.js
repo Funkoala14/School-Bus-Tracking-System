@@ -4,11 +4,12 @@ const options = { discriminatorKey: 'role', timestamps: true };
 
 const UserSchema = new Schema(
     {
-        userName: { type: String, unique: true, required: true, lowercase: true },
-        firstName: { type: String, required: true },
-        lastName: { type: String, required: true },
-        phone: { type: String, unique: true, required: true },
-        email: { type: String, unique: true, required: true, lowercase: true },
+        userName: { type: String, unique: true, required: true, lowercase: true, trim: true },
+        firstName: { type: String, required: true, trim: true },
+        lastName: { type: String, required: true, trim: true },
+        phone: { type: String, unique: true, required: true, trim: true },
+        email: { type: String, unique: true, required: true, lowercase: true, trim: true },
+        password: { type: String, required: true, trim: true },
     },
     options
 );
