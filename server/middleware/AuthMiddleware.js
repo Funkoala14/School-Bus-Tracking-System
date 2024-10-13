@@ -13,8 +13,8 @@ export const jwtValidation = (req, res, next) => {
 
         // get user info from token
         req.user = {
-            userid: decodedToken.id,
-            username: decodedToken.username,
+            userId: decodedToken.id,
+            userName: decodedToken.userName,
             role: decodedToken.role,
             email: decodedToken.email,
             schoolCode: decodedToken.schoolCode,
@@ -34,7 +34,7 @@ export const jwtValidation = (req, res, next) => {
 };
 
 export const checkPermission = (requireRole) => (req, res, next) => {
-    if (!req.user.userid) {
+    if (!req.user.userId) {
         return res.status(401).json({ message: 'Unauthorized user', code: 401 });
     }
 
@@ -54,8 +54,8 @@ export const getTokenInfo = (req, res, next) => {
         try {
             const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
             req.user = {
-                userid: decodedToken.id,
-                username: decodedToken.username,
+                userId: decodedToken.id,
+                userName: decodedToken.userName,
                 role: decodedToken.role,
                 email: decodedToken.email,
                 schoolCode: decodedToken.schoolCode,
@@ -66,5 +66,54 @@ export const getTokenInfo = (req, res, next) => {
         }
     }
 
+    next();
+};
+
+export const createUserValidation = (req, res, next) => {
+    const { userName, password, email, schoolCode, phone } = req.body;
+    console.log('createUserValidation: ', req.body);
+    if (
+        !userName ||
+        !password ||
+        !email ||
+        !schoolCode ||
+        !phone ||
+        validator.isEmpty(userName) ||
+        validator.isEmpty(password) ||
+        validator.isEmpty(email) ||
+        validator.isEmpty(schoolCode) ||
+        validator.isEmpty(phone)
+    ) {
+        return res.status(400).json({ message: 'Missing required fields', code: 400 });
+    }
+
+    if (!validator.isAlphanumeric(userName)) {
+        return res.status(400).json({ message: 'Username must be alphanumeric!' });
+    }
+
+    if (!validator.isEmail(email)) {
+        return res.status(400).json({ message: 'Invalid email format' });
+    }
+
+    if (!validator.isStrongPassword(password)) {
+        return res.status(400).json({ message: 'Password is too weak!' });
+    }
+    next();
+};
+
+export const loginValidation = (req, res, next) => {
+    const { userName, password, email } = req.body;
+    if (
+        (!userName && !email) ||
+        !password ||
+        (validator.isEmpty(userName) && validator.isEmpty(email)) ||
+        validator.isEmpty(password)
+    ) {
+        return res.status(400).json({ message: 'Missing required fields', code: 400 });
+    }
+
+    if (!validator.isAlphanumeric(userName)) {
+        return res.status(400).json({ message: 'Username must be alphanumeric!' });
+    }
     next();
 };
