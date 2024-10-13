@@ -8,8 +8,6 @@ const refType = Schema.Types.ObjectId;
 const ParantSchema = new Schema(
     {
         address: { type: refType, ref: 'Address' },
-        routes: [{ type: refType, ref: 'Route' }],
-        stop: { type: refType, ref: 'Stop' },
         children: [{ type: refType, ref: 'Student' }],
     },
     { timestamps: true }

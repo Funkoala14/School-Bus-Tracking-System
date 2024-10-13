@@ -15,7 +15,6 @@ const studentSchema = new Schema(
         route: { type: refType, ref: 'Route' },
         stop: { type: refType, ref: 'Stop' },
         address: { type: refType, ref: 'Address' },
-        school: { type: refType, ref: 'School' },
     },
     { timestamps: true }
 );

@@ -9,7 +9,6 @@ const DriverSchema = new Schema({
     license: { type: String, required: true, unique: true, trim: true },
     licenseExpiry: { type: Date, required: true },
     assignedBus: { type: refType, ref: 'Bus' },
-    school: { type: refType, ref: 'School' },
 });
 
 const Driver = User.discriminator('Driver', DriverSchema);

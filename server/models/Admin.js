@@ -4,9 +4,7 @@ import User from './User.js';
 
 const refType = Schema.Types.ObjectId;
 
-const AdminSchema = new Schema({
-    school: { type: refType, ref: 'School' },
-});
+const AdminSchema = new Schema({});
 
 const Admin = User.discriminator('Admin', AdminSchema);
 
