@@ -4,7 +4,7 @@ const { JWTSecret } = process.env;
 
 const generateToken = (data) => {
     const token = jwt.sign({ ...data }, JWTSecret, {
-        expiresIn: '1h',
+        expiresIn: '24h',
     });
     return token;
 };

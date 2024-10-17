@@ -1,15 +1,18 @@
 import jwt from 'jsonwebtoken';
 import validator from 'validator';
+import config from '../config/config.js';
 
 export const jwtValidation = (req, res, next) => {
     const token = req.cookies.token;
+
     if (!token || validator.isEmpty(token)) {
         return res.status(401).json({ message: 'No token provided', code: 401 });
     }
 
     try {
         // verify token
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        const decodedToken = jwt.verify(token, config.JWTSecret);
+        console.log(decodedToken);
 
         // get user info from token
         req.user = {
@@ -70,7 +73,7 @@ export const getTokenInfo = (req, res, next) => {
 };
 
 export const createUserValidation = (req, res, next) => {
-    const { userName, password, email, schoolCode, phone } = req.body;
+    const { userName, password, email, schoolCode, phone, firstName, lastName, role } = req.body;
     console.log('createUserValidation: ', req.body);
     if (
         !userName ||
@@ -78,11 +81,16 @@ export const createUserValidation = (req, res, next) => {
         !email ||
         !schoolCode ||
         !phone ||
+        !firstName ||
+        !lastName || !role ||
         validator.isEmpty(userName) ||
         validator.isEmpty(password) ||
         validator.isEmpty(email) ||
         validator.isEmpty(schoolCode) ||
-        validator.isEmpty(phone)
+        validator.isEmpty(phone) ||
+        validator.isEmpty(firstName) ||
+        validator.isEmpty(lastName)||
+        validator.isEmpty(role)
     ) {
         return res.status(400).json({ message: 'Missing required fields', code: 400 });
     }
@@ -95,9 +103,9 @@ export const createUserValidation = (req, res, next) => {
         return res.status(400).json({ message: 'Invalid email format' });
     }
 
-    if (!validator.isStrongPassword(password)) {
-        return res.status(400).json({ message: 'Password is too weak!' });
-    }
+    // if (!validator.isStrongPassword(password)) {
+    //     return res.status(400).json({ message: 'Password is too weak!' });
+    // }
     next();
 };
 
@@ -112,8 +120,5 @@ export const loginValidation = (req, res, next) => {
         return res.status(400).json({ message: 'Missing required fields', code: 400 });
     }
 
-    if (!validator.isAlphanumeric(userName)) {
-        return res.status(400).json({ message: 'Username must be alphanumeric!' });
-    }
     next();
 };

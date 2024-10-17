@@ -1,4 +1,7 @@
-import User from '../models/User';
+import Driver from '../models/Driver.js';
+import Parent from '../models/Parent.js';
+import School from '../models/School.js';
+import User from '../models/User.js';
 
 export const getVerifyToken = async (req, res) => {
     const { role, userId } = req.user || {};
@@ -11,7 +14,7 @@ import generateToken from '../utils/generateToken.js';
 import * as argon2 from 'argon2';
 
 export const postCreateUser = async (req, res) => {
-    const { userName, password, email, schoolCode, phone } = req.body;
+    const { userName, password, email, schoolCode, phone, firstName, lastName, role } = req.body;
 
     try {
         const existingUser = await User.findOne({ $or: [{ email }, { userName }] })
@@ -23,14 +26,38 @@ export const postCreateUser = async (req, res) => {
             return res.status(409).json({ message: 'userName or Email already exists', code: 409 });
         }
 
+        if (!school) {
+            return res.status(404).json({ message: 'school not found', code: 404 });
+        }
+
         const hashedPassword = await argon2.hash(password);
-        const user = await User.create({
-            userName,
-            email,
-            password: hashedPassword,
-            school: school._id,
-            phone,
-        });
+        let user;
+        switch (role) {
+            case 'Parent':
+                user = await Parent.create({
+                    userName,
+                    email,
+                    password: hashedPassword,
+                    school: school._id,
+                    phone,
+                    firstName,
+                    lastName,
+                    role,
+                });
+                break;
+            case 'Driver':
+                user = await Driver.create({
+                    userName,
+                    email,
+                    password: hashedPassword,
+                    school: school._id,
+                    phone,
+                    firstName,
+                    lastName,
+                    role,
+                });
+                break;
+        }
 
         const token = generateToken({
             id: user._id,
@@ -50,6 +77,7 @@ export const postCreateUser = async (req, res) => {
         res.status(201).json({
             message: 'User created successfully',
             code: 201,
+            data: user,
         });
     } catch (error) {
         res.status(500).json({ message: error.message, code: 500 });
@@ -62,7 +90,7 @@ export const postUserLogin = async (req, res) => {
         let filter = {};
         userName && (filter.userName = userName);
         email && (filter.email = userName);
-        const user = await User.findOne(filter).select('-__v').lean().exec();
+        const user = await User.findOne(filter).populate('school').select('-__v').lean().exec();
         if (!user) {
             return res.status(401).json({ message: 'User not exist', code: 401 });
         }
@@ -71,19 +99,23 @@ export const postUserLogin = async (req, res) => {
         if (!ifPasswordCorrect) {
             return res.status(401).json({ message: 'Password not correct', code: 401 });
         }
+        const { role, school, phone } = user;
+
         // generate JWT token
         const token = generateToken({
             id: user._id,
             userName,
             email,
             role,
-            schoolCode,
+            schoolCode: school.code,
             phone,
         });
+        console.log(token);
+
         // set token in cookie
         res.cookie('token', token, {
             httpOnly: true,
-            maxAge: 3600000,
+            maxAge: 24 * 60 * 60 * 1000,
             sameSite: 'strict',
         });
         res.status(200).json({

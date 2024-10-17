@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import authRouter from './routers/AuthRouter.js';
+import userRouter from './routers/UserRouter.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use(morgan(':method :url :status :response-time ms'));
 
 app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 
 app.all('*', (_req, res) => {
     return res.status(404).json({ message: 'API Not Found' });

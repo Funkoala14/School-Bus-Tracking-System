@@ -3,6 +3,7 @@ import Address from './Address.js';
 import Admin from './Admin.js';
 import Bus from './Bus.js';
 import Route from './Route.js';
+import Parent from './Parent.js';
 
 const refType = Schema.Types.ObjectId;
 
@@ -18,8 +19,9 @@ const SchoolSchema = new Schema(
         },
         buses: [{ type: refType, ref: 'Bus' }],
         routes: [{ type: refType, ref: 'Route' }],
-		admins: [{ type: refType, ref: 'Admin' }],
-		drivers: [{ type: refType, ref: 'Driver' }]
+        admins: [{ type: refType, ref: 'Admin' }],
+        drivers: [{ type: refType, ref: 'Driver' }],
+        parents: [{ type: refType, ref: 'Parent' }],
     },
     { timestamps: true }
 );

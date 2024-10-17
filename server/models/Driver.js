@@ -6,8 +6,8 @@ import School from './School.js';
 const refType = Schema.Types.ObjectId;
 
 const DriverSchema = new Schema({
-    license: { type: String, required: true, unique: true, trim: true },
-    licenseExpiry: { type: Date, required: true },
+    license: { type: String,  unique: true, trim: true },
+    licenseExpiry: { type: Date},
     assignedBus: { type: refType, ref: 'Bus' },
 });
 
