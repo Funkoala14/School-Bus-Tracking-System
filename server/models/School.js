@@ -4,6 +4,7 @@ import Admin from './Admin.js';
 import Bus from './Bus.js';
 import Route from './Route.js';
 import Parent from './Parent.js';
+import Student from './Student.js';
 
 const refType = Schema.Types.ObjectId;
 
@@ -22,6 +23,7 @@ const SchoolSchema = new Schema(
         admins: [{ type: refType, ref: 'Admin' }],
         drivers: [{ type: refType, ref: 'Driver' }],
         parents: [{ type: refType, ref: 'Parent' }],
+        students: [{ type: refType, ref: 'Student' }],
     },
     { timestamps: true }
 );

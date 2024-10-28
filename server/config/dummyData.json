@@ -120,5 +120,47 @@
             "license": "N3456789",
             "licenseExpiry": "2026-01-15"
         }
+    ],
+    "parents": [
+        {
+            "userName": "john_doe",
+            "firstName": "John",
+            "lastName": "Doe",
+            "phone": "555-0123",
+            "email": "john.doe@example.com",
+            "password": "password123"
+        },
+        {
+            "userName": "jane_smith",
+            "firstName": "Jane",
+            "lastName": "Smith",
+            "phone": "555-0456",
+            "email": "jane.smith@example.com",
+            "password": "password123"
+        },
+        {
+            "userName": "mike_johnson",
+            "firstName": "Mike",
+            "lastName": "Johnson",
+            "phone": "555-0789",
+            "email": "mike.johnson@example.com",
+            "password": "password123"
+        },
+        {
+            "userName": "emily_brown",
+            "firstName": "Emily",
+            "lastName": "Brown",
+            "phone": "555-1111",
+            "email": "emily.brown@example.com",
+            "password": "password123"
+        },
+        {
+            "userName": "chris_davis",
+            "firstName": "Chris",
+            "lastName": "Davis",
+            "phone": "555-2222",
+            "email": "chris.davis@example.com",
+            "password": "password123"
+        }
     ]
 }

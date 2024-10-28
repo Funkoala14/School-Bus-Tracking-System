@@ -8,9 +8,10 @@ import Stop from './Stop.js';
 const refType = Schema.Types.ObjectId;
 const studentSchema = new Schema(
     {
-        studentid: { type: String, required: true, unique: true },
-        firstname: { type: String, required: true },
-        lastname: { type: String, required: true },
+        studentId: { type: String, required: true, unique: true, trim: true },
+        firstName: { type: String, required: true, trim: true },
+        lastName: { type: String, required: true, trim: true },
+        school: { type: refType, ref: 'School' },
         parent: { type: refType, ref: 'Parent' },
         route: { type: refType, ref: 'Route' },
         stop: { type: refType, ref: 'Stop' },

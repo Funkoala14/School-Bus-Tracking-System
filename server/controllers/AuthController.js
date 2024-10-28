@@ -7,7 +7,7 @@ export const getVerifyToken = async (req, res) => {
     const { role, userId } = req.user || {};
     if (userId) {
         const user = await User.findById(userId).populate('school').lean().exec();
-        res.status(200).json({ message: 'success', data: { ...req.user, school: user.school }, code: 200 });
+        return res.status(200).json({ message: 'success', data: { ...req.user, school: user.school }, code: 200 });
     }
 };
 import generateToken from '../utils/generateToken.js';
@@ -74,13 +74,14 @@ export const postCreateUser = async (req, res) => {
             sameSite: 'strict',
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             message: 'User created successfully',
             code: 201,
             data: user,
         });
     } catch (error) {
-        res.status(500).json({ message: error.message, code: 500 });
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
     }
 };
 
@@ -118,22 +119,23 @@ export const postUserLogin = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000,
             sameSite: 'strict',
         });
-        res.status(200).json({
+        return res.status(200).json({
             message: 'success',
             code: 200,
-            data: { userId: user._id, email, userName },
+            data: { userId: user._id, email, userName, role },
         });
     } catch (error) {
-        res.status(500).json({ message: error.message, code: 500 });
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
     }
 };
 
 export const getUserLogout = (req, res) => {
     try {
         res.clearCookie('token');
-        res.status(200).json({ message: 'Logged out successfully', code: 200 });
+        return res.status(200).json({ message: 'Logged out successfully', code: 200 });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: error.message, code: 500 });
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
     }
 };
