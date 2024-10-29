@@ -1,3 +1,4 @@
+import e from 'express';
 import validator from 'validator';
 
 export const createUserValidation = (req, res, next) => {
@@ -53,7 +54,7 @@ export const addBusValidation = (req, res, next) => {
         const { plate, capacity } = req.body;
         if (!plate || validator.isEmpty(plate)) return res.status(400).json({ message: 'Missing plate', code: 400 });
         if (!capacity) return res.status(400).json({ message: 'Missing capacity', code: 400 });
-        
+
         next();
     } catch (error) {
         console.error(error);
@@ -76,11 +77,24 @@ export const adminAddStudentValidation = (req, res, next) => {
     }
 };
 
-export const parentAddStudent = (req, res, next) => {
+export const parentAddStudentValidation = (req, res, next) => {
     try {
         const { studentId, lastName } = req.body;
         if (!studentId || validator.isEmpty(studentId)) return res.status(400).json({ message: 'Missing studentId', code: 400 });
         if (!lastName || validator.isEmpty(lastName)) return res.status(400).json({ message: 'Missing lastName', code: 400 });
+        next();
+    } catch (error) {
+        console.error(error);
+        return res.status(400).json({ message: 'Missing required info!', code: 400 });
+    }
+};
+
+export const assignDriverValidation = (req, res, next) => {
+    try {
+        const { plate, driverLicense } = req.body;
+        if (!plate || validator.isEmpty(plate)) return res.status(400).json({ message: 'Missing plate', code: 400 });
+        if (!driverLicense || validator.isEmpty(driverLicense))
+            return res.status(400).json({ message: 'Missing driverLicense', code: 400 });
         next();
     } catch (error) {
         console.error(error);

@@ -73,17 +73,18 @@ export const deleteBus = async (req, res) => {
 export const postAssignBusDriver = async (req, res) => {
     try {
         const { plate, driverLicense } = req.body;
-        const driver = await Driver.findOne({ license: driverLicense }).lean().exec();
+        const driver = await Driver.findOne({ license: driverLicense }).exec();
         if (!driver) {
             return res.status(404).json({ message: 'Driver not found', code: 404 });
         }
-        const bus = await Bus.findOne({ plate }).lean().exec();
+        const bus = await Bus.findOne({ plate }).exec();
         if (!bus) {
             return res.status(404).json({ message: 'Bus not found', code: 404 });
         }
         bus.assignedDriver = driver._id;
         driver.assignedBus = bus._id;
-
+        console.log(bus, driver);
+        
         await bus.save();
         await driver.save();
 
