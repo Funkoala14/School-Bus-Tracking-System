@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { createUserValidation, jwtValidation, loginValidation } from '../middleware/AuthMiddleware.js';
+import { jwtValidation } from '../middleware/AuthMiddleware.js';
 import { getUserLogout, getVerifyToken, postCreateUser, postUserLogin } from '../controllers/AuthController.js';
+import { createUserValidation, loginValidation } from '../middleware/ValidationMiddleware.js';
 
 const authRouter = Router();
 

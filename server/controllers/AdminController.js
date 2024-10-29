@@ -1,3 +1,5 @@
+import Bus from '../models/Bus.js';
+import Driver from '../models/Driver.js';
 import School from '../models/School.js';
 import Student from '../models/Student.js';
 import User from '../models/User.js';
@@ -81,7 +83,6 @@ export const postSchoolAddStudent = async (req, res) => {
     const { schoolCode } = req.user;
     try {
         const { student, page = 1, limit = 10 } = req.body;
-        console.log(student);
 
         if (!student.studentId) {
             return res.status(400).json({ message: 'Student must have a valid studentId.' });

@@ -162,5 +162,32 @@
             "email": "chris.davis@example.com",
             "password": "password123"
         }
+    ],
+    "buses": [
+        {
+            "plate": "BUS123",
+            "capacity": 40,
+            "year": 2018
+        },
+        {
+            "plate": "BUS456",
+            "capacity": 50,
+            "year": 2020
+        },
+        {
+            "plate": "BUS789",
+            "capacity": 30,
+            "year": 2015
+        },
+        {
+            "plate": "BUS101",
+            "capacity": 45,
+            "year": 2019
+        },
+        {
+            "plate": "BUS102",
+            "capacity": 60,
+            "year": 2021
+        }
     ]
 }
