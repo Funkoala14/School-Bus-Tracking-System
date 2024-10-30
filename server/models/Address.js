@@ -2,9 +2,10 @@ import { Schema, model } from 'mongoose';
 
 const AddressSchema = new Schema(
     {
-        street: { type: String, trim: true },
-        city: { type: String, trim: true },
-        state: { type: String, trim: true },
+        buildingOrAptNum: { type: String, trim: true },
+        street: { type: String, trim: true, required: true },
+        city: { type: String, trim: true, required: true },
+        state: { type: String, trim: true, required: true },
         zipcode: { type: String, required: true, trim: true },
         address: { type: String, trim: true },
         coordinates: {

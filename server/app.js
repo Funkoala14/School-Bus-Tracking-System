@@ -9,6 +9,7 @@ import userRouter from './routers/UserRouter.js';
 import adminRouter from './routers/AdminRouter.js';
 import parentRouter from './routers/ParentRouter.js';
 import busRouter from './routers/BusRouter.js';
+import routeRouter from './routers/RouteRouter.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -31,6 +32,7 @@ app.use('/api/user', userRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/parent', parentRouter);
 app.use('/api/bus', busRouter);
+app.use('/api/route', routeRouter);
 
 app.all('*', (_req, res) => {
     return res.status(404).json({ message: 'API Not Found' });

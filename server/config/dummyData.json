@@ -32,7 +32,53 @@
                 "lat": "42.308327",
                 "long": "71.794998"
             }
+        },
+        {
+            "street": "23 Elm Street",
+            "city": "Worcester",
+            "state": "MA",
+            "zipcode": "01609",
+            "address": "23 Elm Street, Worcester, MA 01609",
+            "coordinates": {
+                "lat": "42.274278",
+                "long": "-71.803054"
+            }
+        },
+        {
+            "street": "100 Institute Road",
+            "city": "Worcester",
+            "state": "MA",
+            "zipcode": "01609",
+            "address": "100 Institute Road, Worcester, MA 01609",
+            "coordinates": {
+                "lat": "42.274866",
+                "long": "-71.806110"
+            }
+        },
+        {
+            "street": "50 Salisbury Street",
+            "city": "Worcester",
+            "state": "MA",
+            "zipcode": "01609",
+            "address": "50 Salisbury Street, Worcester, MA 01609",
+            "coordinates": {
+                "lat": "42.275654",
+                "long": "-71.801472"
+            }
+        },
+        {
+            "street": "7 Hillside Street",
+            "city": "Worcester",
+            "state": "MA",
+            "zipcode": "01610",
+            "address": "7 Hillside Street, Worcester, MA 01610",
+            "coordinates": {
+                "lat": "42.248794",
+                "long": "-71.812608"
+            }
         }
+        
+        
     ],
     "schools": [
         {
@@ -188,6 +234,40 @@
             "plate": "BUS102",
             "capacity": 60,
             "year": 2021
+        }
+    ],
+    "routes": [
+        {
+            "name": "Route A - Goddard School Inbound",
+            "direction": "inbound"
+        },
+        {
+            "name": "Route A - Goddard School Outbound",
+            "direction": "outbound"
+        },
+        {
+            "name": "Route B - Doherty High Inbound",
+            "direction": "inbound"
+        },
+        {
+            "name": "Route B - Doherty High Outbound",
+            "direction": "outbound"
+        },
+        {
+            "name": "Route C - Nelson Place Inbound",
+            "direction": "inbound"
+        },
+        {
+            "name": "Route C - Nelson Place Outbound",
+            "direction": "outbound"
+        },
+        {
+            "name": "Route D - Combined Schools Inbound",
+            "direction": "inbound"
+        },
+        {
+            "name": "Route D - Combined Schools Outbound",
+            "direction": "outbound"
         }
     ]
 }

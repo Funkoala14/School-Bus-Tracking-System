@@ -6,9 +6,17 @@ export const getUserProfile = async (req, res) => {
     try {
         let populateStr = '';
         if (role === 'Driver') {
-            populateStr = 'school assignedBus';
+            populateStr = [
+                { path: 'school', select: '_id code name address contactInfo' },
+                { path: 'assignedBus', select: '-__v -school -assignedRoutes' },
+            ];
         } else {
             populateStr = 'school address children';
+            populateStr = [
+                { path: 'school', select: '_id code name address contactInfo' },
+                { path: 'address', select: '-__v' },
+                { path: 'children', select: '-__v -school' },
+            ];
         }
         const user = await User.findById(userId).select('-password -__v').populate(populateStr).lean().exec();
 

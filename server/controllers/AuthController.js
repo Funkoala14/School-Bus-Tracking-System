@@ -59,6 +59,10 @@ export const postCreateUser = async (req, res) => {
                 break;
         }
 
+        user = user.toObject();
+        delete user.password;
+        delete user.__v;
+
         const token = generateToken({
             id: user._id,
             userName,

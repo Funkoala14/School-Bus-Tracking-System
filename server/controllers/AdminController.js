@@ -28,13 +28,12 @@ export const getUserList = async (req, res) => {
 export const getDriverList = async (req, res) => {
     const { schoolCode } = req.user;
     try {
-        const school = await School.findOne({ code: schoolCode }).lean().exec();
-        const user = await User.find({ role: 'Driver', school: school._id }).select('-__v').populate('assignedBus school').lean().exec();
-        if (!user) {
-            return res.status(404).json({ message: 'Driver not found', code: 404 });
-        }
+        const school = await School.findOne({ code: schoolCode })
+            .populate({ path: 'drivers', select: '-password -school -__v' })
+            .lean()
+            .exec();
 
-        return res.status(200).json({ message: 'success', code: 200, data: user });
+        return res.status(200).json({ message: 'success', code: 200, data: { list: school.drivers } });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error', code: 500 });
@@ -45,13 +44,12 @@ export const getParentList = async (req, res) => {
     const { schoolCode } = req.user;
 
     try {
-        const school = await School.findOne({ code: schoolCode }).lean().exec();
-        const user = await User.find({ role: 'Parent', school: school._id }).select('-__v').populate('address children').lean().exec();
-        if (!user) {
-            return res.status(404).json({ message: 'Parent not found', code: 404 });
-        }
+        const school = await School.findOne({ code: schoolCode })
+            .populate({ path: 'parents', select: '-password -school -__v', populate: 'children' })
+            .lean()
+            .exec();
 
-        return res.status(200).json({ message: 'success', code: 200, data: user });
+        return res.status(200).json({ message: 'success', code: 200, data: { list: school.parents } });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error', code: 500 });
@@ -62,17 +60,12 @@ export const getStudentList = async (req, res) => {
     const { schoolCode } = req.user;
 
     try {
-        const school = await School.findOne({ code: schoolCode }).lean().exec();
-        const user = await User.find({ role: 'Student', school: school._id })
-            .select('-__v')
-            .populate('parent address route stop children')
+        const school = await School.findOne({ code: schoolCode })
+            .populate({ path: 'students', select: '-school -__v', populate: { path: 'address', select: '-school -__v' } })
             .lean()
             .exec();
-        if (!user) {
-            return res.status(404).json({ message: 'Student not found', code: 404 });
-        }
 
-        return res.status(200).json({ message: 'success', code: 200, data: user });
+        return res.status(200).json({ message: 'success', code: 200, data: { list: school.students } });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error', code: 500 });
@@ -136,3 +129,17 @@ export const postSchoolAddStudent = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', code: 500 });
     }
 };
+
+export const postEditStudentInfo = async(req, res) => {
+
+}
+
+export const postAssignRouteToStudent = (req, res) => {
+    const { schoolCode } = req.user;
+    try {
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
+    }
+}
