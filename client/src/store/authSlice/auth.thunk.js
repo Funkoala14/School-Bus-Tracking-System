@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { post } from '../../services/api';
+import { get, post } from '../../services/api';
 import { showNotification } from '../notificationSlice/notification.slice';
 
 export const loginThunk = createAsyncThunk('auth/login', async ({ userName, password }, { rejectWithValue, dispatch }) => {
@@ -49,14 +49,21 @@ const verifyThunk = createAsyncThunk('auth/verify', async (_, { rejectWithValue 
 });
 
 // Async thunk for logging out
-const logoutThunk = createAsyncThunk('auth/logout', async (_, { rejectWithValue, dispatch }) => {
+export const logoutThunk = createAsyncThunk('auth/logout', async (_, { rejectWithValue, dispatch }) => {
     try {
         // Send the logout request to the server (this assumes your server clears any session-related info)
-        await get('/auth/logout');
+        const res = await get('/auth/logout');
         await localStorage.removeItem('persist:root');
         window.location.href = '/login';
     } catch (error) {
-        return rejectWithValue(error.response?.data || 'Logout failed');
+        const errorMessage = error.response?.data?.message || 'Something went wrong';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
     }
 });
 
