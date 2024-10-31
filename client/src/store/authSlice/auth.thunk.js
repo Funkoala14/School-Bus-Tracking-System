@@ -1,13 +1,23 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { post } from '../../services/api';
+import { showNotification } from '../notificationSlice/notification.slice';
 
-export const loginThunk = createAsyncThunk('auth/login', async ({ userName, password }, { rejectWithValue }) => {
+export const loginThunk = createAsyncThunk('auth/login', async ({ userName, password }, { rejectWithValue, dispatch }) => {
     try {
         const { data, message } = await post('/auth/login', { userName, password });
         // Assuming the response structure: { message, code, data: { userId, userName, role } }
+        const { role } = data;
+        window.location.href = `/${role.toLowerCase()}/home`
         return data; // Return user data if successful
     } catch (error) {
-        return rejectWithValue(error.response?.data || 'Login failed');
+        const errorMessage = error.response?.data?.message || 'Something went wrong';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
     }
 });
 
@@ -50,4 +60,3 @@ const logoutThunk = createAsyncThunk('auth/logout', async (_, { rejectWithValue,
     }
 });
 
-export { loginThunk, signupThunk, verifyThunk, logoutThunk };

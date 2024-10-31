@@ -24,21 +24,21 @@ const NotFound = () => {
 const AppRouter = () => {
     const paths = {
         adminPaths: [
-            { title: 'Route management', path: '/profile', icon: <AssignmentIndIcon /> },
+            { title: 'Route management', path: '/', icon: <AssignmentIndIcon /> },
             { title: 'Bus management', path: '/', icon: <DirectionsBusIcon /> },
             { title: 'Student management', path: '/', icon: <PinDropIcon /> },
             { title: 'Parent management', path: '/', icon: <NotificationsActiveIcon /> },
             { title: 'REQUEST', path: '/', icon: <SendIcon /> },
         ],
         parentPaths: [
-            { title: 'PROFILE', path: '/profile', icon: <AssignmentIndIcon /> },
+            { title: 'PROFILE', path: '/parent/profile', icon: <AssignmentIndIcon /> },
             { title: 'BUS TRACKER', path: '/', icon: <DirectionsBusIcon /> },
             { title: 'BUS ROUTE', path: '/', icon: <PinDropIcon /> },
             { title: 'NOTIFICATION', path: '/', icon: <NotificationsActiveIcon /> },
             { title: 'REQUEST', path: '/', icon: <SendIcon /> },
         ],
         driverPaths: [
-            { title: 'PROFILE', path: '/profile', icon: <AssignmentIndIcon /> },
+            { title: 'PROFILE', path: '/driver/profile', icon: <AssignmentIndIcon /> },
             { title: 'Location TRACKER', path: '/skills', icon: <DirectionsBusIcon /> },
             { title: 'ROUTE Schedule', path: '/projects', icon: <PinDropIcon /> },
         ],
@@ -56,25 +56,26 @@ const AppRouter = () => {
                     className='h-full w-full'
                 >
                     <Routes>
-                        <Route
-                            path='/'
-                            element={
-                                <MainLayout paths={paths.parentPaths}>
-                                    <Home />
-                                </MainLayout>
-                            }
-                        />
                         <Route path='/login' element={<Login />} />
                         <Route path='/Register/:type' element={<Register />} />
 
                         <Route
-                            path='driver'
+                            path='admin'
                             element={
                                 <PrivateRoute allowedRoles={['Driver']}>
                                     <Outlet /> {/* Outlet to render nested routes */}
                                 </PrivateRoute>
                             }
-                        ></Route>
+                        >
+                            <Route
+                                path='home'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <Home />
+                                    </MainLayout>
+                                }
+                            />
+                        </Route>
 
                         <Route
                             path='parent'
@@ -84,6 +85,14 @@ const AppRouter = () => {
                                 </PrivateRoute>
                             }
                         >
+                            <Route
+                                path='home'
+                                element={
+                                    <MainLayout paths={paths.parentPaths}>
+                                        <Home />
+                                    </MainLayout>
+                                }
+                            />
                             <Route path='profile' element={<Profile />} />
                         </Route>
 
@@ -95,6 +104,14 @@ const AppRouter = () => {
                                 </PrivateRoute>
                             }
                         >
+                            <Route
+                                path='home'
+                                element={
+                                    <MainLayout paths={paths.driverPaths}>
+                                        <Home />
+                                    </MainLayout>
+                                }
+                            />
                             <Route path='profile' element={<Profile />} />
                         </Route>
 

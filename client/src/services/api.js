@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create Axios instance with base URL
 const api = axios.create({
-    baseURL: '/v1/api',
+    baseURL: '/api',
     withCredentials: true, // Include cookies if needed
 });
 
@@ -80,7 +80,7 @@ const del = async (url) => {
 
 const upload = async (url, data) => {
     const axiosInstance = await axios.create({
-        baseURL: '/v1/api',
+        baseURL: '/api',
         headers: {
             'Content-Type': 'multipart/form-data',
         },

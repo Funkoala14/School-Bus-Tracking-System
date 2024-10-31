@@ -1,10 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // Default is localStorage for web
 import authReducer from './authSlice/auth.slice';
+import notificationReducer from "./notificationSlice/notification.slice.js";
 
 const rootReducer = combineReducers({
     auth: authReducer,
+    notification: notificationReducer,
 });
 
 // Persist configuration

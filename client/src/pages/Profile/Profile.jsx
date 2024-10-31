@@ -12,7 +12,7 @@ const Profile = () => {
     const navigate = useNavigate();
 
     const goBack = () => {
-        navigate('/home')
+        navigate(-1)
     }
 
     return <div className="h-full w-full">

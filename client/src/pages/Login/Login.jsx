@@ -15,26 +15,23 @@ import cs from 'classnames';
 import { useState } from 'react';
 import styles from './Login.module.scss';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginThunk } from '../../store/authSlice/auth.thunk';
 
 const Login = () => {
     const [formData, setFormData] = useState({
-        email: '',
+        userName: '',
         password: '',
     });
     const [formErrors, setFormErrors] = useState({
-        email: '',
+        userName: '',
         password: '',
     });
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
-
-    // Email validation function
-    const validateEmail = (email) => {
-        const re = /\S+@\S+\.\S+/; // Simple email regex
-        return re.test(email);
-    };
-
+    const dispatch = useDispatch();
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -42,22 +39,17 @@ const Login = () => {
             [name]: value,
         }));
 
-        // Validation logic for email
-        if (name === 'email') {
+        // Validation logic for userName
+        if (name === 'userName') {
             if (!value) {
                 setFormErrors((prevErrors) => ({
                     ...prevErrors,
-                    email: 'Email is required',
-                }));
-            } else if (!validateEmail(value)) {
-                setFormErrors((prevErrors) => ({
-                    ...prevErrors,
-                    email: 'Invalid email address',
+                    userName: 'userName is required',
                 }));
             } else {
                 setFormErrors((prevErrors) => ({
                     ...prevErrors,
-                    email: '',
+                    userName: '',
                 }));
             }
         }
@@ -80,16 +72,16 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formErrors.email && !formErrors.password && formData.email && formData.password) {
+        if (!formErrors.userName && !formErrors.password && formData.userName && formData.password) {
             // Handle login logic here
             console.log('Form submitted', formData);
-            navigate('/home');
+            dispatch(loginThunk(formData));
         } else {
             // If there are errors, or the form is incomplete
-            if (!formData.email) {
+            if (!formData.userName) {
                 setFormErrors((prevErrors) => ({
                     ...prevErrors,
-                    email: 'Email is required',
+                    userName: 'userName is required',
                 }));
             }
             if (!formData.password) {
@@ -122,18 +114,18 @@ const Login = () => {
             />
             <div className='w-full max-w-sm mx-auto py-2 px-8'>
                 <form onSubmit={handleSubmit}>
-                    {/* Email Input */}
-                    <FormControl className='w-full mb-4' error={!!formErrors.email} required>
+                    {/* userName Input */}
+                    <FormControl className='w-full mb-4' error={!!formErrors.userName} required>
                         <TextField
                             label=''
                             variant='outlined'
-                            name='email'
-                            value={formData.email}
+                            name='userName' // Ensure this matches your state
+                            value={formData.userName} // Ensure value is defined
                             onChange={handleChange}
-                            placeholder='Email'
+                            placeholder='UserName'
                             className={cs({
                                 [styles.input]: true,
-                                [styles.error]: !!formErrors.email,
+                                [styles.error]: !!formErrors.userName,
                             })}
                         />
                     </FormControl>

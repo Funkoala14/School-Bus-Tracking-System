@@ -16,9 +16,12 @@ const Nav = ({ paths, onToggle }) => (
         </Box>
         <List sx={{ width: 250, bgcolor: 'primary.dark', color: '#fff', height: '100%' }} onClick={onToggle}>
             {paths.map((item, index) => (
-                <ListItem button key={index} component={Link} to={item.path} sx={{p: '0 1.6rem'}}>
-                    {item.icon}
-                    <ListItemText primary={item.title} sx={{ p: 2 }} />
+                <ListItem key={index} sx={{ p: '0 1.6rem' }}>
+                    <Link to={item.path} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: "center" }}>
+                        {/* Ensure Link styles don't affect ListItem */}
+                        {item.icon}
+                        <ListItemText primary={item.title} sx={{ p: 2 }} />
+                    </Link>
                 </ListItem>
             ))}
         </List>
