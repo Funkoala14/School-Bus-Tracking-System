@@ -91,7 +91,7 @@ export const getRouteDetail = async (req, res) => {
         const parent = await Parent.findById(userId).populate('children').lean().exec();
         return res.status(200).json({
             message: 'success',
-            data: parent.children,
+            data: parent?.children || [],
         });
     } catch (error) {
         console.error(error);

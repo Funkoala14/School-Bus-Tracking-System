@@ -46,7 +46,7 @@ export const deleteBus = async (req, res) => {
     try {
         const { busId = null } = req.body;
         if (!busId) return res.status(400).json({ message: 'Missing bus id', code: 400 });
-        const deletedBus = await Bus.findOneAndDelete({ plate }).lean().exec();
+        const deletedBus = await Bus.findByIdAndDelete({ busId }).lean().exec();
         if (!deletedBus) {
             return res.status(404).json({ message: 'Bus not found', code: 404 });
         }
