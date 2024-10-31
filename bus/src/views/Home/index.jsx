@@ -4,28 +4,74 @@ import { Link } from 'react-router-dom';
 const Home = () => {
     const [showDivider, setShowDivider] = useState(false);
 
-    const list = [
-        {
-            title: 'PROFILE',
-            path: '/profile'
-        },
-        {
-            title: 'BUS TRACKER',
-            path: '/skills'
-        },
-        {
-            title: 'BUS ROUTE',
-            path: '/projects'
-        },
-        {
-            title: 'NOTIFICATION',
-            path: '/contact'
-        },
-        {
-            title: 'REQUEST',
-            path: '/contact'
-        }
-    ]
+    const list = {
+        adminPaths: [
+            {
+                title: 'PROFILE',
+                path: '/profile',
+            },
+            {
+                title: 'BUS TRACKER',
+                path: '/skills',
+            },
+            {
+                title: 'BUS ROUTE',
+                path: '/projects',
+            },
+            {
+                title: 'NOTIFICATION',
+                path: '/contact',
+            },
+            {
+                title: 'REQUEST',
+                path: '/contact',
+            },
+        ],
+        parentPaths: [
+            {
+                title: 'PROFILE',
+                path: '/profile',
+            },
+            {
+                title: 'BUS TRACKER',
+                path: '/skills',
+            },
+            {
+                title: 'BUS ROUTE',
+                path: '/projects',
+            },
+            {
+                title: 'NOTIFICATION',
+                path: '/contact',
+            },
+            {
+                title: 'REQUEST',
+                path: '/contact',
+            },
+        ],
+        driverPaths: [
+            {
+                title: 'PROFILE',
+                path: '/profile',
+            },
+            {
+                title: 'BUS TRACKER',
+                path: '/skills',
+            },
+            {
+                title: 'BUS ROUTE',
+                path: '/projects',
+            },
+            {
+                title: 'NOTIFICATION',
+                path: '/contact',
+            },
+            {
+                title: 'REQUEST',
+                path: '/contact',
+            },
+        ],
+    };
 
     return <div className={`w-full h-full overflow-hidden`}>
         <div className={`w-full h-full flex transition-all duration-500 ease-in-out ${showDivider ? `-translate-x-[70%]` : ''}`}>
