@@ -88,7 +88,17 @@ export const postSetAddress = async (req, res) => {
 export const getRouteDetail = async (req, res) => {
     const { userId } = req.user;
     try {
-        const parent = await Parent.findById(userId).populate('children').lean().exec();
+        const parent = await Parent.findById(userId)
+            .populate({
+                path: 'children',
+                select: '-school -parent -address -__v',
+                populate: [
+                    { path: 'stop', select: '-__v' },
+                    { path: 'route', select: '-school -stops -__v' },
+                ],
+            })
+            .lean()
+            .exec();
         return res.status(200).json({
             message: 'success',
             data: parent?.children || [],

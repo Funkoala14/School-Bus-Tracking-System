@@ -159,13 +159,13 @@ export const getAllRoutes = async (req, res) => {
 
 export const postAddStop = async (req, res) => {
     try {
-        const { routeId, address, routeName } = req.body;
+        const { routeId, address, stopName } = req.body;
         const route = await Route.findById(routeId);
         if (!route) return res.status(404).json({ message: 'Route not found' });
         const newAddress = await Address.create(address);
         const order = route.stops.length + 1;
         const newStop = await Stop.create({
-            routeName,
+            stopName,
             address: newAddress._id,
             route: route._id,
             order,
@@ -200,7 +200,7 @@ export const postUpdateStop = async (req, res) => {
         const { list } = req.body;
         let updatedStops = [];
         const stopUpdates = list.map(async (stopData, i) => {
-            const { _id, routeName, address } = stopData;
+            const { _id, stopName, address } = stopData;
             if (address) {
                 const updatedAddress = await Address.findByIdAndUpdate(address._id, address, { new: true, session });
 
@@ -209,7 +209,7 @@ export const postUpdateStop = async (req, res) => {
                 }
             }
 
-            const updatedStop = await Stop.findByIdAndUpdate(_id, { routeName, order: i + 1 }, { new: true, session }).populate('address');
+            const updatedStop = await Stop.findByIdAndUpdate(_id, { stopName, order: i + 1 }, { new: true, session }).populate('address');
 
             if (!updatedStop) {
                 throw new Error(`Stop with id ${_id} not found`);

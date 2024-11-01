@@ -174,7 +174,7 @@ const createErrorResponse = (message) => ({
     code: 400,
 });
 
-const stopValidation = (stop, type) => {
+const stopValidation = (stop, type = 'new') => {
     const { stopId = '', _id = '', address, stopName } = stop;
     if (type !== 'new') {
         if ((!stopId && !_id) || (validator.isEmpty(stopId) && validator.isEmpty(_id)))
@@ -210,9 +210,9 @@ const addressValidation = (address) => {
 export const addStopValidation = (req, res, next) => {
     try {
         const { routeId } = req.body;
-        if(!routeId) return   res.status(400).json({ message: 'Missing route id', code: 400 });
+        if(!routeId) return res.status(400).json({ message: 'Missing route id', code: 400 });
         
-        const validationError = stopValidation(req.body);
+        const validationError = stopValidation(req.body, 'new');
         if (validationError) {
             return res.status(400).json(validationError);
         }
@@ -232,7 +232,7 @@ export const stopsValidation = (req, res, next) => {
 
     try {
         for (const stop of list) {
-            const validationError = stopValidation(stop);
+            const validationError = stopValidation(stop, "update");
             if (validationError) {
                 return res.status(400).json(validationError);
             }
