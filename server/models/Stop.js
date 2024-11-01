@@ -6,8 +6,8 @@ const refType = Schema.Types.ObjectId;
 
 const StopSchema = new Schema(
     {
-        name: { type: String, trim: true, required: true },
-        location: { type: refType, ref: 'Address' },
+        stopName: { type: String, trim: true, required: true },
+        address: { type: refType, ref: 'Address' },
         order: { type: Number, required: true },
         stopTime: { type: String },
         route: { type: refType, ref: 'Route', required: true },
