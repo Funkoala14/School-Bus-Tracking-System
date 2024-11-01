@@ -1,12 +1,21 @@
 import { model, Schema } from 'mongoose';
 import Address from './Address.js';
+import Route from './Route.js';
 
 const refType = Schema.Types.ObjectId;
 
 const StopSchema = new Schema(
     {
-        location: { type: refType, ref: 'Address' },
+        stopName: { type: String, trim: true, required: true },
+        address: { type: refType, ref: 'Address' },
         order: { type: Number, required: true },
+        stopTime: { type: String },
+        route: { type: refType, ref: 'Route', required: true },
+        direction: {
+            type: String,
+            enum: ['inbound', 'outbound'],
+            required: true,
+        },
     },
     { timestamps: true }
 );

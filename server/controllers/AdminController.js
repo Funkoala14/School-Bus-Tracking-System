@@ -1,6 +1,8 @@
+import validator from 'validator';
 import Bus from '../models/Bus.js';
 import Driver from '../models/Driver.js';
 import School from '../models/School.js';
+import Stop from '../models/Stop.js';
 import Student from '../models/Student.js';
 import User from '../models/User.js';
 
@@ -61,7 +63,15 @@ export const getStudentList = async (req, res) => {
 
     try {
         const school = await School.findOne({ code: schoolCode })
-            .populate({ path: 'students', select: '-school -__v', populate: { path: 'address', select: '-school -__v' } })
+            .populate({
+                path: 'students',
+                select: '-school -__v',
+                populate: [
+                    { path: 'address', select: '-school -__v' },
+                    { path: 'stop', select: '-__v' },
+                    { path: 'route', select: '-school -__v' },
+                ],
+            })
             .lean()
             .exec();
 
@@ -130,16 +140,20 @@ export const postSchoolAddStudent = async (req, res) => {
     }
 };
 
-export const postEditStudentInfo = async(req, res) => {
+export const postEditStudentInfo = async (req, res) => {};
 
-}
-
-export const postAssignRouteToStudent = (req, res) => {
-    const { schoolCode } = req.user;
+export const postAssignStopToStudent = async (req, res) => {
     try {
-        
+        const { studentId, stopId } = req.body;
+        if (!studentId || validator.isEmpty(studentId)) return res.status(400).json({ message: 'Missing student id', code: 400 });
+        if (!stopId || validator.isEmpty(stopId)) return res.status(400).json({ message: 'Missing stop id', code: 400 });
+
+        const stop = await Stop.findById(stopId);
+        const student = await Student.findByIdAndUpdate(studentId, { $set: { stop: stop._id, route: stop.route } });
+
+        return res.status(200).json({ message: 'Stops assigned successfully', code: 200 });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error', code: 500 });
     }
-}
+};
