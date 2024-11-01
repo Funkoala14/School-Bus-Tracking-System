@@ -1,7 +1,7 @@
 // src/router.jsx
 import { CircularProgress } from '@mui/material';
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Loading from './components/Loading';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from './layouts/MainLayout';
@@ -10,6 +10,7 @@ import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import PinDropIcon from '@mui/icons-material/PinDrop';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import SendIcon from '@mui/icons-material/Send';
+import { useSelector } from 'react-redux';
 
 const Home = lazy(() => import('@pages/Home/Home'));
 const Login = lazy(() => import('@pages/Login/Login'));
@@ -44,6 +45,15 @@ const AppRouter = () => {
         ],
     };
 
+    const { isLoggedIn, role } = useSelector((state) => state.auth);
+    const getHomeRote = () => {
+        if (!isLoggedIn) return <Navigate to='/login' />;
+        if (role === 'Admin') return <Navigate to='/admin/home' />;
+        if (role === 'Parent') return <Navigate to='/parent/home' />;
+        if (role === 'Driver') return <Navigate to='/driver/home' />;
+        return <Navigate to='/login' />;
+    };
+
     return (
         <Suspense fallback={<Loading />}>
             <AnimatePresence mode='wait'>
@@ -56,6 +66,7 @@ const AppRouter = () => {
                     className='h-full w-full'
                 >
                     <Routes>
+                        <Route path='/' element={getHomeRote()} />
                         <Route path='/login' element={<Login />} />
                         <Route path='/Register/:type' element={<Register />} />
 
