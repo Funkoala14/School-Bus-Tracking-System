@@ -1,13 +1,9 @@
-import React from 'react';
-import './Home.scss';
-
-function Home() {
+const Home = () => {
     return (
-        <div className='Home'>
-            <h1>Welcome to MyApp</h1>
-            <p>This is the home page.</p>
+        <div className='p-8'>
+            <h1>Welcome to the Home Page!</h1>
         </div>
     );
-}
+};
 
 export default Home;
