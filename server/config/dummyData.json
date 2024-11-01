@@ -77,8 +77,6 @@
                 "long": "-71.812608"
             }
         }
-        
-        
     ],
     "schools": [
         {
@@ -268,6 +266,68 @@
         {
             "name": "Route D - Combined Schools Outbound",
             "direction": "outbound"
+        }
+    ],
+    "stops": [
+        {
+            "routeName": "Worcester Central Station",
+            "address": {
+                "buildingOrAptNum": null,
+                "street": "1 Union Station",
+                "city": "Worcester",
+                "state": "MA",
+                "zipcode": "01608",
+                "address": "1 Union Station, Worcester, MA 01608",
+                "coordinates": {
+                    "lat": "42.2626",
+                    "long": "-71.8023"
+                }
+            }
+        },
+        {
+            "name": "Worcester Public Library",
+            "address": {
+                "buildingOrAptNum": null,
+                "street": "3 Salem Square",
+                "city": "Worcester",
+                "state": "MA",
+                "zipcode": "01608",
+                "address": "3 Salem Square, Worcester, MA 01608",
+                "coordinates": {
+                    "lat": "42.2619",
+                    "long": "-71.8020"
+                }
+            }
+        },
+        {
+            "name": "Worcester City Hall",
+            "address": {
+                "buildingOrAptNum": null,
+                "street": "455 Main St",
+                "city": "Worcester",
+                "state": "MA",
+                "zipcode": "01608",
+                "address": "455 Main St, Worcester, MA 01608",
+                "coordinates": {
+                    "lat": "42.2625",
+                    "long": "-71.8027"
+                }
+            }
+        },
+        {
+            "name": "Elm Park",
+            "address": {
+                "buildingOrAptNum": null,
+                "street": "Hammond St",
+                "city": "Worcester",
+                "state": "MA",
+                "zipcode": "01610",
+                "address": "Hammond St, Worcester, MA 01610",
+                "coordinates": {
+                    "lat": "42.2590",
+                    "long": "-71.8050"
+                }
+            }
         }
     ]
 }

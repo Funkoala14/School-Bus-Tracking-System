@@ -2,6 +2,8 @@ import mongoose, { isObjectIdOrHexString, Types } from 'mongoose';
 import Bus from '../models/Bus.js';
 import Route from '../models/Route.js';
 import School from '../models/School.js';
+import Address from '../models/Address.js';
+import Stop from '../models/Stop.js';
 
 export const postAddRoute = async (req, res) => {
     const { schoolCode } = req.user;
@@ -139,6 +141,41 @@ export const getAllRoutes = async (req, res) => {
             code: 200,
             data: {
                 list: school.routes,
+            },
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
+    }
+};
+
+export const postAddStop = async (req, res) => {
+    try {
+        const { routeId, address, routeName } = req.body;
+        const route = await Route.findById(routeId);
+        if (!route) return res.status(404).json({ message: 'Route not found' });
+        const newAddress = await Address.create(address);
+        const order = route.stops.length + 1;
+        const newStop = await Stop.create({
+            name: routeName,
+            location: newAddress._id,
+            route: route._id,
+            order,
+            direction: route.direction,
+        });
+        route.stops.push(newStop);
+        await route.save();
+
+        const populatedRoute = await route.populate({
+            path: 'stops',
+            populate: { path: 'location' },
+        });
+
+        return res.status(200).json({
+            message: 'Stop added successfully',
+            code: 200,
+            data: {
+                list: populatedRoute.stops,
             },
         });
     } catch (error) {

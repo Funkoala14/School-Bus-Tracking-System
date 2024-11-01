@@ -159,3 +159,29 @@ export const setAddressValidation = (req, res, next) => {
         return res.status(400).json({ message: 'Missing required info!', code: 400 });
     }
 };
+
+export const addStopValidation = (req, res, next) => {
+    try {
+        const { routeId, address, routeName } = req.body;
+        if (!routeId || validator.isEmpty(routeId)) return res.status(400).json({ message: 'Missing route id', code: 400 });
+        if (!routeName || validator.isEmpty(routeName)) return res.status(400).json({ message: 'Missing route name', code: 400 });
+        if (!address) return res.status(400).json({ message: 'Missing address', code: 400 });
+        const { street, city, state, zipcode, coordinates } = address;
+        if (!street || validator.isEmpty(street)) return res.status(400).json({ message: 'Missing street info', code: 400 });
+        if (!city || validator.isEmpty(city)) return res.status(400).json({ message: 'Missing city info', code: 400 });
+        if (!state || validator.isEmpty(state)) return res.status(400).json({ message: 'Missing state info', code: 400 });
+        if (!zipcode || validator.isEmpty(zipcode)) return res.status(400).json({ message: 'Missing zipcode info', code: 400 });
+        if (
+            !coordinates ||
+            !coordinates.lat ||
+            !coordinates.long ||
+            validator.isEmpty(coordinates.lat) ||
+            validator.isEmpty(coordinates.long)
+        )
+            return res.status(400).json({ message: 'Missing coordinates info', code: 400 });
+        next();
+    } catch (error) {
+        console.error(error);
+        return res.status(400).json({ message: 'Missing required info!', code: 400 });
+    }
+};
