@@ -4,11 +4,12 @@ import Route from '../models/Route.js';
 import School from '../models/School.js';
 import Address from '../models/Address.js';
 import Stop from '../models/Stop.js';
+import validator from 'validator';
 
 export const postAddRoute = async (req, res) => {
     const { schoolCode } = req.user;
     try {
-        const { name } = req.body;
+        const { name, direction } = req.body;
         const school = await School.findOne({ code: schoolCode }).lean().exec();
         // check if this route name already exsit in current school
         const exisgingRoutes = await Route.findOne({ name, school: school._id }).lean().exec();
@@ -17,6 +18,14 @@ export const postAddRoute = async (req, res) => {
         }
 
         const newRoute = await new Route({ ...req.body, school: school._id });
+        const schoolStop = await Stop.create({
+            stopName: `${school.name} (School)`,
+            address: school.address,
+            route: newRoute._id,
+            order: 0,
+            direction,
+        });
+        newRoute.stops = [schoolStop._id];
 
         await School.findOneAndUpdate(
             { code: schoolCode },
@@ -25,7 +34,7 @@ export const postAddRoute = async (req, res) => {
         );
         await newRoute.save();
 
-        const routes = await Route.find({ school: school._id }).select('-__v').lean().exec();
+        const routes = await Route.find({ school: school._id }).select('-__v').populate('stops').lean().exec();
 
         return res.status(200).json({
             message: 'Route added successfully',
@@ -49,6 +58,10 @@ export const deleteRoute = async (req, res) => {
         if (!deleteRoute) {
             return res.status(404).json({ message: 'Route not found', code: 404 });
         }
+
+        // Delete all stops associated with the route
+        await Stop.deleteMany({ route: routeId }).exec();
+
         const school = await School.findOne({ code: schoolCode });
         const routes = await Route.find({ school: school._id }).select('-__v').lean().exec();
         school.routes = routes;
@@ -160,10 +173,14 @@ export const getAllRoutes = async (req, res) => {
 export const postAddStop = async (req, res) => {
     try {
         const { routeId, address, stopName } = req.body;
-        const route = await Route.findById(routeId);
+        const route = await Route.findById(routeId).populate({
+            path: 'stops',
+            populate: { path: 'address' },
+        });
         if (!route) return res.status(404).json({ message: 'Route not found' });
         const newAddress = await Address.create(address);
-        const order = route.stops.length + 1;
+        const order = route.direction === 'outbound' ? route.stops.length : route.stops.length - 1;
+
         const newStop = await Stop.create({
             stopName,
             address: newAddress._id,
@@ -171,10 +188,21 @@ export const postAddStop = async (req, res) => {
             order,
             direction: route.direction,
         });
-        route.stops.push(newStop);
+
+        // Insert the new stop in the correct position based on route direction
+        if (route.direction === 'outbound') {
+            route.stops.push(newStop); // Add before the last stop (school)
+        } else {
+            const lastStop = route.stops.at(-1);
+
+            route.stops.splice(route.stops.length - 1, 0, newStop); // Add after all stops for inbound (school is last)
+            const newLstStop = await Stop.findByIdAndUpdate(lastStop._id, { $set: { order: route.stops.length - 1 } }, { new: true });
+            console.log('last', route.stops.length, newLstStop);
+        }
+
         await route.save();
 
-        const populatedRoute = await route.populate({
+        const populatedRoute = await Route.findById(route._id).populate({
             path: 'stops',
             populate: { path: 'address' },
         });
@@ -232,15 +260,17 @@ export const postUpdateStop = async (req, res) => {
 };
 
 export const deleteStop = async (req, res) => {
+    const session = await startSession();
+    session.startTransaction();
+
     try {
         const { stopId, routeId } = req.body;
         if (!routeId || validator.isEmpty(routeId)) return res.status(400).json({ message: 'Missing route id', code: 400 });
         if (!stopId || validator.isEmpty(stopId)) return res.status(400).json({ message: 'Missing stop id', code: 400 });
 
-        const deleteStop = await Stop.findByIdAndDelete(stopId).lean().exec();
+        const deleteStop = await Stop.findByIdAndDelete(stopId, { new: true });
         if (!deleteStop) return res.status(404).json({ message: `Stop with id ${stopId} not found`, code: 404 });
-
-        const updatedRoute = await Route.findByIdAndUpdate(routeId, { $pull: { stops: stopId } }, { new: true }).populate({
+        const route  = await Route.findByIdAndUpdate(routeId, { $pull: { stops: stopId } }, { new: true }).populate({
             path: 'stops',
             populate: 'address',
             options: {
@@ -248,9 +278,21 @@ export const deleteStop = async (req, res) => {
             },
         });
 
-        return res.status(200).json({ message: 'Stops deleted successfully', code: 200, data: updatedRoute.stops });
+        // Reorder stops
+        const stopUpdates = route.stops.map(async (stop, index) => {
+            stop.order = index; // Set order from 0 to n
+            return await stop.save({ session });
+        });
+
+        await Promise.all(stopUpdates);
+        await session.commitTransaction();
+
+        return res.status(200).json({ message: 'Stops deleted successfully', code: 200, data: route.stops });
     } catch (error) {
+        await session.abortTransaction();
         console.error(error);
         return res.status(500).json({ message: 'Internal server error', code: 500 });
+    } finally {
+        session.endSession();
     }
 };

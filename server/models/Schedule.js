@@ -19,7 +19,7 @@ const stopTimeSchema = new Schema(
 const ScheduleSchema = new Schema(
     {
         route: { type: refType, ref: 'Route', required: true },
-        startTime: { type: Date, required: true },
+        startTime: { type: String, required: true },
         stopTimes: [stopTimeSchema],
     },
     { timestamps: true }

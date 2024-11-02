@@ -270,7 +270,7 @@
     ],
     "stops": [
         {
-            "routeName": "Worcester Central Station",
+            "stopName": "Worcester Central Station",
             "address": {
                 "buildingOrAptNum": null,
                 "street": "1 Union Station",
@@ -285,7 +285,7 @@
             }
         },
         {
-            "name": "Worcester Public Library",
+            "stopName": "Worcester Public Library",
             "address": {
                 "buildingOrAptNum": null,
                 "street": "3 Salem Square",
@@ -300,7 +300,7 @@
             }
         },
         {
-            "name": "Worcester City Hall",
+            "stopName": "Worcester City Hall",
             "address": {
                 "buildingOrAptNum": null,
                 "street": "455 Main St",
@@ -315,7 +315,7 @@
             }
         },
         {
-            "name": "Elm Park",
+            "stopName": "Elm Park",
             "address": {
                 "buildingOrAptNum": null,
                 "street": "Hammond St",
@@ -328,6 +328,7 @@
                     "long": "-71.8050"
                 }
             }
-        }
+        },
+        
     ]
 }
