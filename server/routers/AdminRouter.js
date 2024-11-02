@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { checkPermission, jwtValidation } from '../middleware/AuthMiddleware.js';
 import { getDriverList, getParentList, getStudentList, getUserList, postAssignStopToStudent, postSchoolAddStudent } from '../controllers/AdminController.js';
 import { adminAddStudentValidation } from '../middleware/ValidationMiddleware.js';
+import { generateRouteSchedule } from '../controllers/RouteScheduleController.js';
 
 const adminRouter = Router();
 
@@ -12,6 +13,7 @@ adminRouter
     .get('/students', jwtValidation, getStudentList)
     .post('/add-students', adminAddStudentValidation, jwtValidation, postSchoolAddStudent)
     .post('/assign-stop', jwtValidation, postAssignStopToStudent)
+    .post('/generate-schedule', jwtValidation, generateRouteSchedule)
 
 
 export default adminRouter;

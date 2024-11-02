@@ -122,6 +122,8 @@ export const assignDriverValidation = (req, res, next) => {
 
 export const addRouteValidation = (req, res, next) => {
     try {
+        console.log(req.body);
+        
         const { name, direction } = req.body;
         if (!name) return res.status(400).json({ message: 'Missing route name', code: 400 });
         if (!direction) return res.status(400).json({ message: 'Missing route direction', code: 400 });
