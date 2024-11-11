@@ -6,3 +6,4 @@ requirements doc.md
 .DS_Store
 server/.env
 server/.env
+*.env.production
