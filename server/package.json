@@ -5,8 +5,8 @@
     "main": "server.js",
     "type": "module",
     "scripts": {
-        "start": "env-cmd nodemon server.js",
-        "run": "nodemon server.js",
+        "start": "nodemon server.js",
+        "dev": "env-cmd nodemon server.js",
         "seed": "env-cmd node config/seed.js"
     },
     "keywords": [],
