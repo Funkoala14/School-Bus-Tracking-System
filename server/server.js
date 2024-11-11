@@ -15,6 +15,7 @@ const io = new Server(server, {
     },
 });
 
+console.log('config content: ', config.FRONT_URL, config.PORT);
 
 connection.once('open', () => {
     console.log('MongoDB connected successfully');
