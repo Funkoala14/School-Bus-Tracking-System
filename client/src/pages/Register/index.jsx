@@ -13,10 +13,14 @@ const Register = () => {
 
 
     const onRegisterSuccess = (data, token) => {
-
-        // 如果注册成功，则跳转到登录页面
-        // 或者做一些什么操作
-        navigator(`/login`)
+        console.log(data, token)
+        if (type === 'parent') {
+            // redirect to parent dashboard
+            navigator('/profile')
+        } else {
+            // redirect to driver dashboard
+            setOpen(true)
+        }
     }
 
     const handleClose = (event, reason) => {

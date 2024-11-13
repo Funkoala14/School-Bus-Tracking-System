@@ -7,9 +7,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import Loading from './components/Loading.jsx';
 import store, { persistor } from './store/store.js';
-import dayjs from 'dayjs';
-import 'dayjs/locale/en-nz';
-dayjs.locale('en-nz');
+
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <PersistGate loading={<Loading />} persistor={persistor}>
