@@ -11,7 +11,7 @@ export const jwtValidation = (req, res, next) => {
 
     try {
         // verify token
-        const decodedToken = jwt.verify(token, config.JWTSecret);
+        const decodedToken = jwt.verify(token, config.JWT_SECRET);
         console.log(decodedToken);
 
         // get user info from token

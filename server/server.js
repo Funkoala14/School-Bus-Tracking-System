@@ -10,16 +10,17 @@ const server = createServer(app);
 // Initialize Socket.IO on the server
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5000', // Adjust this to match your frontend's origin
+        origin: config.FRONT_URL, // Adjust this to match your frontend's origin
         methods: ['GET', 'POST'],
     },
 });
 
+console.log('config content: ', config.FRONT_URL, config.PORT);
 
 connection.once('open', () => {
     console.log('MongoDB connected successfully');
 
-    server.listen(config.PORT, () => {
+    server.listen(config.PORT || 5000, () => {
         console.log(`API server running on http://localhost:${config.PORT}`);
     });
 });

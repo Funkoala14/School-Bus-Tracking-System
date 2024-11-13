@@ -16,6 +16,7 @@ const RouteSchema = new Schema(
         stops: [{ type: refType, ref: 'Stop' }],
         school: { type: refType, ref: 'School' },
         assignedBus: { type: refType, ref: 'Bus' },
+        schedule: { type: refType, ref: 'Schedule' },
     },
     { timestamps: true }
 );

@@ -8,7 +8,7 @@ const refType = Schema.Types.ObjectId;
 const stopTimeSchema = new Schema(
     {
         stop: { type: refType, ref: 'Stop', required: true },
-        estimatedArrivalTime: {
+        arrivalTime: {
             type: String, // "08:30 AM"
             required: true,
         },
@@ -19,9 +19,7 @@ const stopTimeSchema = new Schema(
 const ScheduleSchema = new Schema(
     {
         route: { type: refType, ref: 'Route', required: true },
-        bus: { type: refType, ref: 'Bus', required: true },
-        driver: { type: refType, ref: 'Driver', required: true },
-        startTime: { type: Date, required: true },
+        startTime: { type: String, required: true },
         stopTimes: [stopTimeSchema],
     },
     { timestamps: true }
