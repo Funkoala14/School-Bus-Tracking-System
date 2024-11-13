@@ -16,10 +16,12 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+console.log('front:', config.FRONT_URL);
+
 app.use(
     cors({
-        origin: '*',
-        credential: true,
+        origin: config.FRONT_URL,
+        credentials: true,
     })
 );
 
