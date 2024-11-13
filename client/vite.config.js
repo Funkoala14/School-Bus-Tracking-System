@@ -21,7 +21,10 @@ export default defineConfig({
     server: {
         port: process.env.VITE_PORT,
         proxy: {
-            '/api': process.env.VITE_BACKEND_URL || 'http://localhost:5000', // backend
+            '/api': process.env.VITE_BACKEND_URL || 'http://localhost:5001', // backend
         },
     },
+    define: {
+        'process.env': process.env
+    }
 });
