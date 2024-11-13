@@ -10,6 +10,7 @@ import adminRouter from './routers/AdminRouter.js';
 import parentRouter from './routers/ParentRouter.js';
 import busRouter from './routers/BusRouter.js';
 import routeRouter from './routers/RouteRouter.js';
+import config from './config/config.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +18,7 @@ const __dirname = path.dirname(__filename);
 
 app.use(
     cors({
-        origin: 'http://localhost:5000',
+        origin: config.FRONT_URL,
         credential: true,
     })
 );
@@ -38,5 +39,4 @@ app.all('*', (_req, res) => {
     return res.status(404).json({ message: 'API Not Found' });
 });
 
-  
 export default app;
