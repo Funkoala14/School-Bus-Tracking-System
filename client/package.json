@@ -40,6 +40,7 @@
     "classnames": "^2.5.1",
     "daisyui": "^4.12.12",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.4.5",
     "eslint": "^9.11.1",
     "eslint-plugin-react": "^7.37.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
