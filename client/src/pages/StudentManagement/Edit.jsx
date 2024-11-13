@@ -1,42 +1,81 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
-import { TextField, Button, Stack } from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
+import { useEffect, useMemo } from 'react';
+import { TextField, Button, Stack, Select, MenuItem, FormControl, InputLabel, CircularProgress } from '@mui/material';
 import BackTitle from '@components/BackTitle';
+import { useDispatch, useSelector } from 'react-redux';
+import GoogleMapsAutocomplete from '@components/GoogleMapsAutocomplete/GoogleMapsAutocomplete';
+import { selectRoute } from '../../store/routeSlice/route.slice';
+import { allRoutesThunk } from '../../store/routeSlice/route.thunk';
 
 const Edit = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const dispatch = useDispatch();
     const id = searchParams.get('id');
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm();
+    const {
+        register,
+        handleSubmit,
+        control,
+        setValue,
+        reset,
+        formState: { errors, isValid },
+    } = useForm({
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            studentId: '',
+            address: '',
+            route: '',
+            stop: '',
+        },
+    });
+    const { selectStudent } = useSelector((state) => state.admin);
+    const { routes, loading, selectedRoute } = useSelector((state) => state.route);
 
-    // 模拟数据填充
+    // Memoize selected route to optimize re-renders
+    const selectedRouteMemo = useMemo(() => {
+        return routes.find((route) => route._id === selectStudent?.route?._id);
+    }, [routes, selectStudent?.route?._id]);
+
     useEffect(() => {
-        if (id) {
-            console.log(id, 'edit');
-            const mockStudentData = {
-                fullName: 'John Doe',
-                studentId: 'ST001',
-                parentName: 'Jane Doe',
-                address: '123 Main Street',
-                stop: 'Stop A',
-                route: 'Route 1',
-            };
-            Object.keys(mockStudentData).forEach(key => {
-                setValue(key, mockStudentData[key]);
-            });
-        } else {
-            console.log('add');
+        dispatch(allRoutesThunk());
+        if (id && selectStudent) {
+            console.log(selectStudent);
+            handleInitialStates();
         }
-    }, [id, setValue]);
+    }, [id, selectStudent, dispatch]);
 
-    // 表单提交处理逻辑
+    const handleInitialStates = () => {
+        setValue('firstName', selectStudent.firstName);
+        setValue('lastName', selectStudent.lastName);
+        setValue('studentId', selectStudent.studentId);
+        setValue('address', selectStudent?.address?.address || '');
+        setValue('route', selectStudent?.route?._id || '');
+        setValue('stop', selectStudent?.stop?._id || '');
+
+        if (selectStudent.route && selectStudent.route._id) {
+            dispatch(selectRoute(selectStudent.route)); // Dispatch route immediately
+        }
+    };
+
+    const handleRouteChange = (event) => {
+        const selected = routes.find((route) => route._id === event.target.value);
+        if (selected) {
+            dispatch(selectRoute(selected));
+        }
+    };
+
     const onSubmit = (data) => {
         console.log('Form Submitted:', data);
-        // 模拟保存数据并导航到学生管理页面
         alert('Form submitted successfully!');
         navigate('/admin/student-management');
+        reset(); // Reset the form after submission
     };
+
+    if (loading) {
+        return <CircularProgress />;
+    }
 
     return (
         <div className='p-4'>
@@ -45,50 +84,94 @@ const Edit = () => {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Stack spacing={2}>
                         <TextField
-                            label="Full Name"
-                            {...register('fullName', { required: 'Full Name is required' })}
-                            error={!!errors?.fullName}
-                            helperText={errors?.fullName?.message}
+                            label='First Name'
+                            {...register('firstName', { required: 'First Name is required' })}
+                            error={!!errors?.firstName}
+                            helperText={errors?.firstName?.message}
                         />
                         <TextField
-                            label="Student ID"
+                            label='Last Name'
+                            {...register('lastName', { required: 'Last Name is required' })}
+                            error={!!errors?.lastName}
+                            helperText={errors?.lastName?.message}
+                        />
+                        <TextField
+                            label='Student ID'
                             {...register('studentId', { required: 'Student ID is required' })}
                             error={!!errors?.studentId}
                             helperText={errors?.studentId?.message}
                         />
-                        <TextField
-                            label="Parent’s name"
-                            {...register('parentName', { required: 'Parent’s name is required' })}
-                            error={!!errors?.parentName}
-                            helperText={errors?.parentName?.message}
-                        />
-                        <TextField
-                            label="Address"
-                            {...register('address', { required: 'Address is required' })}
-                            error={!!errors?.address}
-                            helperText={errors?.address?.message}
-                        />
-                        <TextField
-                            label="Stop"
-                            {...register('stop', { required: 'Stop is required' })}
-                            error={!!errors?.stop}
-                            helperText={errors?.stop?.message}
-                        />
-                        <TextField
-                            label="Route"
-                            {...register('route', { required: 'Route is required' })}
-                            error={!!errors?.route}
-                            helperText={errors?.route?.message}
-                        />
+                        {id && (
+                            <>
+                                <GoogleMapsAutocomplete
+                                    label='Address'
+                                    onPlaceSelected={(place) => {
+                                        console.log(place);
+                                        
+                                        setValue('address', place.formatted_address);
+                                    }}
+                                    defaultValue={selectStudent?.address?.address || ''}
+                                    error={!!errors?.address}
+                                    helperText={errors?.address?.message || ' '}
+                                />
+
+                                {/* Route Select */}
+                                <FormControl fullWidth>
+                                    <InputLabel>Route</InputLabel>
+                                    <Controller
+                                        name='route'
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                {...field}
+                                                label='Route'
+                                                onChange={(e) => {
+                                                    field.onChange(e);
+                                                    handleRouteChange(e);
+                                                }}
+                                            >
+                                                {routes.map((route) => (
+                                                    <MenuItem key={route._id} value={route._id}>
+                                                        {route.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        )}
+                                    />
+                                </FormControl>
+
+                                {/* Stop Select */}
+                                {selectedRouteMemo && (
+                                    <FormControl fullWidth>
+                                        <InputLabel>Stop</InputLabel>
+                                        <Controller
+                                            name='stop'
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Select {...field} label='Stop'>
+                                                    {selectedRouteMemo.stops.map((stop) => (
+                                                        <MenuItem key={stop._id} value={stop._id}>
+                                                            {stop.stopName}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            )}
+                                        />
+                                    </FormControl>
+                                )}
+                            </>
+                        )}
+
                         <Button
-                            type="submit"
+                            type='submit'
                             sx={{
                                 color: '#00E0A1',
                                 height: 40,
                                 borderRadius: 15,
                             }}
-                            variant="outlined"
-                            color="primary"
+                            variant='outlined'
+                            color='primary'
+                            disabled={!isValid} // Disable submit button if form is invalid
                         >
                             Submit
                         </Button>
@@ -100,6 +183,3 @@ const Edit = () => {
 };
 
 export default Edit;
-
-
-
