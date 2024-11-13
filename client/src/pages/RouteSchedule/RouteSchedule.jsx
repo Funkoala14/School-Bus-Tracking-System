@@ -23,7 +23,7 @@ const RouteSchedule = () => {
                     <div className='text-sm text-gray-800'>Route Detail Informations</div>
                 </div>
                 <div className='text-sm mt-2 flex items-center justify-end text-right text-blue-500 cursor-pointer' onClick={() => onDetail(item)}>
-                    <span>详情</span>
+                    <span>Details</span>
                     <KeyboardDoubleArrowRightIcon />
                 </div>
             </div>

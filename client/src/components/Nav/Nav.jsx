@@ -1,12 +1,13 @@
 import { DensityMedium } from '@mui/icons-material';
 import { Avatar, Box, Button, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import { logoutThunk } from '../../store/authSlice/auth.thunk';
 
 const Nav = ({ paths, onToggle }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate(); // Initialize useNavigate
+    const { userName } = useSelector(state=> state.auth);
 
     const handleLogout = () => {
         dispatch(logoutThunk()); // Execute the logout action
@@ -22,7 +23,7 @@ const Nav = ({ paths, onToggle }) => {
                     sx={{ width: 80, height: 80, marginTop: 2 }}
                 />
                 <Typography variant='h6' sx={{ marginTop: 1 }}>
-                    Jason
+                    {userName}
                 </Typography>
             </Box>
             <List sx={{ width: '70vw' }}>

@@ -139,20 +139,37 @@ const AppRouter = () => {
                                     </MainLayout>
                                 }
                             />
-                            <Route path='route-management' element={<RouteManagement />} />
-                            <Route path='student-management' element={<StudentManagement />} />
-                            <Route path='student-management/view' element={<StudentView />} />
+
+                            <Route path='student-management' element={
+                                <MainLayout paths={paths.adminPaths}>
+                                    <StudentManagement />
+                                </MainLayout>
+
+                            } />
+                            <Route path='student-management/view' element={
+                                <MainLayout paths={paths.adminPaths}>
+                                    <StudentManagement />
+                                </MainLayout>} />
                             <Route path='student-management/edit' element={<StudentEdit />} />
 
-                            <Route path='parent-management' element={<ParentManagement />} />
+                            <Route path='parent-management' element={
+                                <MainLayout paths={paths.adminPaths}>
+                                    <ParentManagement />
+                                </MainLayout>} />
                             <Route path='parent-management/view' element={<ParentView />} />
                             <Route path='parent-management/edit' element={<ParentEdit />} />
 
-                            <Route path='bus-management' element={<BusManagement />} />
+                            <Route path='bus-management' element={
+                                <MainLayout paths={paths.adminPaths}>
+                                    <BusManagement />
+                                </MainLayout>} />
                             <Route path='bus-management/view' element={<BusView />} />
                             <Route path='bus-management/edit' element={<BusEdit />} />
 
-                            <Route path='route-management' element={<RouteManagement />} />
+                            <Route path='route-management' element={
+                                <MainLayout paths={paths.adminPaths}>
+                                    <RouteManagement />
+                                </MainLayout>} />
                             <Route path='route-management/view' element={<RouteView />} />
                             <Route path='route-management/edit' element={<RouteEdit />} />
                         </Route>
@@ -173,13 +190,37 @@ const AppRouter = () => {
                                     </MainLayout>
                                 }
                             />
-                            <Route path='profile' element={<Profile />} />
-                            <Route path='bus-tracker' element={<BusTracker />} />
-                            <Route path='bus-route' element={<BusRoute />} />
-                            <Route path='profile/edit' element={<ProfileEdit />} />
-                            <Route path='notification' element={<Notification />} />
-                            <Route path='request' element={<Request />} />
-                            <Route path='request/route' element={<RequestRoute />} />
+                            <Route path='profile' element={
+                                <MainLayout paths={paths.parentPaths}>
+                                    <Profile />
+                                </MainLayout>
+                            } />
+                            <Route path='bus-tracker' element={
+                                <MainLayout paths={paths.parentPaths}>
+                                    <BusTracker />
+                                </MainLayout>
+                            } />
+                            <Route path='bus-route' element={
+                                <MainLayout paths={paths.parentPaths}>
+                                    <BusRoute />
+                                </MainLayout>
+                            } />
+                            <Route path='profile/edit' element={
+                                <MainLayout paths={paths.parentPaths}>
+                                    <ProfileEdit />
+                                </MainLayout>
+                            } />
+                            <Route path='notification' element={
+                                <MainLayout paths={paths.parentPaths}>
+                                    <Notification />
+                                </MainLayout>
+                            } />
+                            <Route path='request' element={
+                                <MainLayout paths={paths.parentPaths}>
+                                    <Request />
+                                </MainLayout>
+                            } />
+
                             <Route path='request/history-list' element={<RequestHistoryList />} />
                         </Route>
 
@@ -199,10 +240,27 @@ const AppRouter = () => {
                                     </MainLayout>
                                 }
                             />
-                            <Route path='profile' element={<DriverProfile />} />
-                            <Route path='profile/edit' element={<DriverProfileEdit />} />
-                            <Route path='skills' element={<LocationTracker />} />
-                            <Route path='schedule' element={<RouteSchedule />} />
+                            <Route path='profile' element={
+                                <MainLayout paths={paths.driverPaths}>
+                                    <DriverProfile />
+                                </MainLayout>
+                            } />
+                            <Route path='profile/edit' element={
+                                <MainLayout paths={paths.driverPaths}>
+                                    <DriverProfileEdit />
+                                </MainLayout>
+                            } />
+                            <Route path='skills' element={
+                                <MainLayout paths={paths.driverPaths}>
+                                    <LocationTracker />
+                                </MainLayout>
+                            } />
+                            <Route path='schedule' element={
+                                <MainLayout paths={paths.driverPaths}>
+                                    <RouteSchedule />
+                                </MainLayout>
+                            } />
+
                             <Route path='schedule/detail' element={<RouteScheduleDetail />} />
                         </Route>
 
