@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+// Use environment variables to set the correct baseURL
+const baseURL = import.meta.env.VITE_BACKEND_URL || '/api';
+
 // Create Axios instance with base URL
 const api = axios.create({
-    baseURL: '/api',
+    baseURL,
     withCredentials: true, // Include cookies if needed
 });
 

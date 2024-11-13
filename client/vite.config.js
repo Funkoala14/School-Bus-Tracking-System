@@ -22,6 +22,7 @@ export default defineConfig({
         port: process.env.VITE_PORT,
         proxy: {
             '/api': process.env.VITE_BACKEND_URL || 'http://localhost:5000', // backend
+            changeOrigin: true,
         },
     },
     define: {
