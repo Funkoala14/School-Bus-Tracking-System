@@ -12,14 +12,13 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import SendIcon from '@mui/icons-material/Send';
 import { useSelector } from 'react-redux';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-
+import { LoadScript } from '@react-google-maps/api';
 
 const Home = lazy(() => import('@pages/Home/Home'));
 const Login = lazy(() => import('@pages/Login/Login'));
 const Profile = lazy(() => import('@pages/Profile/Profile'));
 const Register = lazy(() => import('@pages/Register'));
 const PrivateRoute = lazy(() => import('@components/PrivateRoute'));
-
 
 // Student View
 const StudentManagement = lazy(() => import('@pages/StudentManagement/StudentManagement'));
@@ -31,7 +30,6 @@ const ParentManagement = lazy(() => import('@pages/ParentManagement/ParentManage
 const ParentView = lazy(() => import('@pages/ParentManagement/View'));
 const ParentEdit = lazy(() => import('@pages/ParentManagement/Edit'));
 
-
 // Bus Management
 const BusManagement = lazy(() => import('@pages/BusManagement/BusManagement'));
 const BusView = lazy(() => import('@pages/BusManagement/View'));
@@ -42,7 +40,6 @@ const RouteManagement = lazy(() => import('@pages/RouteManagement/RouteManagemen
 const RouteView = lazy(() => import('@pages/RouteManagement/View'));
 const RouteEdit = lazy(() => import('@pages/RouteManagement/Edit'));
 
-
 // Location Tracker
 const LocationTracker = lazy(() => import('@pages/LocationTracker/LocationTracker'));
 
@@ -50,11 +47,9 @@ const LocationTracker = lazy(() => import('@pages/LocationTracker/LocationTracke
 const DriverProfile = lazy(() => import('@pages/DriverProfile/index'));
 const DriverProfileEdit = lazy(() => import('@pages/DriverProfile/Edit'));
 
-
 // Route Schedule
 const RouteSchedule = lazy(() => import('@pages/RouteSchedule/RouteSchedule'));
 const RouteScheduleDetail = lazy(() => import('@pages/RouteSchedule/Detail'));
-
 
 // Bus Tracker
 const BusTracker = lazy(() => import('@pages/BusTracker/BusTracker'));
@@ -140,38 +135,70 @@ const AppRouter = () => {
                                 }
                             />
 
-                            <Route path='student-management' element={
-                                <MainLayout paths={paths.adminPaths}>
-                                    <StudentManagement />
-                                </MainLayout>
-
-                            } />
-                            <Route path='student-management/view' element={
-                                <MainLayout paths={paths.adminPaths}>
-                                    <StudentManagement />
-                                </MainLayout>} />
+                            <Route
+                                path='student-management'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <StudentManagement />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='student-management/view'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <StudentView />
+                                    </MainLayout>
+                                }
+                            />
                             <Route path='student-management/edit' element={<StudentEdit />} />
 
-                            <Route path='parent-management' element={
-                                <MainLayout paths={paths.adminPaths}>
-                                    <ParentManagement />
-                                </MainLayout>} />
+                            <Route
+                                path='parent-management'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <ParentManagement />
+                                    </MainLayout>
+                                }
+                            />
                             <Route path='parent-management/view' element={<ParentView />} />
                             <Route path='parent-management/edit' element={<ParentEdit />} />
 
-                            <Route path='bus-management' element={
-                                <MainLayout paths={paths.adminPaths}>
-                                    <BusManagement />
-                                </MainLayout>} />
+                            <Route
+                                path='bus-management'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <BusManagement />
+                                    </MainLayout>
+                                }
+                            />
                             <Route path='bus-management/view' element={<BusView />} />
                             <Route path='bus-management/edit' element={<BusEdit />} />
 
-                            <Route path='route-management' element={
-                                <MainLayout paths={paths.adminPaths}>
-                                    <RouteManagement />
-                                </MainLayout>} />
-                            <Route path='route-management/view' element={<RouteView />} />
-                            <Route path='route-management/edit' element={<RouteEdit />} />
+                            <Route
+                                path='route-management'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <RouteManagement />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='route-management/view'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <RouteView />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='route-management/edit'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <RouteEdit />
+                                    </MainLayout>
+                                }
+                            />
                         </Route>
 
                         <Route
@@ -190,36 +217,54 @@ const AppRouter = () => {
                                     </MainLayout>
                                 }
                             />
-                            <Route path='profile' element={
-                                <MainLayout paths={paths.parentPaths}>
-                                    <Profile />
-                                </MainLayout>
-                            } />
-                            <Route path='bus-tracker' element={
-                                <MainLayout paths={paths.parentPaths}>
-                                    <BusTracker />
-                                </MainLayout>
-                            } />
-                            <Route path='bus-route' element={
-                                <MainLayout paths={paths.parentPaths}>
-                                    <BusRoute />
-                                </MainLayout>
-                            } />
-                            <Route path='profile/edit' element={
-                                <MainLayout paths={paths.parentPaths}>
-                                    <ProfileEdit />
-                                </MainLayout>
-                            } />
-                            <Route path='notification' element={
-                                <MainLayout paths={paths.parentPaths}>
-                                    <Notification />
-                                </MainLayout>
-                            } />
-                            <Route path='request' element={
-                                <MainLayout paths={paths.parentPaths}>
-                                    <Request />
-                                </MainLayout>
-                            } />
+                            <Route
+                                path='profile'
+                                element={
+                                    <MainLayout paths={paths.parentPaths}>
+                                        <Profile />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='bus-tracker'
+                                element={
+                                    <MainLayout paths={paths.parentPaths}>
+                                        <BusTracker />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='bus-route'
+                                element={
+                                    <MainLayout paths={paths.parentPaths}>
+                                        <BusRoute />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='profile/edit'
+                                element={
+                                    <MainLayout paths={paths.parentPaths}>
+                                        <ProfileEdit />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='notification'
+                                element={
+                                    <MainLayout paths={paths.parentPaths}>
+                                        <Notification />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='request'
+                                element={
+                                    <MainLayout paths={paths.parentPaths}>
+                                        <Request />
+                                    </MainLayout>
+                                }
+                            />
 
                             <Route path='request/history-list' element={<RequestHistoryList />} />
                         </Route>
@@ -240,26 +285,38 @@ const AppRouter = () => {
                                     </MainLayout>
                                 }
                             />
-                            <Route path='profile' element={
-                                <MainLayout paths={paths.driverPaths}>
-                                    <DriverProfile />
-                                </MainLayout>
-                            } />
-                            <Route path='profile/edit' element={
-                                <MainLayout paths={paths.driverPaths}>
-                                    <DriverProfileEdit />
-                                </MainLayout>
-                            } />
-                            <Route path='skills' element={
-                                <MainLayout paths={paths.driverPaths}>
-                                    <LocationTracker />
-                                </MainLayout>
-                            } />
-                            <Route path='schedule' element={
-                                <MainLayout paths={paths.driverPaths}>
-                                    <RouteSchedule />
-                                </MainLayout>
-                            } />
+                            <Route
+                                path='profile'
+                                element={
+                                    <MainLayout paths={paths.driverPaths}>
+                                        <DriverProfile />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='profile/edit'
+                                element={
+                                    <MainLayout paths={paths.driverPaths}>
+                                        <DriverProfileEdit />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='skills'
+                                element={
+                                    <MainLayout paths={paths.driverPaths}>
+                                        <LocationTracker />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='schedule'
+                                element={
+                                    <MainLayout paths={paths.driverPaths}>
+                                        <RouteSchedule />
+                                    </MainLayout>
+                                }
+                            />
 
                             <Route path='schedule/detail' element={<RouteScheduleDetail />} />
                         </Route>

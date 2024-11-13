@@ -2,18 +2,22 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // Default is localStorage for web
 import authReducer from './authSlice/auth.slice';
-import notificationReducer from "./notificationSlice/notification.slice.js";
+import notificationReducer from './notificationSlice/notification.slice.js';
+import adminReducer from './adminSlice/admin.slice.js';
+import routeReducer from './routeSlice/route.slice.js';
 
 const rootReducer = combineReducers({
     auth: authReducer,
     notification: notificationReducer,
+    admin: adminReducer,
+    route: routeReducer,
 });
 
 // Persist configuration
 const persistConfig = {
     key: 'root',
     storage, // Use localStorage to persist the state
-    whitelist: ['auth'],
+    whitelist: ['auth', 'admin'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

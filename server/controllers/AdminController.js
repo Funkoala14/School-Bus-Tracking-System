@@ -70,6 +70,7 @@ export const getStudentList = async (req, res) => {
                     { path: 'address', select: '-school -__v' },
                     { path: 'stop', select: '-__v' },
                     { path: 'route', select: '-school -__v' },
+                    { path: 'parent', select: '-school -__v' },
                 ],
             })
             .lean()
