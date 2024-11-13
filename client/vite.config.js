@@ -20,7 +20,10 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '/api': process.env.VITE_BACKEND_URL || 'http://localhost:5000', // backend
+            '/api': 'http://localhost:5000', // backend
         },
     },
+    define: {
+        'process.env': process.env
+    }
 });
