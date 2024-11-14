@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import GoogleMapsAutocomplete from '@components/GoogleMapsAutocomplete/GoogleMapsAutocomplete';
 import { selectRoute } from '../../store/routeSlice/route.slice';
 import { allRoutesThunk } from '../../store/routeSlice/route.thunk';
+import { setTitle } from '../../store/titleSlice';
 
 const Edit = () => {
     const navigate = useNavigate();
@@ -39,6 +40,7 @@ const Edit = () => {
     }, [routes, selectStudent?.route?._id]);
 
     useEffect(() => {
+        dispatch(setTitle({ title: id ? 'Edit Student' : 'Add Student', ifBack: true }));
         dispatch(allRoutesThunk());
         if (id && selectStudent) {
             console.log(selectStudent);
@@ -107,7 +109,7 @@ const Edit = () => {
                                     label='Address'
                                     onPlaceSelected={(place) => {
                                         console.log(place);
-                                        
+
                                         setValue('address', place.formatted_address);
                                     }}
                                     defaultValue={selectStudent?.address?.address || ''}

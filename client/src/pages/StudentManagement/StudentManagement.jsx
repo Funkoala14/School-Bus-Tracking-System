@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { studentListThunk } from '../../store/adminSlice/admin.thunk';
 import { selectStudent } from '../../store/adminSlice/admin.slice';
+import { setTitle } from '../../store/titleSlice';
 
 const StudentManagement = () => {
     const navigate = useNavigate();
@@ -23,6 +24,7 @@ const StudentManagement = () => {
     };
 
     useEffect(() => {
+        dispatch(setTitle({ title: 'Student Management', ifBack: false }));
         dispatch(studentListThunk());
     }, []);
 

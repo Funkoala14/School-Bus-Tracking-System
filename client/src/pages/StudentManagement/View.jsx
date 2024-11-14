@@ -10,14 +10,16 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTitle } from '../../store/titleSlice';
 const View = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const [open, setOpen] = useState(false);
     const { studentList, selectStudent } = useSelector((state) => state.admin);
+    const dispatch = useDispatch();
 
     const editHandler = () => {
         console.log('edit');
@@ -37,11 +39,15 @@ const View = () => {
         setOpen(false);
     };
 
+
+    useEffect(()=>{
+        dispatch(setTitle({ title: 'View Student', ifBack: true }));
+    },[])
+    
     return (
-        <div className='p-2'>
-            <BackTitle title='View Student' />
-            <div>
-                <div>
+        <>
+            <>
+                <>
                     <div className='mt-2'>
                         <span className='flex-1 font-bold'>Student ID: </span>
                         <span className='w-full break-all'>{selectStudent.studentId}</span>
@@ -50,7 +56,7 @@ const View = () => {
                         <span className='flex-1 font-bold'>First Name: </span>
                         <span className='w-full break-all'>{selectStudent.firstName}</span>
                     </div>
-                </div>
+                </>
                 <div className='mt-4'>
                     <div></div>
                     <div className='flex gap-2'>
@@ -72,7 +78,7 @@ const View = () => {
                         </Button>
                     </div>
                 </div>
-            </div>
+            </>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle id='scroll-dialog-title'>Confirm Deletion</DialogTitle>
                 <DialogContent>
@@ -86,7 +92,7 @@ const View = () => {
                     {/* Updated label and color */}
                 </DialogActions>
             </Dialog>
-        </div>
+        </>
     );
 };
 

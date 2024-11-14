@@ -1,6 +1,5 @@
 
 *node_modules
-*package-lock.json
 requirements doc.md
 *.env
 .DS_Store
