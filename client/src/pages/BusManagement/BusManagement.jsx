@@ -4,9 +4,13 @@ import CardContent from '@mui/material/CardContent';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import Typography from '@mui/material/Typography';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { setTitle } from '../../store/titleSlice';
+import { useEffect } from 'react';
 
 const BusManagement = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const list = Array.from({ length: 6 }).map((_, index) => ({
         id: index,
@@ -18,11 +22,15 @@ const BusManagement = () => {
         navigate(`/admin/bus-management/view?id=${item.id}`);
     };
 
+    useEffect(()=> {
+        dispatch(setTitle({ title:'Bus Management', ifBack: false }));
+    },[])
+
     return (
         <div className='p-2'>
             <SearchInputBase placeholder='Search bus' />
 
-            <div className='mt-2 grid grid-cols-6 gap-4'>
+            <div className='mt-2 grid grid-cols-1 gap-4'>
                 {
                     list.map((item) => (
                         <div key={item.id} className='col-span-3' onClick={() => visibilityHandler(item)}>

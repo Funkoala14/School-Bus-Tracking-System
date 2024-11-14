@@ -1,14 +1,13 @@
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useNavigate } from 'react-router-dom';
 const BackTitle = (props) => {
-    const { title } = props;
+    const { title, ifBack } = props;
     const navigate = useNavigate();
 
     return (
-        <div className='flex justify-between items-center py-4'>
-            <ArrowBackIosIcon onClick={() => navigate(-1)} />
+        <div className='py-4 flex items-center justify-center' style={{ width: '100%' }}>
+            {ifBack && <ArrowBackIosIcon onClick={() => navigate(-1)} style={{position: "fixed", left: '1.5rem'}}/>}
             <span className='text-xl font-bold'>{title}</span>
-            <div className='w-10'></div>
         </div>
     );
 };

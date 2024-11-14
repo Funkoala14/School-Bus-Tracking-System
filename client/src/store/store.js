@@ -5,19 +5,21 @@ import authReducer from './authSlice/auth.slice';
 import notificationReducer from './notificationSlice/notification.slice.js';
 import adminReducer from './adminSlice/admin.slice.js';
 import routeReducer from './routeSlice/route.slice.js';
+import titleReducer from './titleSlice.js';
 
 const rootReducer = combineReducers({
     auth: authReducer,
     notification: notificationReducer,
     admin: adminReducer,
     route: routeReducer,
+    title: titleReducer,
 });
 
 // Persist configuration
 const persistConfig = {
     key: 'root',
     storage, // Use localStorage to persist the state
-    whitelist: ['auth', 'admin'],
+    whitelist: ['auth', 'admin', 'route', 'title'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

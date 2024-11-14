@@ -4,8 +4,11 @@ import { useEffect } from 'react';
 import { TextField, Button, Stack } from '@mui/material';
 import BackTitle from '@components/BackTitle';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { setTitle } from '../../store/titleSlice';
+import { useDispatch } from 'react-redux';
 const Edit = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const { register, handleSubmit, control, formState: { errors }, setValue } = useForm();
@@ -43,8 +46,11 @@ const Edit = () => {
         console.log(data, 'data');
     };
 
+    useEffect(()=> {
+        dispatch(setTitle({ title: id ? 'Edit Parent' : 'Add Parent', ifBack: true }));
+    },[])
+
     return <div className='p-4'>
-        <BackTitle title={id ? 'Edit Parent' : 'Add Parent'} />
         <div
             className='w-full p-4'
         >
