@@ -9,8 +9,11 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Controller } from 'react-hook-form';
 import dayjs from 'dayjs';
+import { useDispatch } from 'react-redux';
+import { setTitle } from '../../store/titleSlice';
 const Edit = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const { register, handleSubmit, formState: { errors }, control, setValue } = useForm();
@@ -41,6 +44,10 @@ const Edit = () => {
     const onSubmit = (data) => {
         console.log(data, 'data');
     };
+
+    useEffect(()=> {
+        dispatch(setTitle({ title: id ? 'Edit Bus' : 'Add Bus', ifBack: true }));
+    },[])
 
     return <div className='p-4'>
         <BackTitle title={id ? 'Edit Bus' : 'Add Bus'} />

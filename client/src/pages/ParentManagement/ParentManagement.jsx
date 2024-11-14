@@ -5,10 +5,14 @@ import Typography from '@mui/material/Typography';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setTitle } from '../../store/titleSlice';
 
 const ParentManagement = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const dispatch = useDispatch();
     const list = Array.from({ length: 6 }).map((_, index) => ({
         id: index,
         name: `Student ${index + 1}`,
@@ -19,11 +23,15 @@ const ParentManagement = () => {
         navigate(`/admin/parent-management/view?id=${item.id}`);
     };
 
+    useEffect(()=> {
+        dispatch(setTitle({ title: 'Parent Management', ifBack: false }));
+    },[])
+
     return (
         <div className='p-2'>
             <SearchInputBase placeholder='Search parent' />
 
-            <div className='mt-2 grid grid-cols-6 gap-4'>
+            <div className='mt-2 grid grid-cols-1 gap-4'>
                 {
                     list.map((item) => (
                         <div key={item.id} className='col-span-3' onClick={() => visibilityHandler(item)}>

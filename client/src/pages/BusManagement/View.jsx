@@ -10,9 +10,12 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { setTitle } from '../../store/titleSlice';
+import { useDispatch } from 'react-redux';
 const View = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const [open, setOpen] = useState(false);
@@ -65,9 +68,12 @@ const View = () => {
         setOpen(false);
     };
 
+    useEffect(()=> {
+        dispatch(setTitle({ title: 'View Bus', ifBack: true }));
+    },[])
+
     return (
         <div className='p-2'>
-            <BackTitle title='View Student' />
             <div>
                 <div>
                     {list.map((item) => (

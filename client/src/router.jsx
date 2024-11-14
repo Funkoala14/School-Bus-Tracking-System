@@ -151,7 +151,14 @@ const AppRouter = () => {
                                     </MainLayout>
                                 }
                             />
-                            <Route path='student-management/edit' element={<StudentEdit />} />
+                            <Route
+                                path='student-management/edit'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <StudentEdit />
+                                    </MainLayout>
+                                }
+                            />
 
                             <Route
                                 path='parent-management'
@@ -161,8 +168,22 @@ const AppRouter = () => {
                                     </MainLayout>
                                 }
                             />
-                            <Route path='parent-management/view' element={<ParentView />} />
-                            <Route path='parent-management/edit' element={<ParentEdit />} />
+                            <Route
+                                path='parent-management/view'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <ParentView />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='parent-management/edit'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <ParentEdit />
+                                    </MainLayout>
+                                }
+                            />
 
                             <Route
                                 path='bus-management'
@@ -172,8 +193,22 @@ const AppRouter = () => {
                                     </MainLayout>
                                 }
                             />
-                            <Route path='bus-management/view' element={<BusView />} />
-                            <Route path='bus-management/edit' element={<BusEdit />} />
+                            <Route
+                                path='bus-management/view'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <BusView />
+                                    </MainLayout>
+                                }
+                            />
+                            <Route
+                                path='bus-management/edit'
+                                element={
+                                    <MainLayout paths={paths.adminPaths}>
+                                        <BusEdit />
+                                    </MainLayout>
+                                }
+                            />
 
                             <Route
                                 path='route-management'
