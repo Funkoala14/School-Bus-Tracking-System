@@ -3,6 +3,7 @@ import { Avatar, Box, Button, List, ListItem, ListItemIcon, ListItemText, Typogr
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import { logoutThunk } from '../../store/authSlice/auth.thunk';
+import { setTitle } from '../../store/titleSlice';
 
 const Nav = ({ paths, onToggle }) => {
     const dispatch = useDispatch();
@@ -10,6 +11,8 @@ const Nav = ({ paths, onToggle }) => {
     const { userName } = useSelector(state=> state.auth);
 
     const handleLogout = () => {
+        dispatch(setTitle({ title:'', ifBack: false }));
+
         dispatch(logoutThunk()); // Execute the logout action
         navigate('/'); // Redirect to the homepage or login page
     };

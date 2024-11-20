@@ -7,6 +7,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import { useNavigate } from 'react-router-dom';
+
 const LocationTracker = () => {
     const navigate = useNavigate();
     const [status, setStatus] = useState(false);
