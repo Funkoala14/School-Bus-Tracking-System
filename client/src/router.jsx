@@ -88,7 +88,7 @@ const AppRouter = () => {
         ],
         driverPaths: [
             { title: 'PROFILE', path: '/driver/profile', icon: <AssignmentIndIcon /> },
-            { title: 'LOCATION TRACKER', path: '/driver/skills', icon: <DirectionsBusIcon /> },
+            { title: 'LOCATION TRACKER', path: '/driver/tracker', icon: <DirectionsBusIcon /> },
             { title: 'ROUTE SCHEDULE', path: '/driver/schedule', icon: <PinDropIcon /> },
         ],
     };
@@ -337,7 +337,7 @@ const AppRouter = () => {
                                 }
                             />
                             <Route
-                                path='skills'
+                                path='tracker'
                                 element={
                                     <MainLayout paths={paths.driverPaths}>
                                         <LocationTracker />
