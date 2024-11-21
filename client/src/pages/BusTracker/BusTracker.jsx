@@ -71,11 +71,6 @@ const BusTracker = () => {
             />
         </div>
     }
-
-
-    return <div className='py-2 px-4 h-full'>
-
-    </div>;
 };
 
 export default BusTracker;

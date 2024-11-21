@@ -4,14 +4,13 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setTitle } from '../../store/titleSlice';
 
 const ParentManagement = () => {
     const navigate = useNavigate();
-    const location = useLocation();
     const dispatch = useDispatch();
     const list = Array.from({ length: 6 }).map((_, index) => ({
         id: index,
@@ -25,7 +24,7 @@ const ParentManagement = () => {
 
     useEffect(()=> {
         dispatch(setTitle({ title: 'Parent Management', ifBack: false }));
-    },[])
+    },[dispatch])
 
     return (
         <div className='p-2'>

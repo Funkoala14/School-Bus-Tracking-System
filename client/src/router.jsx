@@ -53,6 +53,7 @@ const RouteScheduleDetail = lazy(() => import('@pages/RouteSchedule/Detail'));
 
 // Bus Tracker
 const BusTracker = lazy(() => import('@pages/BusTracker/BusTracker'));
+const BusTrackerPage = lazy(() => import('@pages/BusTrackerForParent/BusTrackerForParent'));
 // Bus Route
 const BusRoute = lazy(() => import('@pages/BusRoute/BusRoute'));
 
@@ -260,11 +261,19 @@ const AppRouter = () => {
                                     </MainLayout>
                                 }
                             />
-                            <Route
+                            {/* <Route
                                 path='bus-tracker'
                                 element={
                                     <MainLayout paths={paths.parentPaths}>
                                         <BusTracker />
+                                    </MainLayout>
+                                }
+                            /> */}
+                            <Route
+                                path='bus-tracker'
+                                element={
+                                    <MainLayout paths={paths.parentPaths}>
+                                        <BusTrackerPage />
                                     </MainLayout>
                                 }
                             />

@@ -14,22 +14,32 @@ const MainLayout = ({ paths, children }) => {
         <>
             <div className='w-full h-full overflow-y-auto overflow-x-hidden relative'>
                 {/* AppBar Component */}
-                <AppBar position='fixed' sx={{ bgcolor: '#fff', boxShadow: 'none' }}>
-                    <Toolbar sx={{ justifyContent: 'flex-end' }}>
-                        <BackTitle title={title} ifBack={ifBack}/>
-                        <div
-                            style={{ position: 'fixed' }}
-                            onClick={toggleDrawer}
-                            className='p-1.5 bg-[#00E0A1] text-white rounded-full flex justify-center items-center shadow-2xl'
-                        >
-                            <DensityMedium />
-                        </div>
-                    </Toolbar>
-                </AppBar>
+                {
+                    title ?
+                    <AppBar position='fixed' sx={{ bgcolor: '#fff', boxShadow: 'none' }}>
+                        <Toolbar sx={{ justifyContent: 'flex-end' }}>
+                            <BackTitle title={title} ifBack={ifBack}/>
+                            <div
+                                style={{ position: 'fixed' }}
+                                onClick={toggleDrawer}
+                                className='p-1.5 bg-[#00E0A1] text-white rounded-full flex justify-center items-center shadow-2xl'
+                            >
+                                <DensityMedium />
+                            </div>
+                        </Toolbar>
+                    </AppBar>
+                    :
+                    <div
+                        style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 9999 }}
+                        onClick={toggleDrawer}
+                        className='p-1.5 bg-[#00E0A1] text-white rounded-full flex justify-center items-center shadow-2xl'
+                    >
+                        <DensityMedium />
+                    </div>
+                }
                 {/* Main content area */}
-                <div style={{ padding: '16px', paddingTop: '3.5rem' }}>
-                    {/* Default padding for content */}
-                    {children} {/* Main content */}
+                <div style={title ? { padding: '16px', paddingTop: '3.5rem' } : {}}>
+                    {children}
                 </div>
                 {/* Drawer Component */}
                 <Drawer anchor='right' open={open} onClose={toggleDrawer}>
