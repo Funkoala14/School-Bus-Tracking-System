@@ -1,86 +1,160 @@
-import MapComponent from '@components/MapComponent';
-import { useState, useRef, useCallback } from 'react';
-import cs from 'classnames';
-import Button from "@mui/material/Button";
-import Stack from '@mui/material/Stack';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from "react";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { Button, Typography, Container, Box } from "@mui/material";  // Importing MUI components
+import { setTitle } from "../../store/titleSlice";
+import { useDispatch } from "react-redux";
 
 const LocationTracker = () => {
-    const navigate = useNavigate();
-    const [status, setStatus] = useState(false);
-    const watchIdRef = useRef(null);
-    const [pathList, setPathList] = useState([]);
-    const [markerList, setMarkerList] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 });
+  const [tracking, setTracking] = useState(false);
+  const [error, setError] = useState(null);
+  const websocketRef = useRef(null);
+  const markerRef = useRef(null);
+  const mapRef = useRef(null);
+  const dispatch = useDispatch();
 
-    const handler = useCallback(() => {
-        setStatus(prev => !prev);
-        if (status) {
-            const marker = {
-                key: Date.now() + '结束',
-                location: pathList[pathList.length - 1]
-            }
-            setMarkerList(() => [marker]);
-            navigator.geolocation.clearWatch(watchIdRef.current);
-            watchIdRef.current = null;
-        } else {
-            // 确保浏览器支持地理定位
-            if (!navigator.geolocation) {
-                console.error("Geolocation is not supported by this browser.");
-                return;
-            }
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY, // Replace with your API key
+  });
 
-            const success = (pos) => {
-                const { latitude, longitude } = pos.coords;
-                const path = { lat: latitude, lng: longitude };
-                console.log(path);
-                setPathList(prev => [...prev, path]);
-                const marker = {
-                    key: Date.now() + '开始',
-                    location: { lat: latitude, lng: longitude }
-                }
-                setMarkerList(() => [marker]);
-            };
+  // Fetch the initial location when the component loads
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const initialLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setCurrentLocation(initialLocation);
 
-            const error = (err) => {
-                console.error(`Error(${err.code}): ${err.message}`);
-            };
+          // Center the map on the current location if the map is already loaded
+          if (mapRef.current) {
+            mapRef.current.panTo(initialLocation);
+          }
 
-            // 使用 watchPosition 实时监听用户位置变化
-            watchIdRef.current = navigator.geolocation.watchPosition(success, error, {
-                enableHighAccuracy: true,
-                maximumAge: 10000,
-                timeout: 5000,
+          // Add marker to map if not already created
+          if (isLoaded && mapRef.current && !markerRef.current) {
+            markerRef.current = new window.google.maps.Marker({
+              position: initialLocation,
+              map: mapRef.current,
+              title: "Your Location",
             });
+          }
+        },
+        (error) => {
+          setError("Failed to fetch initial location. Please enable location access.");
         }
-    }, [status, pathList]);
+      );
+    } else {
+      setError("Geolocation is not supported by this browser.");
+    }
+  }, [isLoaded]); // Depend on `isLoaded` to ensure map is ready
 
-    const backHandler = () => {
-        setPathList([]);
-        setMarkerList([]);
-        navigate(-1);
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
+  // Function to start tracking and establish WebSocket connection
+  const startTracking = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by this browser.");
+      return;
     }
 
-    return <div className="relative w-full h-full">
-        <MapComponent
-            pathList={pathList}
-            markerList={markerList}
-        />
-        <div className={cs('absolute z-10 bottom-8 left-1/2 -translate-x-1/2')}>
-            <Stack direction="row" spacing={2}>
-                <Button variant="contained" color="primary" onClick={backHandler} startIcon={<ArrowBackIosIcon />}>
-                    Back
-                </Button>
-                <Button variant="contained" color="primary" onClick={handler} endIcon={status ? <PauseCircleOutlineIcon /> : <PlayCircleOutlineIcon />}>
-                    {status ? 'Pause' : 'Start'}
-                </Button>
-            </Stack>
-        </div>
-    </div>
-}
+    setTracking(true);
 
-export default LocationTracker
+    // Establish WebSocket connection
+    websocketRef.current = new WebSocket("wss://your-backend-url"); // Replace with your WebSocket URL
+
+    // Start tracking location
+    navigator.geolocation.watchPosition(
+      (position) => {
+        const location = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        setCurrentLocation(location);
+
+        // Send location to WebSocket
+        if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
+          websocketRef.current.send(JSON.stringify(location));
+        }
+
+        // Update marker position
+        if (markerRef.current) {
+          markerRef.current.setPosition(location);
+        }
+
+        // Center map on the new location
+        if (mapRef.current) {
+          mapRef.current.panTo(location);
+        }
+      },
+      (error) => {
+        setError(error.message);
+        setTracking(false);
+      }
+    );
+  };
+
+  // Clean up WebSocket when component unmounts
+  useEffect(() => {
+    dispatch(setTitle({ title: 'Location Tracker', ifBack: false }));
+
+    return () => {
+      if (websocketRef.current) {
+        websocketRef.current.close();
+      }
+    };
+  }, []);
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <Container sx={{ height: "calc(100vh - 4rem)", width: "100%", p: 0 }}>
+      {error && (
+        <Typography variant="h6" color="error" gutterBottom>
+          Error: {error}
+        </Typography>
+      )}
+
+      <Box sx={{ position: "relative", height: "100%" }}>
+        <GoogleMap
+          onLoad={(map) => {
+            mapRef.current = map;
+
+            // Center the map on the current location after it's loaded
+            if (currentLocation.lat !== 0 && currentLocation.lng !== 0) {
+              map.panTo(currentLocation);
+            }
+          }}
+          center={currentLocation}
+          zoom={15}
+          mapContainerStyle={{ width: "100%", height: "100%" }}
+          options={{
+            streetViewControl: false, // Disable street view
+            fullscreenControl: false, // Optional: Disable fullscreen control
+            mapTypeControl: false,   // Optional: Disable map type control
+          }}
+        />
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={startTracking}
+          sx={{
+            position: "absolute",
+            top: "10px",
+            left: "10px",
+            zIndex: 1,
+            padding: "10px 20px",
+          }}
+          disabled={tracking}
+        >
+          {tracking ? "Tracking Started" : "Start Tracking"}
+        </Button>
+      </Box>
+    </Container>
+  );
+};
+
+export default LocationTracker;
