@@ -93,7 +93,7 @@ export const postAssignBus = async (req, res) => {
             .populate({
                 path: 'assignedBus',
                 select: '-__v -school -assignedRoutes',
-                populate: { path: 'assignedDriver', select: '-password -__v -school -username -assignedBus' },
+                populate: { path: 'assignedDriver', select: '-password -__v -school -userName -assignedBus' },
             });
         if (!updatedRoute) return res.status(404).json({ message: 'Route not found', code: 400 });
 
@@ -120,7 +120,7 @@ export const postRemoveBus = async (req, res) => {
             .populate({
                 path: 'assignedBus',
                 select: '-__v -school -assignedRoutes',
-                populate: { path: 'assignedDriver', select: '-password -__v -school -username -assignedBus' },
+                populate: { path: 'assignedDriver', select: '-password -__v -school -userName -assignedBus' },
             });
         if (!updatedRoute) return res.status(404).json({ message: 'Route not found', code: 400 });
 

@@ -30,11 +30,11 @@ io.on('connection', (socket) => {
 
     // Listen for driver's live location updates
     socket.on('driverLocation', (data) => {
-        const { driverId, latitude, longitude } = data;
-        console.log(`Received location for driver ${driverId}: ${latitude}, ${longitude}`);
+        const { driverId, lat, long } = data;
+        console.log(`Received location for driver ${driverId}: ${lat}, ${long}`);
 
         // Broadcast the location update to all connected clients
-        io.emit(`locationUpdate:${driverId}`, { latitude, longitude });
+        io.emit(`locationUpdate:${driverId}`, { lat, long });
     });
 
     // Handle client disconnect

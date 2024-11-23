@@ -60,111 +60,103 @@ const Edit = () => {
         handleClose();
     };
 
-    return <div className='py-2 px-4'>
-        <BackTitle title='Edit Profile' />
-        <div className='mt-4'>
-            {list.map((item) => (
-                <div key={item.id} className='border mt-2 border-gray-200 py-2 px-4 rounded-lg'>
-                    <div>Surname: {item.surname}</div>
-                    <div>Student ID: {item.studentID}</div>
-                    <Stack direction='row' spacing={1} className='mt-2'>
-                        <EditNoteIcon color='primary' onClick={() => onEditHandler(item)} className='cursor-pointer' />
-                        <DeleteIcon color='error' onClick={() => onDeleteHandler(item)} className='cursor-pointer' />
-                    </Stack>
-                </div>
-            ))}
+    return (
+        <div className='py-2 px-4'>
+            <BackTitle title='Edit Profile' />
             <div className='mt-4'>
-                <Button variant='outlined' color='primary' startIcon={<AddIcon />}
-                    onClick={() => setOpen(true)}
-                >Add</Button>
+                {list.map((item) => (
+                    <div key={item.id} className='border mt-2 border-gray-200 py-2 px-4 rounded-lg'>
+                        <div>Surname: {item.surname}</div>
+                        <div>Student ID: {item.studentID}</div>
+                        <Stack direction='row' spacing={1} className='mt-2'>
+                            <EditNoteIcon color='primary' onClick={() => onEditHandler(item)} className='cursor-pointer' />
+                            <DeleteIcon color='error' onClick={() => onDeleteHandler(item)} className='cursor-pointer' />
+                        </Stack>
+                    </div>
+                ))}
+                <div className='mt-4'>
+                    <Button variant='outlined' color='primary' startIcon={<AddIcon />} onClick={() => setOpen(true)}>
+                        Add
+                    </Button>
+                </div>
             </div>
-        </div>
-        <div className='mt-4'>
-            <form onSubmit={handleSubmit(onSubmitProfile)}>
-                <Stack spacing={2}>
-                    <TextField
-                        label="Username"
-                        {...register('username', { required: 'Username is required' })}
-                        error={!!errors?.username}
-                        disabled={!edit}
-                    />
-                    <TextField
-                        name="studentId"
-                        label="Student ID"
-                        {...register('studentId', { required: 'Student ID is required' })}
-                        error={!!errors?.studentId}
-                        disabled={!edit}
-                    />
-                    <TextField
-                        name="email"
-                        label="Email"
-                        {...register('email', { required: 'Email is required' })}
-                        error={!!errors?.email}
-                        disabled={true}
-                    />
-
-                    <Stack direction='row' spacing={1} className='mt-2'>
-                        {
-                            edit ? <>
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    onClick={() => setEdit(false)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    variant="outlined"
-                                    color="primary">
-                                    Save
-                                </Button>
-                            </> : <Button
-                                onClick={() => setEdit(true)}
-                                variant="outlined"
-                                color="primary">
-                                Edit
-                            </Button>
-                        }
-
-                    </Stack>
-                </Stack>
-            </form>
-        </div>
-
-
-        <Dialog
-            open={open}
-            onClose={handleClose}
-            PaperProps={{
-                component: 'form',
-                onSubmit: handleSubmit(onSubmit)
-            }}
-        >
-            <DialogTitle>{formData?.surname ? 'Edit' : 'Add'}</DialogTitle>
-            <DialogContent>
-                <form>
+            <div className='mt-4'>
+                <form onSubmit={handleSubmit(onSubmitProfile)}>
                     <Stack spacing={2}>
                         <TextField
-                            label="Surname"
-                            {...register('surname', { required: 'Surname is required' })}
-                            error={!!errors?.surname}
+                            label='Username'
+                            {...register('userName', { required: 'Username is required' })}
+                            error={!!errors?.userName}
+                            disabled={!edit}
                         />
                         <TextField
-                            name="studentId"
-                            label="Student ID"
+                            name='studentId'
+                            label='Student ID'
                             {...register('studentId', { required: 'Student ID is required' })}
                             error={!!errors?.studentId}
+                            disabled={!edit}
                         />
+                        <TextField
+                            name='email'
+                            label='Email'
+                            {...register('email', { required: 'Email is required' })}
+                            error={!!errors?.email}
+                            disabled={true}
+                        />
+
+                        <Stack direction='row' spacing={1} className='mt-2'>
+                            {edit ? (
+                                <>
+                                    <Button variant='outlined' color='primary' onClick={() => setEdit(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button type='submit' variant='outlined' color='primary'>
+                                        Save
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button onClick={() => setEdit(true)} variant='outlined' color='primary'>
+                                    Edit
+                                </Button>
+                            )}
+                        </Stack>
                     </Stack>
                 </form>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button type='submit'>Submit</Button>
-            </DialogActions>
-        </Dialog>
-    </div>
+            </div>
+
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                PaperProps={{
+                    component: 'form',
+                    onSubmit: handleSubmit(onSubmit),
+                }}
+            >
+                <DialogTitle>{formData?.surname ? 'Edit' : 'Add'}</DialogTitle>
+                <DialogContent>
+                    <form>
+                        <Stack spacing={2}>
+                            <TextField
+                                label='Surname'
+                                {...register('surname', { required: 'Surname is required' })}
+                                error={!!errors?.surname}
+                            />
+                            <TextField
+                                name='studentId'
+                                label='Student ID'
+                                {...register('studentId', { required: 'Student ID is required' })}
+                                error={!!errors?.studentId}
+                            />
+                        </Stack>
+                    </form>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button type='submit'>Submit</Button>
+                </DialogActions>
+            </Dialog>
+        </div>
+    );
 }
 
 export default Edit;
