@@ -9,6 +9,7 @@ import { setTitle } from '../../store/titleSlice';
 import { Box, Typography } from '@mui/material';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import { selectRoute } from '../../store/driverSlice/driver.slice';
 
 const RouteSchedule = () => {
     const navigate = useNavigate();
@@ -17,14 +18,15 @@ const RouteSchedule = () => {
 
     useEffect(() => {
         dispatch(setTitle({ title: 'Route Schedule', ifBack: false }));
-
+        dispatch(getDriverInfo());
         return () => {
             dispatch(setTitle({ title: '', ifBack: false }));
         };
     }, [dispatch]);
 
-    const onDetail = (id) => {
-        navigate(`/driver/schedule/detail?id=${id}`);
+    const onDetail = (route) => {
+        dispatch(selectRoute(route));
+        navigate(`/driver/schedule/detail`);
     };
 
     return (
@@ -47,19 +49,18 @@ const RouteSchedule = () => {
                 </div>
             </Box>
             {info?.assignedBus?.assignedRoutes.length ? (
-                info?.assignedBus?.assignedRoutes.map((item) => (
-                    <div key={item} className='border border-gray-200 rounded-lg p-4'>
+                info?.assignedBus?.assignedRoutes?.map((route) => (
+                    <div key={route._id} className='border border-gray-200 rounded-lg p-4'>
                         <div>
-                            <span className='text-lg font-bold'>Route Name-------{item}</span>
-                            <div className='text-sm text-gray-600'>Route Number-------{item}</div>
-                            <div className='text-sm text-gray-400'>{dayjs().format('DD/MM/YYYY')}</div>
-                            <div className='text-sm text-gray-800'>Route Detail Informations</div>
+                            <span className='text-lg font-bold'>{route.name}</span>
+                            <div className='text-sm text-gray-400'>Direction: {route.direction}</div>
+                            <div className='text-sm text-gray-800'>Stops: {route.stops.length}</div>
                         </div>
                         <div
                             className='text-sm mt-2 flex items-center justify-end text-right text-blue-500 cursor-pointer'
-                            onClick={() => onDetail(item)}
+                            onClick={() => onDetail(route)}
                         >
-                            <span>Details</span>
+                            <span>Schedule Details</span>
                             <KeyboardDoubleArrowRightIcon />
                         </div>
                     </div>

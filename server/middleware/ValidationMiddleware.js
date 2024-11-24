@@ -192,6 +192,8 @@ const stopValidation = (stop, type = 'new') => {
 };
 
 const addressValidation = (address) => {
+    console.log(address);
+    
     const { street, city, state, zipcode, coordinates } = address;
     if (!street || validator.isEmpty(street)) return createErrorResponse(ERROR_MESSAGES.missingStreet);
     if (!city || validator.isEmpty(city)) return createErrorResponse(ERROR_MESSAGES.missingCity);

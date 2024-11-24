@@ -1,7 +1,6 @@
 import { updateLiveTimeRoute } from './RouteScheduleController.js';
 
 export default (io) => {
-    console.log(123);
     io.on('connection', (socket) => {
         console.log('A client connected:', socket.id);
 

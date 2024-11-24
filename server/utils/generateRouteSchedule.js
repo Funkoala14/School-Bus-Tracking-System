@@ -7,149 +7,159 @@ import Route from '../models/Route.js';
 const DIRECTIONS_API_URL = 'https://maps.googleapis.com/maps/api/directions/json';
 const ROUTES_API_URL = 'https://routes.googleapis.com/directions/v2:computeRoutes';
 
-const SCHOOL_START_TIME = new Date('2024-11-04T08:30:00'); // Example start time
-const SCHOOL_END_TIME = new Date('2024-11-04T15:30:00'); // Example end time
+const today = new Date();
 
-export const createRouteSchedule = async (routeId, stops, direction) => {
-    try {
-        if (stops.length < 2) {
-            throw new Error('A route must have at least a start and end stop.');
-        }
+function getNextDayTime(hour, minute) {
+    const nextDay = new Date(today);
+    nextDay.setDate(today.getDate() + 1); // Move to the next day
+    nextDay.setHours(hour, minute, 0, 0); // Set the specific time (hour:minute)
+    return nextDay;
+}
 
-        // Define the travel time window
-        const isInbound = direction === 'inbound';
-        const baseTime = isInbound
-            ? new Date(SCHOOL_START_TIME.getTime() - 30 * 60 * 1000) // 30 minutes before school starts
-            : new Date(SCHOOL_END_TIME.getTime() + 30 * 60 * 1000); // 30 minutes after school ends
-        const baseTimeInSeconds = Math.floor(baseTime.getTime() / 1000);
+const SCHOOL_START_TIME = getNextDayTime(8, 30);
+const SCHOOL_END_TIME = getNextDayTime(15, 30);
 
-        // Prepare waypoints (all stops except start and end)
-        const waypoints = stops.slice(1, -1).map((stop) => ({
-            location: {
-                latLng: {
-                    latitude: stop.address.coordinates.lat,
-                    longitude: stop.address.coordinates.lng,
-                },
-            },
-        }));
+// export const createRouteSchedule = async (routeId, stops, direction) => {
+//     try {
+//         if (stops.length < 2) {
+//             throw new Error('A route must have at least a start and end stop.');
+//         }
 
-        // Build the request payload
-        const payload = {
-            origin: {
-                location: {
-                    latLng: {
-                        latitude: stops[0].address.coordinates.lat,
-                        longitude: stops[0].address.coordinates.lng,
-                    },
-                },
-            },
-            destination: {
-                location: {
-                    latLng: {
-                        latitude: stops[stops.length - 1].address.coordinates.lat,
-                        longitude: stops[stops.length - 1].address.coordinates.lng,
-                    },
-                },
-            },
-            travelMode: 'DRIVE',
-            routingPreference: 'TRAFFIC_AWARE',
-            computeAlternativeRoutes: false,
-            departureTime: baseTimeInSeconds,
-            intermediates: waypoints,
-            languageCode: 'en-US',
-            units: 'IMPERIAL',
-        };
+//         // Define the travel time window
+//         const isInbound = direction === 'inbound';
+//         const baseTime = isInbound
+//             ? new Date(SCHOOL_START_TIME.getTime() - 30 * 60 * 1000) // 30 minutes before school starts
+//             : new Date(SCHOOL_END_TIME.getTime() + 30 * 60 * 1000); // 30 minutes after school ends
+//         const baseTimeInSeconds = Math.floor(baseTime.getTime() / 1000);
 
-        // Define the field mask
-        const fieldMask =
-            'routes.duration,routes.distanceMeters,routes.legs.startLocation,routes.legs.endLocation,routes.legs.duration,routes.legs.distanceMeters,routes.legs.steps';
+//         // Prepare waypoints (all stops except start and end)
+//         const waypoints =
+//             stops.slice(1, -1)?.map((stop) => ({
+//                 location: {
+//                     latLng: {
+//                         latitude: stop.address.coordinates.lat,
+//                         longitude: stop.address.coordinates.lng,
+//                     },
+//                 },
+//             })) || [];
 
-        // Make the API request
-        const response = await axios.post(ROUTES_API_URL, payload, {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Goog-Api-Key': config.GOOGLE_MAPS_API_KEY,
-                'X-Goog-FieldMask': fieldMask,
-            },
-        });
+//         // Build the request payload
+//         const payload = {
+//             origin: {
+//                 location: {
+//                     latLng: {
+//                         latitude: stops[0].address.coordinates.lat,
+//                         longitude: stops[0].address.coordinates.lng,
+//                     },
+//                 },
+//             },
+//             destination: {
+//                 location: {
+//                     latLng: {
+//                         latitude: stops[stops.length - 1].address.coordinates.lat,
+//                         longitude: stops[stops.length - 1].address.coordinates.lng,
+//                     },
+//                 },
+//             },
+//             travelMode: 'DRIVE',
+//             routingPreference: 'TRAFFIC_AWARE',
+//             computeAlternativeRoutes: false,
+//             departureTime: baseTimeInSeconds,
+//             intermediates: waypoints,
+//             languageCode: 'en-US',
+//             units: 'IMPERIAL',
+//         };
 
-        if (response.status !== 200) {
-            throw new Error('Error fetching route data from Google Routes API.');
-        }
+//         // Define the field mask
+//         const fieldMask =
+//             'routes.duration,routes.distanceMeters,routes.legs.startLocation,routes.legs.endLocation,routes.legs.duration,routes.legs.distanceMeters,routes.legs.steps';
 
-        const routeData = response.data.routes[0];
-        const legs = routeData.legs;
+//         // Make the API request
+//         const response = await axios.post(ROUTES_API_URL, payload, {
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'X-Goog-Api-Key': config.GOOGLE_MAPS_API_KEY,
+//                 'X-Goog-FieldMask': fieldMask,
+//             },
+//         });
 
-        if (!legs || legs.length === 0) {
-            throw new Error('No legs data found in the response.');
-        }
+//         if (response.status !== 200) {
+//             throw new Error('Error fetching route data from Google Routes API.');
+//         }
 
-        // Generate the schedule
-        const legTimes = [];
-        let currentTime = new Date(baseTime);
+//         const routeData = response.data.routes[0];
+//         const legs = routeData.legs;
 
-        if (isInbound) {
-            // Inbound: Last stop is school
-            legTimes.push({
-                stop: stops[stops.length - 1]._id,
-                arrivalTime: format(currentTime, 'hh:mm a'),
-            });
+//         if (!legs || legs.length === 0) {
+//             throw new Error('No legs data found in the response.');
+//         }
 
-            // Process legs in reverse order
-            for (let i = legs.length - 1; i >= 0; i--) {
-                const leg = legs[i];
-                currentTime = new Date(currentTime.getTime() - leg.duration.seconds * 1000);
+//         // Generate the schedule
+//         const legTimes = [];
+//         let currentTime = new Date(baseTime);
 
-                legTimes.unshift({
-                    stop: stops[i]._id,
-                    arrivalTime: format(currentTime, 'hh:mm a'),
-                });
+//         if (isInbound) {
+//             // Inbound: Last stop is school
+//             legTimes.push({
+//                 stop: stops[stops.length - 1]._id,
+//                 arrivalTime: format(currentTime, 'hh:mm a'),
+//             });
 
-                // Account for stop duration
-                currentTime = new Date(currentTime.getTime() - 5 * 60 * 1000); // 5 minutes stop duration
-            }
-        } else {
-            // Outbound: First stop is school
-            legTimes.push({
-                stop: stops[0]._id,
-                arrivalTime: format(currentTime, 'hh:mm a'),
-            });
+//             // Process legs in reverse order
+//             for (let i = legs.length - 1; i >= 0; i--) {
+//                 const leg = legs[i];
+//                 currentTime = new Date(currentTime.getTime() - leg.duration.seconds * 1000);
 
-            // Process legs in order
-            for (let i = 0; i < legs.length; i++) {
-                const leg = legs[i];
-                currentTime = new Date(currentTime.getTime() + leg.duration.seconds * 1000);
+//                 legTimes.unshift({
+//                     stop: stops[i]._id,
+//                     arrivalTime: format(currentTime, 'hh:mm a'),
+//                 });
 
-                legTimes.push({
-                    stop: stops[i + 1]._id,
-                    arrivalTime: format(currentTime, 'hh:mm a'),
-                });
+//                 // Account for stop duration
+//                 currentTime = new Date(currentTime.getTime() - 5 * 60 * 1000); // 5 minutes stop duration
+//             }
+//         } else {
+//             // Outbound: First stop is school
+//             legTimes.push({
+//                 stop: stops[0]._id,
+//                 arrivalTime: format(currentTime, 'hh:mm a'),
+//             });
 
-                // Account for stop duration
-                currentTime = new Date(currentTime.getTime() + 5 * 60 * 1000); // 5 minutes stop duration
-            }
-        }
+//             // Process legs in order
+//             for (let i = 0; i < legs.length; i++) {
+//                 const leg = legs[i];
+//                 currentTime = new Date(currentTime.getTime() + leg.duration.seconds * 1000);
 
-        // Save the schedule in the database
-        const newSchedule = await Schedule.create({
-            route: routeId,
-            stopTimes: legTimes,
-            startTime: isInbound ? legTimes[0].arrivalTime : legTimes[legTimes.length - 1].arrivalTime,
-        });
+//                 legTimes.push({
+//                     stop: stops[i + 1]._id,
+//                     arrivalTime: format(currentTime, 'hh:mm a'),
+//                 });
 
-        // Update the route with the schedule
-        const route = await Route.findById(routeId);
-        if (route.schedule) {
-            await Schedule.findByIdAndDelete(route.schedule);
-        }
-        await Route.findByIdAndUpdate(routeId, { schedule: newSchedule._id });
+//                 // Account for stop duration
+//                 currentTime = new Date(currentTime.getTime() + 5 * 60 * 1000); // 5 minutes stop duration
+//             }
+//         }
 
-        return newSchedule;
-    } catch (error) {
-        console.error('Error creating route schedule:', error.message);
-        throw new Error(error.message);
-    }
-};
+//         // Save the schedule in the database
+//         const newSchedule = await Schedule.create({
+//             route: routeId,
+//             stopTimes: legTimes,
+//             startTime: isInbound ? legTimes[0].arrivalTime : legTimes[legTimes.length - 1].arrivalTime,
+//         });
+
+//         // Update the route with the schedule
+//         const route = await Route.findById(routeId);
+//         if (route.schedule) {
+//             await Schedule.findByIdAndDelete(route.schedule);
+//         }
+//         await Route.findByIdAndUpdate(routeId, { schedule: newSchedule._id });
+
+//         return newSchedule;
+//     } catch (error) {
+//         console.error('Error creating route schedule:', error.message);
+//         throw new Error(error.message);
+//     }
+// };
 
 export const updateLiveRoute = async (driverLocation, remainingStops, socket) => {
     try {
@@ -295,120 +305,120 @@ export const getRemainingStops = async (driverLocation, allStops) => {
 };
 
 
-// export const createRouteSchedule = async (routeId, stops, direction) => {
-//     try {
-//         // Define waypoints (all stops except the start and end)
-//         const waypoints = stops
-//             .slice(1, stops.length - 1)
-//             .map((stop) => `${stop.address.coordinates.lat},${stop.address.coordinates.lng}`);
+export const createRouteSchedule = async (routeId, stops, direction) => {
+    try {
+        // Define waypoints (all stops except the start and end)
+        const waypoints = stops
+            .slice(1, stops.length - 1)
+            .map((stop) => `${stop.address.coordinates.lat},${stop.address.coordinates.lng}`);
 
-//         // Determine the base time based on direction
-//         const isInbound = direction === 'inbound';
-//         const time = isInbound
-//             ? new Date(SCHOOL_START_TIME.getTime() - 60 * 60 * 1000) // 30 minutes before school start
-//             : new Date(SCHOOL_END_TIME.getTime() + 30 * 60 * 1000); // 30 minutes after school end
-//         const timeInSeconds = Math.floor(time.getTime() / 1000);
+        // Determine the base time based on direction
+        const isInbound = direction === 'inbound';
+        const time = isInbound
+            ? new Date(SCHOOL_START_TIME.getTime() - 60 * 60 * 1000) // 30 minutes before school start
+            : new Date(SCHOOL_END_TIME.getTime() + 30 * 60 * 1000); // 30 minutes after school end
+        const timeInSeconds = Math.floor(time.getTime() / 1000);
 
-//         // Set up API request parameters
-//         const params = {
-//             origin: `${stops[0].address.coordinates.lat},${stops[0].address.coordinates.lng}`,
-//             destination: `${stops[stops.length - 1].address.coordinates.lat},${stops[stops.length - 1].address.coordinates.lng}`,
-//             waypoints: waypoints.join('|'),
-//             traffic_model: 'best_guess',
-//             departure_time: timeInSeconds,
-//             key: config.GOOGLE_MAPS_API_KEY,
-//         };
+        // Set up API request parameters
+        const params = {
+            origin: `${stops[0].address.coordinates.lat},${stops[0].address.coordinates.lng}`,
+            destination: `${stops[stops.length - 1].address.coordinates.lat},${stops[stops.length - 1].address.coordinates.lng}`,
+            waypoints: waypoints.join('|'),
+            traffic_model: 'best_guess',
+            departure_time: timeInSeconds,
+            key: config.GOOGLE_MAPS_API_KEY,
+        };
 
-//         console.log(params);
+        console.log(params);
 
-//         // Fetch schedule from Google Directions API
-//         const response = await axios.get(DIRECTIONS_API_URL, { params });
+        // Fetch schedule from Google Directions API
+        const response = await axios.get(DIRECTIONS_API_URL, { params });
 
-//         if (response.statusText !== 'OK') throw new Error('Error fetching directions.');
+        if (response.statusText !== 'OK') throw new Error('Error fetching directions.');
 
-//         // Check for an empty routes array
-//         if (!response.data.routes || response.data.routes.length === 0) {
-//             throw new Error('No routes found for the given parameters.');
-//         }
+        // Check for an empty routes array
+        if (!response.data.routes || response.data.routes.length === 0) {
+            throw new Error('No routes found for the given parameters.');
+        }
 
-//         const legs = response.data.routes[0].legs;
-//         const legTimes = [];
-//         let currentArrivalTime;
-//         // Handle outbound and inbound directions separately
-//         if (!isInbound) {
-//             // Outbound case
+        const legs = response.data.routes[0].legs;
+        const legTimes = [];
+        let currentArrivalTime;
+        // Handle outbound and inbound directions separately
+        if (!isInbound) {
+            // Outbound case
 
-//             currentArrivalTime = new Date(time.getTime()); // Start with the base time
+            currentArrivalTime = new Date(time.getTime()); // Start with the base time
 
-//             // start stop is school
-//             legTimes.push({
-//                 stop: stops[0]._id,
-//                 arrivalTime: format(currentArrivalTime, 'hh:mm a'),
-//             });
+            // start stop is school
+            legTimes.push({
+                stop: stops[0]._id,
+                arrivalTime: format(currentArrivalTime, 'hh:mm a'),
+            });
 
-//             for (let i = 0; i < legs.length; i++) {
-//                 const legDuration = legs[i].duration.value * 1000; // Duration in milliseconds
-//                 const stopDuration = 300 * 1000; // Assuming a 5-minute stop (300 seconds) at each stop
+            for (let i = 0; i < legs.length; i++) {
+                const legDuration = legs[i].duration.value * 1000; // Duration in milliseconds
+                const stopDuration = 300 * 1000; // Assuming a 5-minute stop (300 seconds) at each stop
 
-//                 // Calculate arrival time for this stop
-//                 currentArrivalTime = new Date(currentArrivalTime.getTime() + legDuration);
-//                 const formattedTime = format(currentArrivalTime, 'hh:mm a');
+                // Calculate arrival time for this stop
+                currentArrivalTime = new Date(currentArrivalTime.getTime() + legDuration);
+                const formattedTime = format(currentArrivalTime, 'hh:mm a');
 
-//                 legTimes.push({
-//                     stop: stops[i + 1]._id,
-//                     arrivalTime: formattedTime, // Store as string in desired format
-//                 });
+                legTimes.push({
+                    stop: stops[i + 1]._id,
+                    arrivalTime: formattedTime, // Store as string in desired format
+                });
 
-//                 // Add stop duration for next leg calculation
-//                 currentArrivalTime = new Date(currentArrivalTime.getTime() + stopDuration);
-//             }
-//         } else {
-//             // Inbound case
-//             // Set the initial arrival time to be 15 minutes before school starts
-//             currentArrivalTime = new Date(SCHOOL_START_TIME.getTime() - 15 * 60 * 1000); // 15 minutes before school start
+                // Add stop duration for next leg calculation
+                currentArrivalTime = new Date(currentArrivalTime.getTime() + stopDuration);
+            }
+        } else {
+            // Inbound case
+            // Set the initial arrival time to be 15 minutes before school starts
+            currentArrivalTime = new Date(SCHOOL_START_TIME.getTime() - 15 * 60 * 1000); // 15 minutes before school start
 
-//             // last stop is school
-//             legTimes.push({
-//                 stop: stops[stops.length - 1]._id,
-//                 arrivalTime: format(currentArrivalTime, 'hh:mm a'),
-//             });
+            // last stop is school
+            legTimes.push({
+                stop: stops[stops.length - 1]._id,
+                arrivalTime: format(currentArrivalTime, 'hh:mm a'),
+            });
 
-//             for (let i = legs.length - 1; i >= 0; i--) {
-//                 const legDuration = legs[i].duration.value * 1000; // Duration in milliseconds
-//                 const stopDuration = 300 * 1000; // Assuming a 5-minute stop (300 seconds) at each stop
+            for (let i = legs.length - 1; i >= 0; i--) {
+                const legDuration = legs[i].duration.value * 1000; // Duration in milliseconds
+                const stopDuration = 300 * 1000; // Assuming a 5-minute stop (300 seconds) at each stop
 
-//                 // Calculate the arrival time for this stop
-//                 currentArrivalTime = new Date(currentArrivalTime.getTime() - legDuration);
+                // Calculate the arrival time for this stop
+                currentArrivalTime = new Date(currentArrivalTime.getTime() - legDuration);
 
-//                 const formattedTime = format(currentArrivalTime, 'hh:mm a');
+                const formattedTime = format(currentArrivalTime, 'hh:mm a');
 
-//                 legTimes.unshift({
-//                     stop: stops[i]._id,
-//                     arrivalTime: formattedTime, // Store as string in desired format
-//                 });
+                legTimes.unshift({
+                    stop: stops[i]._id,
+                    arrivalTime: formattedTime, // Store as string in desired format
+                });
 
-//                 // Add stop duration for next leg calculation (going backwards)
-//                 currentArrivalTime = new Date(currentArrivalTime.getTime() - stopDuration);
-//             }
+                // Add stop duration for next leg calculation (going backwards)
+                currentArrivalTime = new Date(currentArrivalTime.getTime() - stopDuration);
+            }
 
-//             // Ensure the first stop's arrival time is indeed 15 minutes before the school start time
-//             if (new Date(legTimes[0].arrivalTime) > SCHOOL_START_TIME) {
-//                 throw new Error('Calculated arrival time exceeds the allowed schedule before school starts.');
-//             }
-//         }
+            // Ensure the first stop's arrival time is indeed 15 minutes before the school start time
+            if (new Date(legTimes[0].arrivalTime) > SCHOOL_START_TIME) {
+                throw new Error('Calculated arrival time exceeds the allowed schedule before school starts.');
+            }
+        }
 
-//         // Save the schedule to the database
-//         const newSchedule = await Schedule.create({
-//             route: routeId,
-//             stopTimes: legTimes,
-//             startTime: isInbound ? legTimes[0].arrivalTime : '16:00 PM',
-//         });
-//         const route = await Route.findById(routeId);
-//         if (route.schedule) await Schedule.findByIdAndDelete(route.schedule);
-//         await Route.findByIdAndUpdate(routeId, { $set: { schedule: newSchedule._id } });
-//         return newSchedule;
-//     } catch (error) {
-//         console.error('Error creating route schedule:', error);
-//         throw new Error(error.message);
-//     }
-// };
+        // Save the schedule to the database
+        const newSchedule = await Schedule.create({
+            route: routeId,
+            stopTimes: legTimes,
+            startTime: isInbound ? legTimes[0].arrivalTime : '16:00 PM',
+        });
+        const route = await Route.findById(routeId);
+        if (route.schedule) await Schedule.findByIdAndDelete(route.schedule);
+        await Route.findByIdAndUpdate(routeId, { $set: { schedule: newSchedule._id } });
+        return newSchedule;
+    } catch (error) {
+        console.error('Error creating route schedule:', error);
+        throw new Error(error.message);
+    }
+};
