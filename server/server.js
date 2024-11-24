@@ -4,6 +4,7 @@ import config from './config/config.js';
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { updateLiveTimeRoute } from './controllers/RouteScheduleController.js';
+import wsController from './controllers/wsController.js';
 
 // HTTP server to use with Socket.IO
 const server = createServer(app);
@@ -16,30 +17,13 @@ const io = new Server(server, {
     },
 });
 
+// WebSocket connection and event listeners
+wsController(io);
+
 connection.once('open', () => {
     console.log('MongoDB connected successfully');
 
     server.listen(config.PORT || 5000, () => {
         console.log(`API server running on http://localhost:${config.PORT}`);
-    });
-});
-
-
-// WebSocket connection and event listeners
-io.on('connection', (socket) => {
-    console.log('A client connected:', socket.id);
-
-    // Listen for driver's live location updates
-    socket.on('driverLocation', (data) => {
-        const { driverId, lat, lng } = data;
-        console.log(`Received location for driver ${driverId}: ${lat}, ${lng}`);
-        updateLiveTimeRoute({ driverId, lat, lng , socket});
-        // Broadcast the location update to all connected clients
-        io.emit(`locationUpdate:${driverId}`, { lat, lng });
-    });
-
-    // Handle client disconnect
-    socket.on('disconnect', () => {
-        console.log('A client disconnected:', socket.id);
     });
 });

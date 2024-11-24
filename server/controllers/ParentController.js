@@ -113,7 +113,7 @@ export const getChildrenDetail = async (req, res) => {
 export const getParentProfile = async (req, res) => {
     const { userId } = req.user;
     try {
-        const parent = await Parent.findById(userId).select('-parent -__v').populate('address');
+        const parent = await Parent.findById(userId).select('-parent -password -__v').populate('address');
         return res.status(200).json({
             message: 'success',
             data: parent,

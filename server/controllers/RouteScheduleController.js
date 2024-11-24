@@ -22,23 +22,16 @@ export const generateRouteSchedule = async (req, res) => {
 };
 
 export const updateLiveTimeRoute = async (data) => {
-    const { driverId, lat, lng, socket } = data;
+    const { driverId, direction, lat, lng, socket } = data;
     try {
         const bus = await Bus.findOne({ assignedDriver: driverId }).populate('school');
-        console.log(bus);
-        
-        // Get the current time
-        const currentTime = new Date();
-        const hour = currentTime.getHours();
+        console.log(bus, 'bus');
 
-        // const isInbound = hour < 12;
-        const isInbound = true;
-
-        const route = await Route.findOne({ assignedBus: bus._id, direction: isInbound ? 'inBound' : 'outBound' });
-        console.log(route);
+        const route = await Route.findOne({ assignedBus: bus._id, direction });
+        console.log(route, 'route');
         
         const remainingStops = await getRemainingStops({ lat, lng }, route.stops);
-        console.log(remainingStops);
+        console.log(remainingStops, 'remainingStops');
         
         updateLiveRoute({ lat, lng }, remainingStops, socket);
     } catch (error) {
