@@ -8,7 +8,11 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import dayjs from 'dayjs';
 import { random } from 'lodash';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+
 const Detail = () => {
+    const dispatch = useDispatch();
 
     const columns = [
         {
@@ -42,8 +46,15 @@ const Detail = () => {
         }
     }
 
+     useEffect(() => {
+         dispatch(setTitle({ title: 'Route Schedule', ifBack: false }));
+
+         return () => {
+             dispatch(setTitle({ title: '', ifBack: false }));
+         };
+     }, [dispatch]);
+
     return <div className='py-2 px-4'>
-        <BackTitle title="Route Schedule" />
         <div className='mt-4'>
             <TableContainer>
                 <Table stickyHeader aria-label="sticky table">

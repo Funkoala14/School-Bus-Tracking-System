@@ -10,7 +10,7 @@ const AddressSchema = new Schema(
         address: { type: String, trim: true },
         coordinates: {
             lat: { type: String, required: true },
-            long: { type: String, required: true },
+            lng: { type: String, required: true },
         },
     },
     { timestamps: true }

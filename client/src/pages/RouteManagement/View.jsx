@@ -60,9 +60,9 @@ const View = () => {
         setOpen(false);
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(setTitle({ title: 'View Route', ifBack: true }));
-    },[])
+    }, [dispatch]);
     
     return (
         <div className='p-2'>

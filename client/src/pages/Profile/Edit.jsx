@@ -9,16 +9,28 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTitle } from '../../store/titleSlice';
+
 const Edit = () => {
+    const dispatch = useDispatch();
+    const { childInfo } = useSelector((state) => state.parent);
+    const { userName } = useSelector((state) => state.auth);
+
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
         surname: '',
         studentID: '',
     });
     const [edit, setEdit] = useState(false);
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+    } = useForm();
     const list = [
         {
             id: 1,
@@ -30,13 +42,11 @@ const Edit = () => {
             surname: 'First Name',
             studentID: 'Student ID',
         },
-    ]
-
+    ];
 
     const handleClose = () => {
         setOpen(false);
     };
-
 
     const onSubmit = (data) => {
         console.log(data, 'data');
@@ -46,7 +56,7 @@ const Edit = () => {
     const onEditHandler = (item) => {
         setFormData(item);
         setOpen(true);
-        Object.keys(item).forEach(key => {
+        Object.keys(item).forEach((key) => {
             setValue(key, item[key]);
         });
     };
@@ -60,18 +70,21 @@ const Edit = () => {
         handleClose();
     };
 
+    useEffect(() => {
+        dispatch(setTitle({ title: 'Edit Profile', ifBack: true }));
+        return () => {
+            dispatch(setTitle({ title: '', ifBack: false }));
+        };
+    }, [dispatch]);
+
     return (
         <div className='py-2 px-4'>
-            <BackTitle title='Edit Profile' />
             <div className='mt-4'>
                 {list.map((item) => (
                     <div key={item.id} className='border mt-2 border-gray-200 py-2 px-4 rounded-lg'>
                         <div>Surname: {item.surname}</div>
                         <div>Student ID: {item.studentID}</div>
-                        <Stack direction='row' spacing={1} className='mt-2'>
-                            <EditNoteIcon color='primary' onClick={() => onEditHandler(item)} className='cursor-pointer' />
-                            <DeleteIcon color='error' onClick={() => onDeleteHandler(item)} className='cursor-pointer' />
-                        </Stack>
+                        <DeleteIcon color='error' onClick={() => onDeleteHandler(item)} className='cursor-pointer' />
                     </div>
                 ))}
                 <div className='mt-4'>
@@ -84,10 +97,10 @@ const Edit = () => {
                 <form onSubmit={handleSubmit(onSubmitProfile)}>
                     <Stack spacing={2}>
                         <TextField
+                            disabled
                             label='Username'
                             {...register('userName', { required: 'Username is required' })}
                             error={!!errors?.userName}
-                            disabled={!edit}
                         />
                         <TextField
                             name='studentId'
@@ -132,7 +145,7 @@ const Edit = () => {
                     onSubmit: handleSubmit(onSubmit),
                 }}
             >
-                <DialogTitle>{formData?.surname ? 'Edit' : 'Add'}</DialogTitle>
+                <DialogTitle>Add Student</DialogTitle>
                 <DialogContent>
                     <form>
                         <Stack spacing={2}>
@@ -157,6 +170,6 @@ const Edit = () => {
             </Dialog>
         </div>
     );
-}
+};
 
 export default Edit;

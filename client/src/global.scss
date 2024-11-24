@@ -12,3 +12,28 @@ html, body, #root {
         display: none !important;
     }
 }
+
+
+
+.view-container {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1rem;
+  width: 100%;
+
+  .view-item {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    color: #69748a;
+    font-size: 0.875rem;
+    span {
+      font-size: 1rem;
+      min-height: 2rem;
+      line-height: 2rem;
+      color: #000;
+    }
+  }
+}

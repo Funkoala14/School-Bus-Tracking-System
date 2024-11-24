@@ -5,7 +5,6 @@ import Bus from './Bus.js';
 import Route from './Route.js';
 import Parent from './Parent.js';
 import Student from './Student.js';
-import { trim } from 'validator';
 
 const refType = Schema.Types.ObjectId;
 

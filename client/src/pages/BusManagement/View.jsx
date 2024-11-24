@@ -68,9 +68,9 @@ const View = () => {
         setOpen(false);
     };
 
-    useEffect(()=> {
+    useEffect(() => {
         dispatch(setTitle({ title: 'View Bus', ifBack: true }));
-    },[])
+    }, [dispatch]);
 
     return (
         <div className='p-2'>

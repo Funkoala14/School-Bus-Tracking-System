@@ -1,125 +1,134 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { TextField, Button, Stack } from '@mui/material';
-import BackTitle from '@components/BackTitle';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Controller } from 'react-hook-form';
 import dayjs from 'dayjs';
+import { useDispatch, useSelector } from 'react-redux';
+import { getDriverInfo, updateDriverProfile } from '../../store/driverSlice/driver.thunk';
+import { setTitle } from '../../store/titleSlice';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+
 const Edit = () => {
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const id = searchParams.get('id');
-    const { register, handleSubmit, control, formState: { errors }, setValue } = useForm();
+    const dispatch = useDispatch();
+    const { info } = useSelector((state) => state.driver);
 
-    useEffect(() => {
-        if (id) {
-            console.log(id, 'edit');
-            // 模拟从后端获取数据
-            // 实际使用时替换为真实的 API 调用
-            const mockDriverData = {
-                userName: 'John Doe',
-                firstName: 'John',
-                lastName: 'Doe',
-                email: 'john.doe@example.com',
-                phoneNumber: '1234567890',
-                driverLicense: '1234567890',
-                licenseDate: dayjs('2024-01-01'),
-            }
-
-            // 设置表单默认值
-            Object.keys(mockDriverData).forEach(key => {
-                setValue(key, mockDriverData[key]);
-            });
-        } else {
-            console.log('add');
-        }
-    }, [id]);
+    const {
+        register,
+        handleSubmit,
+        control,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm({
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            driverLicense: '',
+            licenseExpiry: null,
+        },
+    });
 
     const onSubmit = (data) => {
-        console.log(data, 'data');
+        const formattedData = {
+            ...data,
+            licenseExpiry: dayjs(data.licenseExpiry).format('MM/DD/YYYY'),
+        };
+
+        console.log(formattedData, 'data');
+        dispatch(updateDriverProfile(formattedData));
     };
 
-    return <div className='p-4'>
-        <BackTitle title={'Edit Profile'} />
-        <div
-            className='w-full p-4'
-        >
+    useEffect(() => {
+        dispatch(setTitle({ title: 'Edit Profile', ifBack: true }));
+        dispatch(getDriverInfo());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (info) {
+            reset({
+                firstName: info.firstName || '',
+                lastName: info.lastName || '',
+                email: info.email || '',
+                phone: info.phone || '',
+                license: info.license || '',
+                licenseExpiry: info.licenseExpiry ? dayjs(info.licenseExpiry) : null,
+            });
+        }
+    }, [info, reset]);
+    const [value, setDValue] = useState(null);
+
+    return (
+        <div className='w-full p-4'>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Stack spacing={2}>
                     <TextField
-                        label="Username"
-                        {...register('userName', { required: 'Username is required' })}
-                        error={!!errors?.userName}
-                        disabled
-                    />
-                    <TextField
-                        label="First name"
+                        label='First name'
                         {...register('firstName', { required: 'First name is required' })}
                         error={!!errors?.firstName}
                     />
                     <TextField
-                        label="Last name"
+                        label='Last name'
                         {...register('lastName', { required: 'Last name is required' })}
                         error={!!errors?.lastName}
                     />
+                    <TextField label='Email' {...register('email', { required: 'Email is required' })} error={!!errors?.email} disabled />
                     <TextField
-                        label="Email"
-                        {...register('email', { required: 'Email is required' })}
-                        error={!!errors?.email}
-                        disabled
+                        label='phone number'
+                        {...register('phone', { required: 'Phone number is required' })}
+                        error={!!errors?.phone}
                     />
                     <TextField
-                        label="phone number"
-                        {...register('phoneNumber', { required: 'Phone number is required' })}
-                        error={!!errors?.phoneNumber}
-                    />
-                    <TextField
-                        label="driver license"
-                        {...register('driverLicense', { required: 'Driver license is required' })}
-                        error={!!errors?.driverLicense}
+                        label='driver license'
+                        {...register('license', { required: 'Driver license is required' })}
+                        error={!!errors?.license}
                     />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={['DatePicker']}>
-                            <Controller
-                                name="licenseDate"
-                                control={control}
-                                rules={{ required: 'License date is required' }}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => {
-                                    return (
-                                        <DatePicker
-                                            label="License date"
-                                            value={value || null}
-                                            onChange={(date) => onChange(date)}
-                                            slotProps={{
-                                                textField: {
-                                                    error: !!error,
-                                                }
-                                            }}
-                                        />
-                                    )
-                                }}
-                            />
-                        </DemoContainer>
+                        <Controller
+                            name='licenseExpiry'
+                            control={control}
+                            rules={{
+                                required: 'License date is required',
+                                validate: (value) => dayjs(value).isAfter(dayjs(), 'day') || 'Date must be after today',
+                            }}
+                            render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                <MobileDatePicker
+                                    label='License date'
+                                    value={value || null}
+                                    onChange={(date) => onChange(date)}
+                                    minDate={dayjs()} // Disable dates before today
+                                    disablePast // Disable past dates
+                                    slotProps={{
+                                        textField: {
+                                            error: !!error,
+                                            sx: { backgroundColor: '#fff' }, // Optional: Add consistent styling
+                                        },
+                                    }}
+                                />
+                            )}
+                        />
                     </LocalizationProvider>
+
                     <Button
-                        type="submit"
+                        type='submit'
                         sx={{
                             color: '#00E0A1',
                             height: 40,
                             borderRadius: 15,
                         }}
-                        variant="outlined"
-                        color="primary">
+                        variant='outlined'
+                        color='primary'
+                    >
                         Submit
                     </Button>
                 </Stack>
             </form>
         </div>
-    </div>;
+    );
 };
 
 export default Edit;

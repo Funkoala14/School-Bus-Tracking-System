@@ -40,9 +40,9 @@ const View = () => {
     };
 
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(setTitle({ title: 'View Student', ifBack: true }));
-    },[])
+    }, [dispatch]);
     
     return (
         <>

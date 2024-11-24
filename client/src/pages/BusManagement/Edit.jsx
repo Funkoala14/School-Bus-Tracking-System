@@ -45,9 +45,9 @@ const Edit = () => {
         console.log(data, 'data');
     };
 
-    useEffect(()=> {
+    useEffect(() => {
         dispatch(setTitle({ title: id ? 'Edit Bus' : 'Add Bus', ifBack: true }));
-    },[])
+    }, [dispatch]);
 
     return <div className='p-4'>
         <BackTitle title={id ? 'Edit Bus' : 'Add Bus'} />

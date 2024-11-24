@@ -46,9 +46,9 @@ const Edit = () => {
         console.log(data, 'data');
     };
 
-    useEffect(()=> {
+    useEffect(() => {
         dispatch(setTitle({ title: id ? 'Edit Parent' : 'Add Parent', ifBack: true }));
-    },[])
+    }, [dispatch]);
 
     return <div className='p-4'>
         <div

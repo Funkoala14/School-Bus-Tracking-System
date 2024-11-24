@@ -15,7 +15,7 @@ const MapComponent = (props) => {
         <APIProvider apiKey={API_KEY} language='en'>
             <Map
                 className={cs(['w-full h-full', className])}
-                defaultCenter={{ lat: 52.19566102463737, long: -2.2203824104736944 }}
+                defaultCenter={{ lat: 52.19566102463737, lng: -2.2203824104736944 }}
                 defaultZoom={14}
                 maxZoom={18}
                 minZoom={10}

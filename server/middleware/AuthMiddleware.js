@@ -12,7 +12,7 @@ export const jwtValidation = (req, res, next) => {
     try {
         // verify token
         const decodedToken = jwt.verify(token, config.JWT_SECRET);
-        console.log(decodedToken);
+        console.log('decodedToken: ', decodedToken);
 
         // get user info from token
         req.user = {
@@ -24,6 +24,7 @@ export const jwtValidation = (req, res, next) => {
             phone: decodedToken.phone,
         };
 
+        console.log('req.user: ', req.user);
         next();
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
