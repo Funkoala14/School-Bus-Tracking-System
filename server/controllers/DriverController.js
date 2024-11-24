@@ -3,7 +3,10 @@ import Driver from '../models/Driver.js';
 export const getDriverInfo = async (req, res) => {
     const { userId } = req.user;
     try {
-        const driver = await Driver.findById(userId).populate({ path: 'assignedBus', populate: 'assignedRoutes' });
+        const driver = await Driver.findById(userId).populate({
+            path: 'assignedBus',
+            populate: { path: 'assignedRoutes', populate: [{ path: 'schedule', populate: 'stopTimes.stop' }, {path: 'stops', populate: "address"}] },
+        });
         return res.status(200).json({
             message: 'success',
             code: 200,
@@ -20,7 +23,7 @@ export const postUpdateDriverProfile = async (req, res) => {
     try {
         const updatedDriver = await Driver.findByIdAndUpdate(userId, req.body, { new: true, runValidators: true }).populate({
             path: 'assignedBus',
-            populate: 'assignedRoutes',
+            populate: 'assignedRoutes'
         });
         return res.status(200).json({
             message: 'success',

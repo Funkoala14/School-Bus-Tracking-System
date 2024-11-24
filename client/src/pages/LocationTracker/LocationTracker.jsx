@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef } from "react";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { DirectionsRenderer, GoogleMap, Polyline, useJsApiLoader } from '@react-google-maps/api';
 import { Button, Typography, Container, Box, ToggleButtonGroup, ToggleButton, Snackbar, Alert } from '@mui/material'; // Importing MUI components
 import { setTitle } from '../../store/titleSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
-import { NotificationSnackbar } from '../../components/NotificationSnackbar/NotificationSnackbar';
 import { getDriverInfo } from '../../store/driverSlice/driver.thunk';
+import DirectionsMap from '../../components/DirectionsMap/DirectionsMap';
+import { Marker } from '@vis.gl/react-google-maps';
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import { showNotification } from '../../store/notificationSlice/notification.slice';
 
 const LocationTracker = () => {
     const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 }); // Stores the current location of the user
@@ -15,10 +18,11 @@ const LocationTracker = () => {
     const markerRef = useRef(null); // Reference for the map marker
     const mapRef = useRef(null); // Reference for the Google Map instance
     const dispatch = useDispatch();
-    const [direction, setDirection] = useState('inBound');
+    const [direction, setDirection] = useState('inbound');
     const [socket, setSocket] = useState(null);
     const { userId } = useSelector((state) => state.auth);
     const { info } = useSelector((state) => state.driver);
+    const [directionsResponse, setDirectionsResponse] = useState(null);
 
     // Load Google Maps JavaScript API
     const { isLoaded } = useJsApiLoader({
@@ -164,7 +168,62 @@ const LocationTracker = () => {
     };
 
     const handleChange = (event, value) => {
-        setDirection(value);
+        if (value !== null) {
+            setDirection(value);
+        }
+    };
+
+    const calculateRoute = async () => {
+        if (
+            !currentLocation ||
+            !info ||
+            !info.assignedBus ||
+            !info.assignedBus.assignedRoutes ||
+            info.assignedBus.assignedRoutes.length === 0
+        )
+            return;
+
+        // Extracting stops from the assigned routes
+        const route = await info.assignedBus.assignedRoutes.find((item) => item.direction === direction);
+
+        if (!route) {
+            dispatch(showNotification({ message: `${direction} no route`, severity: 'error' }));
+            if (direction === 'inbound') {
+                setDirection('outbound');
+            } else {
+                setDirection('inbound');
+            }
+        }
+        const stops = route.stops; // Assuming only one assigned route
+        const waypoints =
+            stops.slice(1, -1)?.map((stop) => ({
+                location: new google.maps.LatLng(stop.address.coordinates.lat, stop.address.coordinates.lng),
+                stopover: true,
+            })) || [];
+
+        // Setting the origin (first stop) and destination (last stop)
+        const origin = new google.maps.LatLng(stops[0].address.coordinates.lat, stops[0].address.coordinates.lng);
+        const destination = new google.maps.LatLng(
+            stops[stops.length - 1].address.coordinates.lat,
+            stops[stops.length - 1].address.coordinates.lng
+        );
+
+        const directionsService = new google.maps.DirectionsService();
+        directionsService.route(
+            {
+                origin: origin,
+                destination: destination,
+                waypoints: waypoints, // Set waypoints for the route
+                travelMode: google.maps.TravelMode.DRIVING, // Mode of travel
+            },
+            (result, status) => {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    setDirectionsResponse(result);
+                } else {
+                    console.error('Directions request failed due to ' + status);
+                }
+            }
+        );
     };
 
     // Clean up resources when the component unmounts
@@ -182,12 +241,15 @@ const LocationTracker = () => {
             if (info.assignedBus) {
                 if (info.assignedBus.assignedRoutes.length === 0) {
                     setError('No Assigned Route');
+                } else {
+                    calculateRoute();
                 }
             } else {
                 setError('No Assigned Bus');
             }
         }
-    }, [info]);
+    }, [info, direction]);
+
     useEffect(() => {
         const socketId = localStorage.getItem('socketId');
         if (socketId) {
@@ -238,15 +300,30 @@ const LocationTracker = () => {
                         }
                     }}
                     center={currentLocation} // Center the map on the user's current location
-                    zoom={15}
+                    zoom={13}
                     mapContainerStyle={{ width: '100%', height: '100%' }}
                     options={{
                         streetViewControl: false, // Disable Street View control
                         fullscreenControl: false, // Disable fullscreen control
                         mapTypeControl: false, // Disable map type selection
                     }}
-                />
-
+                >
+                    {currentLocation.lat !== 0 && currentLocation.lng !== 0 && (
+                        <Marker icon={<DirectionsBusIcon />} position={currentLocation} />
+                    )}
+                    {/* Render DirectionsRenderer if directions are available */}
+                    {directionsResponse && (
+                        <DirectionsRenderer
+                            directions={directionsResponse}
+                            options={{
+                                polylineOptions: {
+                                    strokeColor: '#62dea7', // Route color
+                                    strokeWeight: 5,
+                                },
+                            }}
+                        />
+                    )}
+                </GoogleMap>
                 {!error && (
                     <>
                         <ToggleButtonGroup
@@ -265,8 +342,8 @@ const LocationTracker = () => {
                             disabled={tracking ? true : false}
                             aria-label='Direction'
                         >
-                            <ToggleButton value='inBound'>inbound</ToggleButton>
-                            <ToggleButton value='outBound'>outbound</ToggleButton>
+                            <ToggleButton value='inbound'>inbound</ToggleButton>
+                            <ToggleButton value='outbound'>outbound</ToggleButton>
                         </ToggleButtonGroup>
                         {/* Button to start or stop location tracking */}
                         <Button

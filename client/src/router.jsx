@@ -354,7 +354,14 @@ const AppRouter = () => {
                                 }
                             />
 
-                            <Route path='schedule/detail' element={<RouteScheduleDetail />} />
+                            <Route
+                                path='schedule/detail'
+                                element={
+                                    <MainLayout paths={paths.driverPaths}>
+                                        <RouteScheduleDetail />
+                                    </MainLayout>
+                                }
+                            />
                         </Route>
 
                         <Route path='*' element={<NotFound />} />

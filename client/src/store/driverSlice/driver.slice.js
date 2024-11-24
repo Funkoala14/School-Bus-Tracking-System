@@ -17,9 +17,15 @@ const driverSlice = createSlice({
     name: 'driver',
     initialState: {
         info: [],
+        selectedRoute: null,
         loading: false,
     },
-    reducers: {},
+    reducers: {
+        selectRoute: (state, action) => {
+            console.log(action.payload);
+            state.selectedRoute = action.payload;
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getDriverInfo.pending, setPending)
@@ -30,6 +36,6 @@ const driverSlice = createSlice({
             .addCase(getDriverInfo.rejected, setRejected);
     },
 });
-
+export const { selectRoute } = driverSlice.actions;
 const driverReducer = driverSlice.reducer;
 export default driverReducer;

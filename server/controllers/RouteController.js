@@ -225,7 +225,7 @@ export const postUpdateStop = async (req, res) => {
     session.startTransaction();
 
     try {
-        const { list } = req.body;
+        const { list, routeId } = req.body;
         let updatedStops = [];
         const stopUpdates = list.map(async (stopData, i) => {
             const { _id, stopName, address } = stopData;
@@ -246,6 +246,11 @@ export const postUpdateStop = async (req, res) => {
         });
 
         await Promise.all(stopUpdates);
+
+        const route = await Route.findById(routeId);
+        route.stops = updatedStops.sort((a, b) => a.order - b.order).map((stop) => stop._id);
+
+        await route.save();
 
         await session.commitTransaction();
 
