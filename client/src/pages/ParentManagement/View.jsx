@@ -50,9 +50,9 @@ const View = () => {
         setOpen(false);
     };
 
-    useEffect(()=> {
+    useEffect(() => {
         dispatch(setTitle({ title: 'View Parent', ifBack: true }));
-    },[])
+    }, [dispatch]);
 
     return (
         <div>

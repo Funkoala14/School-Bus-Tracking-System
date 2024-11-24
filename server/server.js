@@ -3,6 +3,7 @@ import connection from './config/connection.js';
 import config from './config/config.js';
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { updateLiveTimeRoute } from './controllers/RouteScheduleController.js';
 
 // HTTP server to use with Socket.IO
 const server = createServer(app);
@@ -30,11 +31,11 @@ io.on('connection', (socket) => {
 
     // Listen for driver's live location updates
     socket.on('driverLocation', (data) => {
-        const { driverId, latitude, longitude } = data;
-        console.log(`Received location for driver ${driverId}: ${latitude}, ${longitude}`);
-
+        const { driverId, lat, lng } = data;
+        console.log(`Received location for driver ${driverId}: ${lat}, ${lng}`);
+        updateLiveTimeRoute({ driverId, lat, lng , socket});
         // Broadcast the location update to all connected clients
-        io.emit(`locationUpdate:${driverId}`, { latitude, longitude });
+        io.emit(`locationUpdate:${driverId}`, { lat, lng });
     });
 
     // Handle client disconnect

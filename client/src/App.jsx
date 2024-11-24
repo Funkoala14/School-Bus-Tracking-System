@@ -11,7 +11,8 @@ const theme = createTheme({
             light: '#fff',
         },
         secondary: {
-            main: '#1a3357', // Main secondary color (same green as primary)
+            main: '#112138', // Main secondary color (same green as primary)
+            light: '#1a3357',
         },
         // Define other colors as needed
         error: {

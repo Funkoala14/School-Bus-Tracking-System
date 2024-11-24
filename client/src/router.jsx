@@ -322,14 +322,6 @@ const AppRouter = () => {
                             }
                         >
                             <Route
-                                path='home'
-                                element={
-                                    <MainLayout paths={paths.driverPaths}>
-                                        <Home />
-                                    </MainLayout>
-                                }
-                            />
-                            <Route
                                 path='profile'
                                 element={
                                     <MainLayout paths={paths.driverPaths}>

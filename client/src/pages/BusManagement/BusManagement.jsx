@@ -22,9 +22,9 @@ const BusManagement = () => {
         navigate(`/admin/bus-management/view?id=${item.id}`);
     };
 
-    useEffect(()=> {
-        dispatch(setTitle({ title:'Bus Management', ifBack: false }));
-    },[])
+    useEffect(() => {
+        dispatch(setTitle({ title: 'Bus Management', ifBack: false }));
+    }, [dispatch]);
 
     return (
         <div className='p-2'>

@@ -38,7 +38,7 @@ const MainLayout = ({ paths, children }) => {
                     </div>
                 }
                 {/* Main content area */}
-                <div style={title ? { padding: '16px', paddingTop: '3.5rem' } : {}}>
+                <div style={title ? { padding: '16px', paddingTop: '4rem' } : {}}>
                     {children}
                 </div>
                 {/* Drawer Component */}

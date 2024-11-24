@@ -26,7 +26,7 @@ const StudentManagement = () => {
     useEffect(() => {
         dispatch(setTitle({ title: 'Student Management', ifBack: false }));
         dispatch(studentListThunk());
-    }, []);
+    }, [dispatch]);
 
     return (
         <div className='p-2'>

@@ -1,71 +1,56 @@
 import BackTitle from '@components/BackTitle';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import Button from '@mui/material/Button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getDriverInfo } from '../../store/driverSlice/driver.thunk';
+import { setTitle } from '../../store/titleSlice';
+import { formatDate } from '../../assets/publicUtils';
 const View = () => {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const id = searchParams.get('id');
-
-    const list = [
-        {
-            id: 1,
-            name: 'Username',
-        },
-        {
-            id: 2,
-            name: 'First name',
-        },
-        {
-            id: 3,
-            name: 'Last name',
-        },
-        {
-            id: 4,
-            name: 'Email',
-        },
-        {
-            id: 5,
-            name: 'phone number',
-        },
-        {
-            id: 6,
-            name: 'driver license',
-        },
-        {
-            id: 7,
-            name: 'license expire date',
-        }
-    ];
-
-    console.log(location, id, 'id');
+    const dispatch = useDispatch();
+    const { info } = useSelector((state) => state.driver);
 
     const editHandler = () => {
-        navigate(`/driver/profile/edit?id=${id}`);
+        navigate('/driver/profile/edit');
     };
 
+    useEffect(() => {
+        dispatch(setTitle({ title: 'Profile', ifBack: false }));
+        dispatch(getDriverInfo());
+    }, [dispatch]);
     return (
-        <div className='p-2'>
-            <BackTitle title='Profile' />
-            <div>
-                <div>
-                    {list.map((item) => (
-                        <div className='mt-2 ' key={item.id}>
-                            <span className='flex-1 font-bold'>{item.name}：</span>
-                            <span className='w-full break-all'>
-                                value
-                            </span>
-                        </div>
-                    ))}
-                </div>
-                <div className='mt-4'>
-                    <div></div>
-                    <div className='flex gap-2'>
-                        <Button variant='outlined' color='primary' startIcon={<EditNoteIcon color='primary' />} onClick={editHandler}>Edit</Button>
-                    </div>
-                </div>
+        <div className='p-2 flex flex-col gap-3'>
+            <div className='view-container'>
+                <label className='view-item'>
+                    First Name
+                    <span>{info?.firstName}</span>
+                </label>
+                <label className='view-item'>
+                    Last Name
+                    <span>{info?.lastName}</span>
+                </label>
+                <label className='view-item'>
+                    License
+                    <span>{info?.license}</span>
+                </label>
+                <label className='view-item'>
+                    License Expiry Data
+                    <span>{formatDate(info?.licenseExpiry)}</span>
+                </label>
+                <label className='view-item'>
+                    Phone
+                    <span>{info?.phone}</span>
+                </label>
+                <label className='view-item'>
+                    Email
+                    <span>{info?.email}</span>
+                </label>
             </div>
+            <Button variant='outlined' color='primary' startIcon={<EditNoteIcon color='primary' />} onClick={editHandler}>
+                Edit
+            </Button>
         </div>
     );
 };

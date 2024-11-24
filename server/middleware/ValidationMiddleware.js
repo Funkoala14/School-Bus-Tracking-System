@@ -197,13 +197,7 @@ const addressValidation = (address) => {
     if (!city || validator.isEmpty(city)) return createErrorResponse(ERROR_MESSAGES.missingCity);
     if (!state || validator.isEmpty(state)) return createErrorResponse(ERROR_MESSAGES.missingState);
     if (!zipcode || validator.isEmpty(zipcode)) return createErrorResponse(ERROR_MESSAGES.missingZipcode);
-    if (
-        !coordinates ||
-        !coordinates.lat ||
-        !coordinates.long ||
-        validator.isEmpty(coordinates.lat) ||
-        validator.isEmpty(coordinates.long)
-    ) {
+    if (!coordinates || !coordinates.lat || !coordinates.lng || validator.isEmpty(coordinates.lat) || validator.isEmpty(coordinates.lng)) {
         return createErrorResponse(ERROR_MESSAGES.missingCoordinates);
     }
     return null;

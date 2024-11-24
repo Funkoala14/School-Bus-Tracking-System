@@ -6,6 +6,8 @@ import notificationReducer from './notificationSlice/notification.slice.js';
 import adminReducer from './adminSlice/admin.slice.js';
 import routeReducer from './routeSlice/route.slice.js';
 import titleReducer from './titleSlice.js';
+import parentReuducer from './parentSlice/parent.slice.js';
+import driverReducer from './driverSlice/driver.slice.js';
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -13,13 +15,15 @@ const rootReducer = combineReducers({
     admin: adminReducer,
     route: routeReducer,
     title: titleReducer,
+    parent: parentReuducer,
+    driver: driverReducer,
 });
 
 // Persist configuration
 const persistConfig = {
     key: 'root',
     storage, // Use localStorage to persist the state
-    whitelist: ['auth', 'admin', 'route', 'title'],
+    whitelist: ['auth', 'notification', 'admin', 'route', 'title', 'parent', 'driver'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
