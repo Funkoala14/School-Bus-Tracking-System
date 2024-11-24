@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import { Button, Typography, Container, Box } from "@mui/material";  // Importing MUI components
-import { setTitle } from "../../store/titleSlice";
+import { Button, Typography, Container, Box, ToggleButtonGroup, ToggleButton, Snackbar, Alert } from '@mui/material'; // Importing MUI components
+import { setTitle } from '../../store/titleSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import socket from '../../services/socket';
+import { io } from 'socket.io-client';
+import { NotificationSnackbar } from '../../components/NotificationSnackbar/NotificationSnackbar';
+import { getDriverInfo } from '../../store/driverSlice/driver.thunk';
 
 const LocationTracker = () => {
     const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 }); // Stores the current location of the user
@@ -13,7 +15,10 @@ const LocationTracker = () => {
     const markerRef = useRef(null); // Reference for the map marker
     const mapRef = useRef(null); // Reference for the Google Map instance
     const dispatch = useDispatch();
+    const [direction, setDirection] = useState('inBound');
+    const [socket, setSocket] = useState(null);
     const { userId } = useSelector((state) => state.auth);
+    const { info } = useSelector((state) => state.driver);
 
     // Load Google Maps JavaScript API
     const { isLoaded } = useJsApiLoader({
@@ -54,16 +59,55 @@ const LocationTracker = () => {
         }
     }, [isLoaded]); // Dependencies ensure this runs only when the map is loaded
 
+    const reconnectWS = () => {
+        const socketId = localStorage.getItem('socketId');
+        if (socketId) {
+            const existingSocket = io(import.meta.env.VITE_BACKEND_URL, {
+                query: { socketId },
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+            });
+
+            existingSocket.on('connect', () => {
+                console.log('Reconnected to server with socketId:', existingSocket.id);
+                localStorage.setItem('socketId', existingSocket.id); // Save the new socketId in localStorage
+                setTracking(true); // Enable tracking mode
+            });
+
+            existingSocket.on('disconnect', () => {
+                console.log('Disconnected from server');
+                setTracking(false);
+                localStorage.removeItem('socketId');
+                localStorage.setItem('trackingState', 'false');
+            });
+
+            setSocket(existingSocket);
+        }
+    };
     // Start tracking the user's location
-    const startTracking = () => {
+    const startTracking = async () => {
         if (!navigator.geolocation) {
             setError('Geolocation is not supported by this browser.');
             return;
         }
 
-        setTracking(true); // Enable tracking mode
-        localStorage.setItem('trackingState', 'true'); // Save tracking state to localStorage
-        setError(null); // Clear any previous errors
+        const newSocket = io(import.meta.env.VITE_BACKEND_URL);
+        await newSocket.on('connect', () => {
+            console.log('Connected to server with socketId:', newSocket.id);
+            localStorage.setItem('socketId', newSocket.id); // Save the new socketId in localStorage
+            setTracking(true); // Enable tracking mode
+            localStorage.setItem('trackingState', 'true'); // Save tracking state to localStorage
+            setError(null); // Clear any previous errors
+            newSocket.emit('driverLocation', { ...currentLocation, direction });
+        });
+
+        newSocket.on('disconnect', () => {
+            console.log('Disconnected from server', newSocket.id);
+        });
+
+        await setSocket(newSocket);
 
         // Start listening for the user's location updates
         watchIdRef.current = navigator.geolocation.watchPosition(
@@ -80,7 +124,7 @@ const LocationTracker = () => {
                 const locationUpdateInterval = setInterval(() => {
                     // Check if socket is connected before emitting location
                     if (socket && socket.connected) {
-                        socket.emit('driverLocation', location); // Send the location data to the backend
+                        socket.emit('driverLocation', { ...location, direction }); // Send the location data to the backend
                     }
                 }, 60000); // 60000 ms = 1 minute
 
@@ -103,6 +147,7 @@ const LocationTracker = () => {
                 setError(error.message); // Capture any location errors
                 setTracking(false); // Disable tracking on error
                 localStorage.setItem('trackingState', 'false');
+                localStorage.removeItem('socketId');
             }
         );
     };
@@ -115,27 +160,50 @@ const LocationTracker = () => {
         }
         setTracking(false); // Disable tracking mode
         localStorage.setItem('trackingState', 'false');
+        localStorage.removeItem('socketId');
+    };
+
+    const handleChange = (event, value) => {
+        setDirection(value);
     };
 
     // Clean up resources when the component unmounts
     useEffect(() => {
         dispatch(setTitle({ title: 'Location Tracker', ifBack: false })); // Update the page title in Redux store
-
-        const savedTrackingState = localStorage.getItem('trackingState');
-        if (savedTrackingState === 'true') {
-            setTracking(true);
-            startTracking(); // Start tracking if the state is saved in localStorage
-        }
+        dispatch(getDriverInfo());
 
         return () => {
             dispatch(setTitle({ title: '', ifBack: false }));
+        };
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (info) {
+            if (info.assignedBus) {
+                if (info.assignedBus.assignedRoutes.length === 0) {
+                    setError('No Assigned Route');
+                }
+            } else {
+                setError('No Assigned Bus');
+            }
+        }
+    }, [info]);
+    useEffect(() => {
+        const socketId = localStorage.getItem('socketId');
+        if (socketId) {
+            reconnectWS(); // Attempt to reconnect if socketId exists
+        }
+
+        return () => {
+            if (socket) {
+                socket.disconnect();
+            }
 
             if (watchIdRef.current) {
                 navigator.geolocation.clearWatch(watchIdRef.current); // Stop geolocation tracking
-                socket.disconnect();
             }
         };
-    }, [dispatch]);
+    }, []);
 
     // Display a loading message until the Google Maps API is loaded
     if (!isLoaded) {
@@ -143,12 +211,19 @@ const LocationTracker = () => {
     }
 
     return (
-        <Container sx={{ height: 'calc(100vh - 4rem)', width: '100%', p: 0 }}>
+        <Container sx={{ height: 'calc(100vh - 6rem)', width: '100%', p: 0 }}>
             {/* Display any error messages */}
             {error && (
-                <Typography variant='h6' color='error' gutterBottom>
-                    Error: {error}
-                </Typography>
+                <Snackbar
+                    sx={{ top: '5rem', zIndex: 1 }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    open={error}
+                    autoHideDuration={'999999999999'}
+                >
+                    <Alert severity={'error'} sx={{ width: '70%' }}>
+                        {error}
+                    </Alert>
+                </Snackbar>
             )}
 
             <Box sx={{ position: 'relative', height: '100%' }}>
@@ -172,22 +247,45 @@ const LocationTracker = () => {
                     }}
                 />
 
-                {/* Button to start or stop location tracking */}
-                <Button
-                    variant='contained'
-                    color={tracking ? 'secondary' : 'primary'} // Change button color based on tracking state
-                    onClick={tracking ? stopTracking : startTracking} // Toggle tracking state
-                    sx={{
-                        position: 'absolute',
-                        bottom: '3rem',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        zIndex: 1,
-                        padding: '10px 20px',
-                    }}
-                >
-                    {tracking ? 'Stop Tracking' : 'Start Tracking'} {/* Change button text based on tracking state */}
-                </Button>
+                {!error && (
+                    <>
+                        <ToggleButtonGroup
+                            sx={{
+                                bgcolor: '#fff',
+                                position: 'absolute',
+                                bottom: '6rem',
+                                left: '50%',
+                                zIndex: 1,
+                                transform: 'translateX(-50%)',
+                            }}
+                            color='primary'
+                            value={direction}
+                            exclusive
+                            onChange={handleChange}
+                            disabled={tracking ? true : false}
+                            aria-label='Direction'
+                        >
+                            <ToggleButton value='inBound'>inbound</ToggleButton>
+                            <ToggleButton value='outBound'>outbound</ToggleButton>
+                        </ToggleButtonGroup>
+                        {/* Button to start or stop location tracking */}
+                        <Button
+                            variant='contained'
+                            color={tracking ? 'secondary' : 'primary'} // Change button color based on tracking state
+                            onClick={tracking ? stopTracking : startTracking} // Toggle tracking state
+                            sx={{
+                                position: 'absolute',
+                                bottom: '3rem',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                zIndex: 1,
+                                padding: '10px 20px',
+                            }}
+                        >
+                            {tracking ? 'Stop Tracking' : 'Start Tracking'} {/* Change button text based on tracking state */}
+                        </Button>
+                    </>
+                )}
             </Box>
         </Container>
     );

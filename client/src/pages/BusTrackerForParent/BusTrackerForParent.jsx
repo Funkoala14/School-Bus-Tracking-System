@@ -5,12 +5,13 @@ import socket from '../../services/socket'; // Assuming your socket instance
 import { useDispatch, useSelector } from 'react-redux';
 import { Phone } from '@mui/icons-material';
 import { getChildInfoThunk } from '../../store/parentSlice/parent.thunk';
+import DirectionsMap from '../../components/DirectionsMap/DirectionsMap';
 
 const ParentLocationTracker = () => {
     const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 }); // Stores the current location of the bus
     const [route, setRoute] = useState([]); // Stores the bus route as an array of coordinates
     const [error, setError] = useState(null); // Stores any errors related to location or WebSocket
-    const { userId, destination } = useSelector((state) => state.auth);
+    const { userId } = useSelector((state) => state.auth);
     const { childInfo } = useSelector((state) => state.parent);
 
     const markerRef = useRef(null); // Reference for the map marker
@@ -32,6 +33,7 @@ const ParentLocationTracker = () => {
             }
         }
     }, [childInfo]);
+    
     // Fetch the user's initial location when the component mounts
     useEffect(() => {
         if (navigator.geolocation) {
@@ -86,6 +88,7 @@ const ParentLocationTracker = () => {
     // }, [childRouteId, destination]); // Re-run the effect when childRouteId changes
 
     // Fetch the route information (this could be dynamic based on your route data)
+
     useEffect(() => {
         dispatch(getChildInfoThunk());
     }, [dispatch]);
@@ -109,47 +112,12 @@ const ParentLocationTracker = () => {
             )}
 
             <Box sx={{ position: 'relative', height: '100%' }}>
-                {/* Render the Google Map */}
-                <GoogleMap
-                    onLoad={(map) => {
-                        mapRef.current = map; // Store the map instance in a ref
-                        // Center the map on the user's current location
-                        if (currentLocation.lat !== 0 && currentLocation.lng !== 0) {
-                            map.panTo(currentLocation);
-                        }
-                    }}
-                    center={currentLocation} // Center the map on the user's current location
-                    zoom={13}
-                    mapContainerStyle={{ width: '100%', height: '100%' }}
-                    options={{
-                        streetViewControl: false, // Disable Street View control
-                        fullscreenControl: false, // Disable fullscreen control
-                        mapTypeControl: false, // Disable map type selection
-                    }}
-                >
-                    {/* Render the route as a polyline */}
-                    <Polyline
-                        path={route}
-                        geodesic={true}
-                        options={{
-                            strokeColor: '#0000FF',
-                            strokeOpacity: 1.0,
-                            strokeWeight: 2,
-                        }}
-                    />
-                    {route.map((stop, index) => (
-                        <Marker key={index} position={stop} title={`Stop ${index + 1}`} />
-                    ))}
-                    {/* Render the bus marker */}
-                    {currentLocation && (
-                        <Marker
-                            position={currentLocation}
-                            title='Bus Location'
-                            ref={markerRef}
-                            icon='http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-                        />
-                    )}
-                </GoogleMap>
+                {/* <DirectionsMap
+                    defaultCenter={currentLocation}
+                    origin={{ ...currentLocation, title: '123' }}
+                    destination={{ lat: 42.25220601155644, lng: -71.82450591692111 }}
+                    waypoints={[{ lat: 42.249839429634896, lng: -71.81860505711992 }]}
+                ></DirectionsMap> */}
 
                 {/* Display the time to destination */}
                 <Box className='absolute bottom-0 w-full bg-white p-4 shadow-lg rounded-t-xl'>

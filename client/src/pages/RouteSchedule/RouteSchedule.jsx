@@ -18,7 +18,6 @@ const RouteSchedule = () => {
     useEffect(() => {
         dispatch(setTitle({ title: 'Route Schedule', ifBack: false }));
 
-        dispatch(getDriverInfo());
         return () => {
             dispatch(setTitle({ title: '', ifBack: false }));
         };

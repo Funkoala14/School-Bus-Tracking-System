@@ -3,7 +3,7 @@ import { Snackbar, Alert } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearNotification } from '../../store/notificationSlice/notification.slice';
 
-export const NotificationSnackbar = () => {
+export const NotificationSnackbar = ({duration = 3000}) => {
     const dispatch = useDispatch();
     const { open, message, severity } = useSelector((state) => state.notification);
 
@@ -15,18 +15,13 @@ export const NotificationSnackbar = () => {
         if (open) {
             const timer = setTimeout(() => {
                 dispatch(clearNotification());
-            }, 3000);
+            }, duration);
             return () => clearTimeout(timer);
         }
     }, [open, dispatch]);
 
     return (
-        <Snackbar
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            open={open}
-            autoHideDuration={3000}
-            onClose={handleClose}
-        >
+        <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={open} autoHideDuration={duration} onClose={handleClose}>
             <Alert onClose={handleClose} severity={severity} sx={{ width: '70%' }}>
                 {message}
             </Alert>
