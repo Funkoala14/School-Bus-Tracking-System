@@ -150,7 +150,10 @@ export const postAssignStopToStudent = async (req, res) => {
         if (!stopId || validator.isEmpty(stopId)) return res.status(400).json({ message: 'Missing stop id', code: 400 });
 
         const stop = await Stop.findById(stopId);
-        const student = await Student.findByIdAndUpdate(studentId, { $set: { stop: stop._id, route: stop.route } });
+        const student = await Student.findByIdAndUpdate(studentId, {
+            $set: { stop: stop._id }, // Update stop
+            $addToSet: { route: stop.route }, // Add route to the array (avoids duplicates)
+        });
 
         return res.status(200).json({ message: 'Stops assigned successfully', code: 200 });
     } catch (error) {

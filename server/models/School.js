@@ -24,6 +24,10 @@ const SchoolSchema = new Schema(
         drivers: [{ type: refType, ref: 'Driver' }],
         parents: [{ type: refType, ref: 'Parent' }],
         students: [{ type: refType, ref: 'Student' }],
+        timeSchedule: {
+            startTime: { type: String, trim: true },
+            endTime: { type: String, trim: true },
+        }
     },
     { timestamps: true }
 );

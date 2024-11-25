@@ -1,13 +1,32 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { get, post } from '../../services/api';
 import { showNotification } from '../notificationSlice/notification.slice';
+import { getParentProfileThunk } from '../parentSlice/parent.thunk';
 
 export const loginThunk = createAsyncThunk('auth/login', async ({ userName, password }, { rejectWithValue, dispatch }) => {
     try {
         const { data, message } = await post('/auth/login', { userName, password });
         // Assuming the response structure: { message, code, data: { userId, userName, role } }
         const { role } = data;
-        window.location.href = `/${role.toLowerCase()}/home`
+        let path = 'home';
+        switch (role) {
+            case 'Admin':
+                path = 'route-management';
+                break;
+
+            case 'Parent':
+                path = 'bus-tracker';
+                await dispatch(getParentProfileThunk());
+                break;
+
+            case 'Driver':
+                path = 'tracker';
+                break;
+
+            default:
+                break;
+        }
+        window.location.href = `/${role.toLowerCase()}/${path}`;
         return data; // Return user data if successful
     } catch (error) {
         const errorMessage = error.response?.data?.message || 'Something went wrong';

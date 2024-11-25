@@ -85,16 +85,24 @@ export const postSetAddress = async (req, res) => {
     } catch (error) {}
 };
 
-export const getRouteDetail = async (req, res) => {
+export const getChildrenDetail = async (req, res) => {
     const { userId } = req.user;
     try {
         const parent = await Parent.findById(userId)
             .populate({
                 path: 'children',
-                select: '-school -parent -address -__v',
+                select: '-parent -address -__v',
                 populate: [
+                    { path: 'school', select: '-__v' },
                     { path: 'stop', select: '-__v' },
-                    { path: 'route', select: '-school -stops -__v' },
+                    {
+                        path: 'route',
+                        select: '-school -stop -__v',
+                        populate: [
+                            { path: 'assignedBus', populate: 'assignedDriver' },
+                            { path: 'stops', populate: 'address' },
+                        ],
+                    },
                 ],
             })
             .lean()
@@ -102,6 +110,20 @@ export const getRouteDetail = async (req, res) => {
         return res.status(200).json({
             message: 'success',
             data: parent?.children || [],
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
+    }
+};
+
+export const getParentProfile = async (req, res) => {
+    const { userId } = req.user;
+    try {
+        const parent = await Parent.findById(userId).select('-parent -password -__v').populate('address');
+        return res.status(200).json({
+            message: 'success',
+            data: parent,
         });
     } catch (error) {
         console.error(error);

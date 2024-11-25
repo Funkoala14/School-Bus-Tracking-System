@@ -8,7 +8,7 @@
             "address": "14 Richards Street, Worcester, MA 01603",
             "coordinates": {
                 "lat": "42.254101",
-                "long": "71.825506"
+                "lng": "71.825506"
             }
         },
         {
@@ -19,7 +19,7 @@
             "address": "299 Highland Street, Worcester, MA 01602",
             "coordinates": {
                 "lat": "42.267482",
-                "long": "71.821990"
+                "lng": "71.821990"
             }
         },
         {
@@ -30,7 +30,7 @@
             "address": "35 Nelson Place, Worcester, MA 01605",
             "coordinates": {
                 "lat": "42.308327",
-                "long": "71.794998"
+                "lng": "71.794998"
             }
         },
         {
@@ -41,7 +41,7 @@
             "address": "23 Elm Street, Worcester, MA 01609",
             "coordinates": {
                 "lat": "42.274278",
-                "long": "-71.803054"
+                "lng": "-71.803054"
             }
         },
         {
@@ -52,7 +52,7 @@
             "address": "100 Institute Road, Worcester, MA 01609",
             "coordinates": {
                 "lat": "42.274866",
-                "long": "-71.806110"
+                "lng": "-71.806110"
             }
         },
         {
@@ -63,7 +63,7 @@
             "address": "50 Salisbury Street, Worcester, MA 01609",
             "coordinates": {
                 "lat": "42.275654",
-                "long": "-71.801472"
+                "lng": "-71.801472"
             }
         },
         {
@@ -74,7 +74,7 @@
             "address": "7 Hillside Street, Worcester, MA 01610",
             "coordinates": {
                 "lat": "42.248794",
-                "long": "-71.812608"
+                "lng": "-71.812608"
             }
         }
     ],
@@ -280,7 +280,7 @@
                 "address": "1 Union Station, Worcester, MA 01608",
                 "coordinates": {
                     "lat": "42.2626",
-                    "long": "-71.8023"
+                    "lng": "-71.8023"
                 }
             }
         },
@@ -295,7 +295,7 @@
                 "address": "3 Salem Square, Worcester, MA 01608",
                 "coordinates": {
                     "lat": "42.2619",
-                    "long": "-71.8020"
+                    "lng": "-71.8020"
                 }
             }
         },
@@ -310,7 +310,7 @@
                 "address": "455 Main St, Worcester, MA 01608",
                 "coordinates": {
                     "lat": "42.2625",
-                    "long": "-71.8027"
+                    "lng": "-71.8027"
                 }
             }
         },
@@ -325,10 +325,9 @@
                 "address": "Hammond St, Worcester, MA 01610",
                 "coordinates": {
                     "lat": "42.2590",
-                    "long": "-71.8050"
+                    "lng": "-71.8050"
                 }
             }
-        },
-        
+        }
     ]
 }

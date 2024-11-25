@@ -19,6 +19,7 @@ const routeSlice = createSlice({
         routes: [],
         selectedRoute: null,
         loading: false,
+        nextStopData: null,
     },
     reducers: {
         selectRoute: (state, action) => {
@@ -26,6 +27,9 @@ const routeSlice = createSlice({
         },
         clearRoute: (state, action) => {
             state.selectedRoute = null;
+        },
+        setNextStopData: (state, action) => {
+            state.nextStopData = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -39,7 +43,7 @@ const routeSlice = createSlice({
     },
 });
 
-export const { selectRoute, clearRoute } = routeSlice.actions;
+export const { selectRoute, clearRoute, setNextStopData } = routeSlice.actions;
 
 const routeReducer = routeSlice.reducer;
 export default routeReducer;

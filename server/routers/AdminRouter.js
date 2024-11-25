@@ -8,12 +8,12 @@ const adminRouter = Router();
 
 adminRouter
     .get('/all', jwtValidation, checkPermission('Admin'), getUserList)
-    .get('/drivers', jwtValidation, getDriverList)
-    .get('/parents', jwtValidation, getParentList)
-    .get('/students', jwtValidation, getStudentList)
-    .post('/add-students', adminAddStudentValidation, jwtValidation, postSchoolAddStudent)
-    .post('/assign-stop', jwtValidation, postAssignStopToStudent)
-    .post('/generate-schedule', jwtValidation, generateRouteSchedule)
+    .get('/drivers', jwtValidation, checkPermission('Admin'), getDriverList)
+    .get('/parents', jwtValidation, checkPermission('Admin'), getParentList)
+    .get('/students', jwtValidation, checkPermission('Admin'), getStudentList)
+    .post('/add-students', adminAddStudentValidation, checkPermission('Admin'), jwtValidation, postSchoolAddStudent)
+    .post('/assign-stop', jwtValidation, checkPermission('Admin'), postAssignStopToStudent)
+    .post('/generate-schedule', jwtValidation, checkPermission('Admin'), generateRouteSchedule);
 
 
 export default adminRouter;

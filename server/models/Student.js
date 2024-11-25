@@ -13,7 +13,7 @@ const studentSchema = new Schema(
         lastName: { type: String, required: true, trim: true },
         school: { type: refType, ref: 'School' },
         parent: { type: refType, ref: 'Parent' },
-        route: { type: refType, ref: 'Route' },
+        route: [{ type: refType, ref: 'Route' }],
         stop: { type: refType, ref: 'Stop' },
         address: { type: refType, ref: 'Address' },
     },

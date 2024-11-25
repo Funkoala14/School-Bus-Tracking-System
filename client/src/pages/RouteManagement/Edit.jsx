@@ -39,9 +39,9 @@ const Edit = () => {
         }
     }, [id]);
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(setTitle({ title: id ? 'Edit Route' : 'Add Route', ifBack: true }));
-    },[])
+    }, [dispatch]);
     
     const onSubmit = (data) => {
         console.log(data, 'data');

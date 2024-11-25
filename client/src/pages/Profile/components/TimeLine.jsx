@@ -5,30 +5,9 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import Typography from '@mui/material/Typography';
-export default function OutlinedTimeline() {
 
-    const timeLineList = [
-        {
-            title: "School",
-            content: "Flagg Street School",
-            address: "115 Flagg St, Worcester, MA 01602",
-        },
-        {
-            title: "Student Name",
-            content: "Rachel",
-        },
-        {
-            title: "Contract Details",
-            content: "774-920-9200",
-        },
-        {
-            title: "Pick-Up/Drop-off Location",
-            content: "Royal Worcester Apartments, 45 Grand St, Worcester, MA 01610",
-        }
-    ]
-
-    const active = 0;
-
+export default function OutlinedTimeline(props) {
+    const { child } = props;
     return (
         <div className='p-4 pt-0'>
             <Timeline
@@ -39,31 +18,119 @@ export default function OutlinedTimeline() {
                     },
                 }}
             >
-                {
-                    timeLineList.map((item, index) => {
-                        return (
-                            <TimelineItem key={index}>
-                                <TimelineSeparator>
-                                    <TimelineDot variant="outlined" />
-                                    <TimelineConnector />
-                                </TimelineSeparator>
-                                <TimelineContent>
-                                    <Typography variant="" component={"div"} color={index === active ? "primary" : "#828282"} sx={{
-                                        fontSize: index === active ? "20px" : "18px",
-                                    }}>
-                                        {item.title}
-                                    </Typography>
-                                    <Typography variant="span" color="#0F3D65" sx={{
-                                        fontSize: "18px",
-                                    }}>
-                                        {item.content}
-                                    </Typography>
-                                </TimelineContent>
-                            </TimelineItem>
-                        )
-                    })
-                }
+                <TimelineItem>
+                    <TimelineSeparator>
+                        <TimelineDot variant='outlined' />
+                        <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                        <Typography
+                            variant=''
+                            component={'div'}
+                            color={'#828282'}
+                            sx={{
+                                fontSize: '18px',
+                            }}
+                        >
+                            Name
+                        </Typography>
+                        <Typography
+                            variant='span'
+                            color='#0F3D65'
+                            sx={{
+                                fontSize: '18px',
+                            }}
+                        >
+                            {child.firstName} {child.lastName}
+                        </Typography>
+                    </TimelineContent>
+                </TimelineItem>
+                <TimelineItem>
+                    <TimelineSeparator>
+                        <TimelineDot variant='outlined' />
+                        <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                        <Typography
+                            variant=''
+                            component={'div'}
+                            color={'#828282'}
+                            sx={{
+                                fontSize: '18px',
+                            }}
+                        >
+                            Student ID
+                        </Typography>
+                        <Typography
+                            variant='span'
+                            color='#0F3D65'
+                            sx={{
+                                fontSize: '18px',
+                            }}
+                        >
+                            {child.studentId}
+                        </Typography>
+                    </TimelineContent>
+                </TimelineItem>
+                <TimelineItem>
+                    <TimelineSeparator>
+                        <TimelineDot variant='outlined' />
+                        <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                        <Typography
+                            variant=''
+                            component={'div'}
+                            color={'#828282'}
+                            sx={{
+                                fontSize: '18px',
+                            }}
+                        >
+                            School
+                        </Typography>
+                        <Typography
+                            variant='span'
+                            color='#0F3D65'
+                            sx={{
+                                fontSize: '18px',
+                            }}
+                        >
+                            {child?.school?.name}
+                        </Typography>
+                    </TimelineContent>
+                </TimelineItem>
+                <TimelineItem>
+                    <TimelineSeparator>
+                        <TimelineDot variant='outlined' />
+                        <TimelineConnector />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                        <Typography
+                            variant=''
+                            component={'div'}
+                            color={'#828282'}
+                            sx={{
+                                fontSize: '18px',
+                            }}
+                        >
+                            Routes
+                        </Typography>
+                        {child?.route.length &&
+                            child?.route.map((route) => (
+                                <Typography
+                                    variant='span'
+                                    color='#0F3D65'
+                                    sx={{
+                                        fontSize: '18px',
+                                    }}
+                                    key={route._id}
+                                >
+                                    {route.name}
+                                </Typography>
+                            ))}
+                    </TimelineContent>
+                </TimelineItem>
             </Timeline>
-        </div >
+        </div>
     );
 }

@@ -1,11 +1,10 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { get } from '../../services/api';
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { get } from "../../services/api.js";
 
-export const allRoutesThunk = createAsyncThunk('/route/all', async (_, { rejectWithValue, dispatch }) => {
+export const getChildInfoThunk = createAsyncThunk('/parent/children-info', async (_, { rejectWithValue, dispatch }) => {
     try {
-        const { data, message } = await get('/route/all');
-        const { list } = data;
-        return list;
+        const { data, message } = await get('/parent/children-info');
+        return data;
     } catch (error) {
         const errorMessage = error.response?.data?.message;
         dispatch(
@@ -18,11 +17,10 @@ export const allRoutesThunk = createAsyncThunk('/route/all', async (_, { rejectW
     }
 });
 
-export const getDriverRoutes = createAsyncThunk('/driver/routes', async (_, { rejectWithValue, dispatch }) => {
+export const getParentProfileThunk = createAsyncThunk('/parent/profile', async (_, { rejectWithValue, dispatch }) => {
     try {
-        const { data, message } = await get('/driver/routes');
-        const { list } = data;
-        return list;
+        const { data, message } = await get('/parent/profile');
+        return data;
     } catch (error) {
         const errorMessage = error.response?.data?.message;
         dispatch(
