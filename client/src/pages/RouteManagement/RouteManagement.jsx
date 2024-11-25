@@ -5,13 +5,16 @@ import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import Typography from '@mui/material/Typography';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setTitle } from '../../store/titleSlice';
+import { allRoutesThunk } from '../../store/routeSlice/route.thunk';
+import moment from 'moment'
 
 const RouteManagement = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const routeList = useSelector(state => state.route.routes)
     const list = Array.from({ length: 6 }).map((_, index) => ({
         id: index,
         name: `Route ${index + 1}`,
@@ -19,12 +22,19 @@ const RouteManagement = () => {
 
     const visibilityHandler = (item) => {
         console.log('visibility');
-        navigate(`/admin/route-management/view?id=${item.id}`);
+        navigate(`/admin/route-management/view?id=${item._id}`);
     };
 
+<<<<<<< Updated upstream
     useEffect(()=>{
         dispatch(setTitle({ title: 'Route Management', ifBack: false }));
     },[dispatch])
+=======
+    useEffect(() => {
+        dispatch(setTitle({ title: 'Route Management', ifBack: true }));
+        dispatch(allRoutesThunk())
+    }, [])
+>>>>>>> Stashed changes
 
     return (
         <div className='p-2'>
@@ -32,13 +42,14 @@ const RouteManagement = () => {
 
             <div className='mt-2 grid grid-cols-1 gap-4'>
                 {
-                    list.map((item) => (
-                        <div key={item.id} className='col-span-3' onClick={() => visibilityHandler(item)}>
+                    Array.isArray(routeList) && routeList.map((item) => (
+                        <div key={item._id} className='col-span-3' onClick={() => visibilityHandler(item)}>
                             <Card>
                                 <CardContent>
-                                    <Typography variant='h5' sx={{ fontWeight: 'bold' }}>Route name</Typography>
+                                    <Typography variant='h5' sx={{ fontWeight: 'bold' }}>{item.name}</Typography>
                                     <Typography variant='body2' className='mt-2'>Stops</Typography>
-                                    <Typography variant='body2' className='mt-2'>Stops est arrival time</Typography>
+                                    {item.stops.length >= 1 && item.stops.map((item, i) => { return <div>{i + 1}.{item.stopName}</div> })}
+                                    <Typography variant='body2' className='mt-2'>Time: {moment(item.createdAt).format('YYYY-MM-DD hh:mm:ss')}</Typography>
                                 </CardContent>
                             </Card>
                         </div>

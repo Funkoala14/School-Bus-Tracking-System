@@ -11,15 +11,19 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setTitle } from '../../store/titleSlice';
+import moment from 'moment';
 const View = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
-
+    const route = useSelector((state) =>
+        state.route.routes.find((p) => p._id === id) // 从 Redux 中找到对应家长
+    );
+    console.log(route,'route')
     const list = [
         {
             id: 1,
@@ -68,14 +72,18 @@ const View = () => {
         <div className='p-2'>
             <div>
                 <div>
-                    {list.map((item) => (
-                        <div className='mt-2 ' key={item.id}>
-                            <span className='flex-1 font-bold'>{item.name}：</span>
+                    
+                        <div className='mt-2 '>
+                            <span className='flex-1 font-bold'>Name：</span>
                             <span className='w-full break-all'>
-                                value
+                                {route.name}
                             </span>
                         </div>
-                    ))}
+                        <div>
+                        {route.stops.length >= 1 && route.stops.map((item, i) => { return <div>{i + 1}.{item.stopName}</div> })}
+                        </div>
+                        <div>Inbound start time: {moment(route.createdAt).format('YYYY-MM-DD hh:mm:ss')}</div>
+                        <div>Outbound start time: {moment(route.updatedAt).format('YYYY-MM-DD hh:mm:ss')}</div>
                 </div>
                 <div className='mt-4'>
                     <div></div>

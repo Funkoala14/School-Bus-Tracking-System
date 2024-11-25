@@ -1,42 +1,35 @@
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
+import React, { useEffect } from 'react'; // 添加 useEffect 的导入
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Card, CardContent, CardActions, Button } from '@mui/material';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteIcon from '@mui/icons-material/Delete';
-import BackTitle from '@components/BackTitle';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setTitle } from '../../store/titleSlice';
+import BackTitle from '@components/BackTitle'; // 保留后退标题功能
+import { deleteParent } from '../../store/parentSlice/parent.thunk'; // 家长删除接口
+import { setTitle } from '../../store/titleSlice'; // 设置标题
 
 const View = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // 用于页面跳转
     const dispatch = useDispatch();
-    const [searchParams] = useSearchParams();
-    const id = searchParams.get('id');
-    const [open, setOpen] = useState(false);
+    const [searchParams] = useSearchParams(); // 获取 URL 参数
+    const parentId = searchParams.get('id'); // 从 URL 中获取家长 ID
+    const parent = useSelector((state) =>
+        state.parent.parentList.find((p) => p._id === parentId) // 从 Redux 中找到对应家长
+    );
 
-    const list = [
-        { id: 1, name: 'Full Name' },
-        { id: 2, name: 'Email' },
-        { id: 3, name: 'Phone number' },
-    ];
+    useEffect(() => {
+        // 设置页面标题和后退功能
+        dispatch(setTitle({ title: 'Parent Management', ifBack: true }));
+    }, [dispatch]);
 
-    const childrenList = [
-        { id: 1, name: 'Child Name', route: 'Route', stop: 'Stop' },
-        { id: 2, name: 'Child Name', route: 'Route', stop: 'Stop' },
-        { id: 3, name: 'Child Name', route: 'Route', stop: 'Stop' },
-    ];
-
-    const editHandler = () => {
-        navigate(`/admin/parent-management/edit?id=${id}`);
+    const handleDelete = () => {
+        if (window.confirm('Are you sure you want to delete this parent?')) {
+            // 调用删除接口，并在成功后返回列表页面
+            dispatch(deleteParent(parentId)).then(() => navigate('/admin/parent-management'));
+        }
     };
 
+<<<<<<< Updated upstream
     const deleteHandler = () => {
         setOpen(true);
     };
@@ -53,65 +46,43 @@ const View = () => {
     useEffect(() => {
         dispatch(setTitle({ title: 'View Parent', ifBack: true }));
     }, [dispatch]);
+=======
+    if (!parent) return <p>Parent not found</p>; // 如果家长信息未找到，显示提示
+>>>>>>> Stashed changes
 
     return (
-        <div>
-            <div>
-                <div>
-                    {list.map((item) => (
-                        <div className="mt-2" key={item.id}>
-                            <span className="flex-1 font-bold">{item.name}:</span>
-                            <span className="w-full break-all">value</span>
-                        </div>
-                    ))}
-                </div>
-                <div className="mt-2 border border-gray-200">
-                    {childrenList.map((item) => (
-                        <div
-                            className="border-b border-gray-200 last:border-b-0 p-4"
-                            key={item.id}
-                        >
-                            <div className="flex-1 font-bold">{item.name}</div>
-                            <div className="w-full break-all">{item.route}</div>
-                            <div className="w-full break-all">{item.stop}</div>
-                        </div>
-                    ))}
-                </div>
-                <div className="mt-4">
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outlined"
-                            color="primary"
-                            startIcon={<EditNoteIcon color="primary" />}
-                            onClick={editHandler}
-                        >
-                            Edit
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            startIcon={<DeleteIcon color="error" />}
-                            onClick={deleteHandler}
-                        >
-                            Delete
-                        </Button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Dialog for confirming deletion */}
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle id="scroll-dialog-title">Confirm Deletion</DialogTitle>
-                <DialogContent>
-                    <div>Are you sure you want to delete this parent's information? This action cannot be undone.</div>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={submitHandler} color="error">Delete</Button>
-                </DialogActions>
-            </Dialog>
+        <div className="p-2">
+            <BackTitle /> {/* 保留后退标题 */}
+            <Card>
+                <CardContent>
+                    <h2>
+                        {parent.firstName} {parent.lastName}
+                    </h2>
+                    <p>Phone: {parent.phone}</p>
+                    <p>Email: {parent.email}</p>
+                    {/* 渲染子女信息 */}
+                    {parent?.children &&
+                        parent?.children.map((item) => (
+                            <p key={item?.studentId}>
+                                {'childrenName&id:'} {item?.firstName} {item?.lastName} ({item?.studentId})
+                            </p>
+                        ))}
+                </CardContent>
+                <CardActions>
+                    <Button
+                        startIcon={<EditNoteIcon />}
+                        onClick={() => navigate(`/admin/parent-management/edit?id=${parent._id}`)} // 跳转到编辑页面
+                    >
+                        Edit
+                    </Button>
+                    <Button startIcon={<DeleteIcon />} color="error" onClick={handleDelete}>
+                        Delete
+                    </Button>
+                </CardActions>
+            </Card>
         </div>
     );
 };
 
 export default View;
+

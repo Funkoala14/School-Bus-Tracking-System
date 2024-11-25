@@ -1,51 +1,39 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { TextField, Button, Stack } from '@mui/material';
 import BackTitle from '@components/BackTitle';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { setTitle } from '../../store/titleSlice';
 import { useDispatch } from 'react-redux';
+import { setTitle } from '../../store/titleSlice';
+import { addParent, updateParent } from '../../store/parentSlice/parent.thunk';
+
 const Edit = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { register, handleSubmit, setValue } = useForm();
     const [searchParams] = useSearchParams();
-    const id = searchParams.get('id');
-    const { register, handleSubmit, control, formState: { errors }, setValue } = useForm();
-    const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
-        control, // control props comes from useForm (optional: if you are using FormProvider)
-        name: "list", // unique name for your Field Array
-    });
+    const parentId = searchParams.get('id'); // 获取当前家长 ID，判断是否编辑模式
 
     useEffect(() => {
-        if (id) {
-            console.log(id, 'edit');
-            // 模拟从后端获取数据
-            // 实际使用时替换为真实的 API 调用
-            const mockStudentData = {
-                fullName: 'John Doe',
-                studentId: 'ST001',
-                parentName: 'Jane Doe',
-                list: [{
-                    name: 'John Doe',
-                    stop: 'Stop A',
-                    route: 'Route 1'
-                }]
-            };
+        dispatch(setTitle({ title: parentId ? 'Edit Parent' : 'Add Parent', ifBack: true }));
 
-            // 设置表单默认值
-            Object.keys(mockStudentData).forEach(key => {
-                setValue(key, mockStudentData[key]);
-            });
-        } else {
-            console.log('add');
+        // 如果是编辑模式，预填充数据（假设从 Redux 获取家长信息）
+        if (parentId) {
+            // 在实际实现中，您可能需要从 Redux 获取数据，例如通过 useSelector
+            // 示例：const parent = useSelector(state => state.parent.parentList.find(p => p._id === parentId));
+            // 然后 setValue('fieldName', parent.fieldName);
         }
-    }, [id]);
+    }, [dispatch, parentId, setValue]);
 
     const onSubmit = (data) => {
-        console.log(data, 'data');
+        if (parentId) {
+            dispatch(updateParent({ ...data, _id: parentId })).then(() => navigate(-1));
+        } else {
+            dispatch(addParent(data)).then(() => navigate(-1));
+        }
     };
 
+<<<<<<< Updated upstream
     useEffect(() => {
         dispatch(setTitle({ title: id ? 'Edit Parent' : 'Add Parent', ifBack: true }));
     }, [dispatch]);
@@ -120,6 +108,22 @@ const Edit = () => {
             </form>
         </div>
     </div>;
+=======
+    return (
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <BackTitle />
+            <Stack spacing={2} className="p-2">
+                <TextField label="First Name" {...register('firstName')} />
+                <TextField label="Last Name" {...register('lastName')} />
+                <TextField label="Phone" {...register('phone')} />
+                <TextField label="Email" {...register('email')} />
+                <Button type="submit" variant="contained">
+                    {parentId ? 'Update' : 'Add'} Parent
+                </Button>
+            </Stack>
+        </form>
+    );
+>>>>>>> Stashed changes
 };
 
 export default Edit;

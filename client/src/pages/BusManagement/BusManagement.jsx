@@ -4,27 +4,32 @@ import CardContent from '@mui/material/CardContent';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import Typography from '@mui/material/Typography';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setTitle } from '../../store/titleSlice';
 import { useEffect } from 'react';
+import { alignProperty } from '@mui/material/styles/cssUtils';
+import { fetchBuses } from '../../store/busSlice/bus.thunk';
+import moment from 'moment';
 
 const BusManagement = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const list = Array.from({ length: 6 }).map((_, index) => ({
-        id: index,
-        name: `Bus ${index + 1}`,
-    }));
 
+    const navigate = useNavigate();
+    const { busList } = useSelector((state) => state.bus);
     const visibilityHandler = (item) => {
         console.log('visibility');
-        navigate(`/admin/bus-management/view?id=${item.id}`);
+        navigate(`/admin/bus-management/view?id=${item._id}`);
     };
 
     useEffect(() => {
         dispatch(setTitle({ title: 'Bus Management', ifBack: false }));
+<<<<<<< Updated upstream
     }, [dispatch]);
+=======
+        dispatch(fetchBuses());
+    }, [])
+>>>>>>> Stashed changes
 
     return (
         <div className='p-2'>
@@ -32,16 +37,16 @@ const BusManagement = () => {
 
             <div className='mt-2 grid grid-cols-1 gap-4'>
                 {
-                    list.map((item) => (
-                        <div key={item.id} className='col-span-3' onClick={() => visibilityHandler(item)}>
+                    Array.isArray(busList) && busList.map((item) => (
+                        <div key={item._id} className='col-span-3' onClick={() => visibilityHandler(item)}>
                             <Card>
                                 <CardContent>
-                                    <Typography variant='h5' sx={{ fontWeight: 'bold' }}>Bus plate</Typography>
-                                    <Typography variant='body2' className='mt-2'>Capacity</Typography>
-                                    <Typography variant='body2' className='mt-2'>Year of production</Typography>
-                                    <Typography variant='body2' className='mt-2'>Assigned driver</Typography>
+                                    <Typography variant='h5' sx={{ fontWeight: 'bold' }}>Plate: {item?.plate}</Typography>
+                                    <Typography variant='body2' className='mt-2'>Capacity: {item?.capacity}</Typography>
+                                    <Typography variant='body2' className='mt-2'>Year: {item?.year}</Typography>
+                                    <Typography variant='body2' className='mt-2'>Driver: {item?.assignedDriver.firstName} {item?.assignedDriver.lastName}</Typography>
                                     <Typography variant='body2' className='mt-2'>Assigned route</Typography>
-                                    <Typography variant='body2' className='mt-2'>Bus added time</Typography>
+                                    <Typography variant='body2' className='mt-2'>Time: {moment(item?.createdAt).format("YYYY-MM-DD hh:mm:ss")}</Typography>
                                 </CardContent>
                             </Card>
                         </div>
