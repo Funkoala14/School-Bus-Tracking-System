@@ -253,7 +253,7 @@ const LocationTracker = () => {
     }, []);
 
     useEffect(() => {
-        if (socket && socket.connected) socket.emit('driverLocation', { ...currentLocation, driverId: userId, direction, nextStop }); // Send the location data to the backend
+        if (socket && socket.connected) socket.emit('driverLocation', { ...currentLocation, driverId: userId, direction, nextStopData }); // Send the location data to the backend
     }, [nextStopData]);
 
     return (
