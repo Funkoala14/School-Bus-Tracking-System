@@ -1,13 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import { DirectionsRenderer, GoogleMap, Polyline, useJsApiLoader } from '@react-google-maps/api';
 import { Button, Typography, Container, Box, ToggleButtonGroup, ToggleButton, Snackbar, Alert } from '@mui/material'; // Importing MUI components
 import { setTitle } from '../../store/titleSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
 import { getDriverInfo } from '../../store/driverSlice/driver.thunk';
 import DirectionsMap from '../../components/DirectionsMap/DirectionsMap';
-import { Marker } from '@vis.gl/react-google-maps';
-import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { showNotification } from '../../store/notificationSlice/notification.slice';
 
 const LocationTracker = () => {
@@ -23,11 +20,9 @@ const LocationTracker = () => {
     const { userId } = useSelector((state) => state.auth);
     const { info } = useSelector((state) => state.driver);
     const [directionsResponse, setDirectionsResponse] = useState(null);
+    const [route, setRoute] = useState(null);
 
-    // Load Google Maps JavaScript API
-    const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY, // Replace with your Google Maps API Key
-    });
+    const { nextStopData } = useSelector((state) => state.route);
 
     // Fetch the user's initial location when the component mounts
     useEffect(() => {
@@ -38,21 +33,9 @@ const LocationTracker = () => {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,
                     };
+                    
                     setCurrentLocation(initialLocation);
 
-                    // Center the map on the user's location if the map is loaded
-                    if (mapRef.current) {
-                        mapRef.current.panTo(initialLocation);
-                    }
-
-                    // Add a marker at the user's location
-                    if (isLoaded && mapRef.current && !markerRef.current) {
-                        markerRef.current = new window.google.maps.Marker({
-                            position: initialLocation,
-                            map: mapRef.current,
-                            title: 'Your Location',
-                        });
-                    }
                 },
                 () => {
                     setError('Failed to fetch initial location. Please enable location access.');
@@ -61,7 +44,7 @@ const LocationTracker = () => {
         } else {
             setError('Geolocation is not supported by this browser.');
         }
-    }, [isLoaded]); // Dependencies ensure this runs only when the map is loaded
+    }, []); // Dependencies ensure this runs only when the map is loaded
 
     const reconnectWS = () => {
         const socketId = localStorage.getItem('socketId');
@@ -104,7 +87,7 @@ const LocationTracker = () => {
             setTracking(true); // Enable tracking mode
             localStorage.setItem('trackingState', 'true'); // Save tracking state to localStorage
             setError(null); // Clear any previous errors
-            newSocket.emit('driverLocation', { ...currentLocation, direction });
+            newSocket.emit('driverLocation', { ...currentLocation, driverId: userId, direction, nextStop }); // Send the location data to the backend
         });
 
         newSocket.on('disconnect', () => {
@@ -122,13 +105,13 @@ const LocationTracker = () => {
                     lng: position.coords.longitude,
                 };
                 setCurrentLocation(location);
-                console.log(location);
+                console.log('location', location);
 
                 // Send the location data to the backend every 1 minute
                 const locationUpdateInterval = setInterval(() => {
                     // Check if socket is connected before emitting location
                     if (socket && socket.connected) {
-                        socket.emit('driverLocation', { ...location, direction }); // Send the location data to the backend
+                        socket.emit('driverLocation', { ...location, driverId: userId, direction, nextStopData }); // Send the location data to the backend
                     }
                 }, 60000); // 60000 ms = 1 minute
 
@@ -158,6 +141,8 @@ const LocationTracker = () => {
 
     // Stop tracking the user's location
     const stopTracking = () => {
+        // should clean live location database as well
+        socket.emit('driverStop', { driverId: userId, direction });
         if (watchIdRef.current) {
             navigator.geolocation.clearWatch(watchIdRef.current); // Stop location updates
             watchIdRef.current = null; // Clear the reference
@@ -185,7 +170,7 @@ const LocationTracker = () => {
 
         // Extracting stops from the assigned routes
         const route = await info.assignedBus.assignedRoutes.find((item) => item.direction === direction);
-
+        setRoute(route);
         if (!route) {
             dispatch(showNotification({ message: `${direction} no route`, severity: 'error' }));
             if (direction === 'inbound') {
@@ -267,10 +252,9 @@ const LocationTracker = () => {
         };
     }, []);
 
-    // Display a loading message until the Google Maps API is loaded
-    if (!isLoaded) {
-        return <div>Loading...</div>;
-    }
+    useEffect(() => {
+        if (socket && socket.connected) socket.emit('driverLocation', { ...currentLocation, driverId: userId, direction, nextStopData }); // Send the location data to the backend
+    }, [nextStopData]);
 
     return (
         <Container sx={{ height: 'calc(100vh - 6rem)', width: '100%', p: 0 }}>
@@ -290,7 +274,12 @@ const LocationTracker = () => {
 
             <Box sx={{ position: 'relative', height: '100%' }}>
                 {/* Render the Google Map */}
-                <GoogleMap
+                <DirectionsMap
+                    stops={route?.stops}
+                    defaultCenter={currentLocation}
+                ></DirectionsMap>
+
+                {/* <GoogleMap
                     onLoad={(map) => {
                         mapRef.current = map; // Store the map instance in a ref
 
@@ -309,9 +298,14 @@ const LocationTracker = () => {
                     }}
                 >
                     {currentLocation.lat !== 0 && currentLocation.lng !== 0 && (
-                        <Marker icon={<DirectionsBusIcon />} position={currentLocation} />
+                        <Marker
+                            position={currentLocation}
+                            icon={{
+                                url: 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/bus_share_taxi_pinlet.svg',
+                                scaledSize: { width: 30, height: 30 },
+                            }}
+                        />
                     )}
-                    {/* Render DirectionsRenderer if directions are available */}
                     {directionsResponse && (
                         <DirectionsRenderer
                             directions={directionsResponse}
@@ -323,7 +317,7 @@ const LocationTracker = () => {
                             }}
                         />
                     )}
-                </GoogleMap>
+                </GoogleMap> */}
                 {!error && (
                     <>
                         <ToggleButtonGroup

@@ -95,7 +95,14 @@ export const getChildrenDetail = async (req, res) => {
                 populate: [
                     { path: 'school', select: '-__v' },
                     { path: 'stop', select: '-__v' },
-                    { path: 'route', select: '-school -stop -__v', populate: 'stops' },
+                    {
+                        path: 'route',
+                        select: '-school -stop -__v',
+                        populate: [
+                            { path: 'assignedBus', populate: 'assignedDriver' },
+                            { path: 'stops', populate: 'address' },
+                        ],
+                    },
                 ],
             })
             .lean()

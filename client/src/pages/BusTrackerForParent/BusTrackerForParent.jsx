@@ -1,109 +1,109 @@
 import { useEffect, useState, useRef } from 'react';
-import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/api';
 import { Typography, Container, Box, Button, CircularProgress } from '@mui/material';
-import socket from '../../services/socket'; // Assuming your socket instance
 import { useDispatch, useSelector } from 'react-redux';
 import { Phone } from '@mui/icons-material';
 import { getChildInfoThunk } from '../../store/parentSlice/parent.thunk';
 import DirectionsMap from '../../components/DirectionsMap/DirectionsMap';
+import { io } from 'socket.io-client';
+import { setNextStopData } from '../../store/routeSlice/route.slice';
 
 const ParentLocationTracker = () => {
     const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 }); // Stores the current location of the bus
-    const [route, setRoute] = useState([]); // Stores the bus route as an array of coordinates
     const [error, setError] = useState(null); // Stores any errors related to location or WebSocket
     const { userId } = useSelector((state) => state.auth);
     const { childInfo } = useSelector((state) => state.parent);
+    const { nextStop } = useSelector((state) => state.route);
+    const [selectedRoute, setSelectedRoute] = useState(null);
+    const [socket, setSocket] = useState(null);
 
-    const markerRef = useRef(null); // Reference for the map marker
     const mapRef = useRef(null); // Reference for the Google Map instance
-    const [timeToDestination, setTimeToDestination] = useState(null); // Stores time to destination
     const dispatch = useDispatch();
 
-    // Load Google Maps JavaScript API
-    const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY, // Replace with your Google Maps API Key
-    });
+    const connectWebSockey = async () => {
+        const socketId = localStorage.getItem('socketId');
+
+        if (socketId) {
+            const existingSocket = io(import.meta.env.VITE_BACKEND_URL, {
+                query: { socketId },
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+            });
+
+            existingSocket.on('connect', () => {
+                console.log('Connected to existingSocket with socketId:', existingSocket.id);
+                localStorage.setItem('socketId', existingSocket.id); // Save the new socketId in localStorage
+                localStorage.setItem('trackingState', 'true'); // Save tracking state to localStorage
+                existingSocket.emit('parentTracking', { parentId: userId, routeId: selectedRoute._id });
+                setSocket(existingSocket);
+            });
+
+            existingSocket.on('busLocation', (data) => {
+                dispatch(setNextStopData(data));
+            });
+
+            existingSocket.on('disconnect', () => {
+                console.log('Disconnected from server', existingSocket.id);
+                localStorage.removeItem('socketId');
+                localStorage.removeItem('trackingState');
+            });
+        } else {
+            const newSocket = io(import.meta.env.VITE_BACKEND_URL);
+            await newSocket.on('connect', () => {
+                console.log('Connected to server with socketId:', newSocket.id);
+                localStorage.setItem('socketId', newSocket.id); // Save the new socketId in localStorage
+                localStorage.setItem('trackingState', 'true'); // Save tracking state to localStorage
+                newSocket.emit('parentTracking', { parentId: userId, routeId: selectedRoute._id });
+                setSocket(newSocket);
+            });
+            newSocket.on('busLocation', (data) => {
+                dispatch(setNextStopData(data));
+            });
+            newSocket.on('disconnect', () => {
+                console.log('Disconnected from server', newSocket.id);
+                localStorage.removeItem('socketId');
+                localStorage.removeItem('trackingState');
+            });
+        }
+    };
+
+    useEffect(() => {
+        return () => {};
+    }, []);
+
+    useEffect(() => {
+        console.log('nextStop', nextStop);
+        return () => {};
+    }, [nextStop]);
 
     useEffect(() => {
         if (childInfo) {
-            console.log(childInfo);
+            const currentTime = new Date();
+            const currentHour = currentTime.getHours();
 
-            const { route } = childInfo;
-            if (route && route.length) {
-            }
+            const isInbound = currentHour < 12;
+            const routeDirection = isInbound ? 'inbound' : 'outbound';
+
+            const selectRoute = childInfo[0].route?.find((route) => route.direction === 'inbound');
+            setSelectedRoute(selectRoute);
         }
     }, [childInfo]);
-    
-    // Fetch the user's initial location when the component mounts
+
     useEffect(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const initialLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    };
-                    setCurrentLocation(initialLocation);
-                    // Center the map on the user's location if the map is loaded
-                    if (mapRef.current) {
-                        mapRef.current.panTo(initialLocation);
-                    }
-                },
-                () => {
-                    setError('Failed to fetch initial location. Please enable location access.');
-                }
-            );
-        } else {
-            setError('Geolocation is not supported by this browser.');
+        if (selectedRoute) {
+            console.log('selectedRoute', selectedRoute);
+            connectWebSockey();
         }
-    }, []); // Dependencies ensure this runs only when the map is loaded
-
-    // Listen for the bus driver location updates specific to the child's route
-    // useEffect(() => {
-    //     if (childRouteId) {
-    //         // Subscribe to the socket event for the child's route
-    //         socket.on(`busLocation-${childRouteId}`, (location) => {
-    //             setCurrentLocation(location);
-    //             if (markerRef.current) {
-    //                 markerRef.current.setPosition(location);
-    //             }
-
-    //             // Calculate the time or distance to destination
-    //             const distance = google.maps.geometry.spherical.computeDistanceBetween(
-    //                 new google.maps.LatLng(location.lat, location.lng),
-    //                 new google.maps.LatLng(destination.lat, destination.lng)
-    //             );
-
-    //             const speed = 20; // Assuming a constant speed, adjust as needed
-    //             const time = distance / speed; // Simple time calculation (in hours), adjust based on speed
-
-    //             setTimeToDestination(Math.round(time * 60)); // Convert time to minutes
-    //         });
-
-    //         // Cleanup the socket listener when the component unmounts
-    //         return () => {
-    //             socket.off(`busLocation-${childRouteId}`);
-    //         };
-    //     }
-    // }, [childRouteId, destination]); // Re-run the effect when childRouteId changes
-
+    }, [selectedRoute]);
     // Fetch the route information (this could be dynamic based on your route data)
 
     useEffect(() => {
         dispatch(getChildInfoThunk());
     }, [dispatch]);
 
-    // Display a loading message until the Google Maps API is loaded
-    if (!isLoaded) {
-        return (
-            <Box display='flex' justifyContent='center' alignItems='center' height='100vh'>
-                <CircularProgress />
-            </Box>
-        );
-    }
-
     return (
-        <Container sx={{ height: '100vh', width: '100%', p: 0 }}>
+        <Container sx={{ height: 'calc(100vh - 6rem)', width: '100%', p: 0 }}>
             {/* Display any error messages */}
             {error && (
                 <Typography variant='h6' color='error' gutterBottom>
@@ -112,41 +112,41 @@ const ParentLocationTracker = () => {
             )}
 
             <Box sx={{ position: 'relative', height: '100%' }}>
-                {/* <DirectionsMap
-                    defaultCenter={currentLocation}
-                    origin={{ ...currentLocation, title: '123' }}
-                    destination={{ lat: 42.25220601155644, lng: -71.82450591692111 }}
-                    waypoints={[{ lat: 42.249839429634896, lng: -71.81860505711992 }]}
-                ></DirectionsMap> */}
-
+                <DirectionsMap stops={selectedRoute?.stops} parentTracking={true} defaultCenter={currentLocation}></DirectionsMap>
                 {/* Display the time to destination */}
-                <Box className='absolute bottom-0 w-full bg-white p-4 shadow-lg rounded-t-xl'>
-                    <div className='flex items-center justify-between'>
-                        <div className='text-gray-800'>
-                            <Typography variant='h6'>10 min away</Typography>
-                            <Typography variant='body2' color='textSecondary'>
-                                213 Millbrook Road - Pick Up Trip
-                            </Typography>
+                {nextStop && (
+                    <Box className='absolute bottom-0 w-full bg-white p-4 shadow-lg rounded-t-xl'>
+                        <div className='flex items-center justify-between'>
+                            <div className='text-gray-800'>
+                                <Typography variant='h6'>{nextStop?.nextStop?.duration} away</Typography>
+                                <Typography variant='body2' color='textSecondary'>
+                                    Next Stop: {nextStop?.nextStop?.stopName}
+                                </Typography>
+                            </div>
+                            <div className='flex items-center space-x-2'>
+                                <Typography variant='body2' color='textSecondary'>
+                                    {}
+                                </Typography>
+                                <Typography variant='body2' color='textSecondary'>
+                                    ({nextStop?.nextStop?.distance} away)
+                                </Typography>
+                            </div>
                         </div>
-                        <div className='flex items-center space-x-2'>
-                            <Typography variant='body2' color='textSecondary'>
-                                Bus - 07
-                            </Typography>
-                            <Typography variant='body2' color='textSecondary'>
-                                (2.3 km away)
-                            </Typography>
-                        </div>
-                    </div>
 
-                    <div className='flex justify-between items-center mt-2'>
-                        <div className='text-gray-800'>
-                            <Typography variant='body2'>Driver: Marvin Waters</Typography>
+                        <div className='flex justify-between items-center mt-2'>
+                            <div className='text-gray-800'>
+                                <Typography variant='body2'>
+                                    Driver: {selectedRoute?.assignedBus.assignedDriver.firstName}{' '}
+                                    {selectedRoute?.assignedBus.assignedDriver.lastName}
+                                </Typography>
+                            </div>
+                            <Button variant='contained' color='primary' className='flex items-center space-x-2' startIcon={<Phone />}>
+                                {'Call '}
+                                {selectedRoute?.assignedBus.assignedDriver.phone}
+                            </Button>
                         </div>
-                        <Button variant='contained' color='primary' className='flex items-center space-x-2' startIcon={<Phone />}>
-                            Call
-                        </Button>
-                    </div>
-                </Box>
+                    </Box>
+                )}
             </Box>
         </Container>
     );

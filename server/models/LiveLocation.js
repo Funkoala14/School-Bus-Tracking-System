@@ -15,8 +15,14 @@ const stopTimeSchema = new Schema(
 
 const LiveLocationSchema = new Schema(
     {
-        route: { type: refType, ref: 'Route', required: true },
-        remainSchedule: [stopTimeSchema],
+        route: { type: refType, ref: 'Route', required: true, unique: true },
+        location: { lat: { type: String, trim: true }, lng: { type: String, trim: true } },
+        nextStop: {
+            stopName: { type: String, trim: true },
+            duration: { type: String, trim: true },
+            distance: { type: String, trim: true },
+        },
+        // remainSchedule: [stopTimeSchema],
     },
     { timestamps: true }
 );
