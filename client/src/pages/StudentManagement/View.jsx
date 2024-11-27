@@ -19,6 +19,7 @@ const View = () => {
     const id = searchParams.get('id');
     const [open, setOpen] = useState(false);
     const { studentList, selectStudent } = useSelector((state) => state.admin);
+    console.log(selectStudent, 'pink')
     const dispatch = useDispatch();
 
     const editHandler = () => {
@@ -50,12 +51,30 @@ const View = () => {
                 <>
                     <div className='mt-2'>
                         <span className='flex-1 font-bold'>Student ID: </span>
-                        <span className='w-full break-all'>{selectStudent.studentId}</span>
+                        <span className='w-full break-all'>{selectStudent.studentId||''}</span>
                     </div>
                     <div className='mt-2'>
-                        <span className='flex-1 font-bold'>First Name: </span>
-                        <span className='w-full break-all'>{selectStudent.firstName}</span>
+                        <span className='flex-1 font-bold'>Full Name: </span>
+                        <span className='w-full break-all'>{selectStudent.firstName||'' + ' ' + selectStudent.lastName||''}</span>
                     </div>
+                    <div className='mt-2'>
+                        <span className='flex-1 font-bold'>Parent Name: </span>
+                        <span className='w-full break-all'>{`${selectStudent?.parent?.firstName||''} ${selectStudent?.parent?.lastName||''}`}</span>
+                    </div>
+                    <div className='mt-2'>
+                        <span className='flex-1 font-bold'>Address: </span>
+                        <span className='w-full break-all'>{`${selectStudent?.address?.address||''} ${selectStudent?.address?.address||''}`}</span>
+                    </div>
+                    <div className='mt-2'>
+                        <span className='flex-1 font-bold'>Stop: </span>
+                        <span className='w-full break-all'>{`${selectStudent?.stop?.stopName||''} `}</span>
+                    </div>
+                    <div className='mt-2'>
+                        <span className='flex-1 font-bold'>Route: </span>
+                        <span className='w-full break-all'>{`${selectStudent?.route?.name||''} `}</span>
+                    </div>
+
+
                 </>
                 <div className='mt-4'>
                     <div></div>

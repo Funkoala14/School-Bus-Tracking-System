@@ -19,7 +19,6 @@ const rootReducer = combineReducers({
     driver: driverReducer,
 });
 
-// Persist configuration
 const persistConfig = {
     key: 'root',
     storage, // Use localStorage to persist the state
@@ -29,15 +28,18 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-    reducer: persistedReducer, // Use the persisted root reducer
+    reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
-            serializableCheck: false, // Disable serializable check for redux-persist
+            serializableCheck: false,
         }),
-    devTools: true,
 });
 
-// Create the persistor to manage rehydrating the store
 export const persistor = persistStore(store);
-
 export default store;
+
+
+
+
+
+
