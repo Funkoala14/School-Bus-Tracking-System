@@ -7,12 +7,9 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-<<<<<<< Updated upstream
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-=======
->>>>>>> Stashed changes
 import { setTitle } from '../../store/titleSlice';
 import { fetchParents } from '../../store/parentSlice/parent.thunk';
 
@@ -31,13 +28,10 @@ const ParentManagement = () => {
         navigate(`/admin/parent-management/view?id=${item._id}`);
     };
 
-<<<<<<< Updated upstream
     useEffect(()=> {
         dispatch(setTitle({ title: 'Parent Management', ifBack: false }));
     },[dispatch])
 
-=======
->>>>>>> Stashed changes
     return (
         <div className="p-2">
             {/* 页面标题 */}

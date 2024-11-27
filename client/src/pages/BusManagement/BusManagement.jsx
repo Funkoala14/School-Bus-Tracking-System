@@ -24,12 +24,7 @@ const BusManagement = () => {
 
     useEffect(() => {
         dispatch(setTitle({ title: 'Bus Management', ifBack: false }));
-<<<<<<< Updated upstream
     }, [dispatch]);
-=======
-        dispatch(fetchBuses());
-    }, [])
->>>>>>> Stashed changes
 
     return (
         <div className='p-2'>

@@ -57,20 +57,9 @@ const View = () => {
         setOpen(false);
     };
 
-<<<<<<< Updated upstream
     useEffect(() => {
         dispatch(setTitle({ title: 'View Bus', ifBack: true }));
     }, [dispatch]);
-=======
-    const list = [
-        { id: 1, name: 'Bus plate' },
-        { id: 2, name: 'Capacity' },
-        { id: 3, name: 'Year of production' },
-        { id: 4, name: 'Assigned driver' },
-        { id: 5, name: 'Assigned route' },
-        { id: 6, name: 'Bus added time' },
-    ];
->>>>>>> Stashed changes
 
     return (
         <div className="p-2">

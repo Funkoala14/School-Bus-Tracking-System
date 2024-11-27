@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { get, post, put, del } from '../../services/api'; 
+import { get, post, put, del } from '../../services/api';
 import { showNotification } from '../notificationSlice/notification.slice';
 
 // 获取家长信息

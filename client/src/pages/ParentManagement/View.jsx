@@ -29,7 +29,6 @@ const View = () => {
         }
     };
 
-<<<<<<< Updated upstream
     const deleteHandler = () => {
         setOpen(true);
     };
@@ -46,9 +45,8 @@ const View = () => {
     useEffect(() => {
         dispatch(setTitle({ title: 'View Parent', ifBack: true }));
     }, [dispatch]);
-=======
+    
     if (!parent) return <p>Parent not found</p>; // 如果家长信息未找到，显示提示
->>>>>>> Stashed changes
 
     return (
         <div className="p-2">

@@ -33,7 +33,6 @@ const Edit = () => {
         }
     };
 
-<<<<<<< Updated upstream
     useEffect(() => {
         dispatch(setTitle({ title: id ? 'Edit Parent' : 'Add Parent', ifBack: true }));
     }, [dispatch]);
@@ -108,22 +107,6 @@ const Edit = () => {
             </form>
         </div>
     </div>;
-=======
-    return (
-        <form onSubmit={handleSubmit(onSubmit)}>
-            <BackTitle />
-            <Stack spacing={2} className="p-2">
-                <TextField label="First Name" {...register('firstName')} />
-                <TextField label="Last Name" {...register('lastName')} />
-                <TextField label="Phone" {...register('phone')} />
-                <TextField label="Email" {...register('email')} />
-                <Button type="submit" variant="contained">
-                    {parentId ? 'Update' : 'Add'} Parent
-                </Button>
-            </Stack>
-        </form>
-    );
->>>>>>> Stashed changes
 };
 
 export default Edit;
