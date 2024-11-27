@@ -65,4 +65,5 @@ const busSlice = createSlice({
 });
 
 export const { selectBus, clearBus } = busSlice.actions;
-export default busSlice.reducer;
+const busReducer = busSlice.reducer;
+export default busReducer;

@@ -22,7 +22,7 @@ const RouteManagement = () => {
     };
 
     useEffect(() => {
-        dispatch(setTitle({ title: 'Route Management', ifBack: true }));
+        dispatch(setTitle({ title: 'Route Management', ifBack: false }));
         dispatch(allRoutesThunk())
     }, [])
 

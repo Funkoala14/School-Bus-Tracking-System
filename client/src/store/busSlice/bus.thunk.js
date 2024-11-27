@@ -7,7 +7,7 @@ export const fetchBuses = createAsyncThunk(
   'bus/fetchBuses',
   async (_, { rejectWithValue, dispatch }) => {
     try {
-      const { data } = await get('/bus/all'); // 替换为实际 API 路径
+      const { data } = await get('/bus/all');
       const { list } = data;
       return list;
     } catch (error) {
