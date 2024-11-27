@@ -23,6 +23,7 @@ const BusManagement = () => {
     };
 
     useEffect(() => {
+        dispatch(fetchBuses());
         dispatch(setTitle({ title: 'Bus Management', ifBack: false }));
     }, [dispatch]);
 
