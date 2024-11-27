@@ -1,6 +1,6 @@
-<<<<<<< Updated upstream
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { get } from "../../services/api.js";
+import { get, post, put, del } from '../../services/api'; // 假设服务文件提供了 HTTP 方法
+import { showNotification } from '../notificationSlice/notification.slice';
 
 export const getChildInfoThunk = createAsyncThunk('/parent/children-info', async (_, { rejectWithValue, dispatch }) => {
     try {
@@ -33,10 +33,7 @@ export const getParentProfileThunk = createAsyncThunk('/parent/profile', async (
         return rejectWithValue(errorMessage);
     }
 });
-=======
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { get, post, put, del } from '../../services/api'; // 假设服务文件提供了 HTTP 方法
-import { showNotification } from '../notificationSlice/notification.slice';
+
 
 // 获取家长列表
 export const fetchParents = createAsyncThunk(
@@ -136,5 +133,3 @@ export const deleteParent = createAsyncThunk(
     }
   }
 );
-
->>>>>>> Stashed changes
