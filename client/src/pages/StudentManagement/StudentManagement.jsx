@@ -30,7 +30,7 @@ const StudentManagement = () => {
 
     return (
         <div className='p-2'>
-            <SearchInputBase placeholder='Search student' />
+            {/* <SearchInputBase placeholder='Search student' /> */}
 
             <div className='mt-2 grid grid-cols-1 gap-4'>
                 {studentList.map((student) => (

@@ -31,9 +31,6 @@ const theme = createTheme({
 });
 
 function App() {
-    console.log('VITE_PORT:', import.meta.env.VITE_PORT);
-    console.log('VITE_BACKEND_URL:', import.meta.env.VITE_BACKEND_URL);
-    
     return (
         <ThemeProvider theme={theme}>
             <NotificationSnackbar />

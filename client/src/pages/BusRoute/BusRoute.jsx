@@ -90,36 +90,32 @@ const BusRoute = () => {
         },
     ];
 
-    return <div className='py-2 px-4'>
-        <BackTitle title="Route" />
-        <div className='mt-4'>
-            <TableContainer>
-                <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((column) => (
-                                <TableCell
-                                    key={column.id}
-                                    align={column.align}
-                                    style={{ minWidth: column.minWidth }}
-                                >
-                                    {column.label}
+    return (
+        <div className='py-2 px-4'>
+            <BackTitle title='Route' />
+            <div className='mt-4'>
+                <TableContainer>
+                    <Table stickyHeader aria-label='sticky table'>
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((column) => (
+                                    <TableCell
+                                        key={column.id}
+                                        align={column.align}
+                                        style={{ minWidth: column.minWidth }}
+                                    >
+                                        {column.label}
+                                    </TableCell>
+                                ))}
+                                <TableCell key='action' align='center' style={{ minWidth: 170 }}>
+                                    Driver
                                 </TableCell>
-                            ))}
-                            <TableCell
-                                key='action'
-                                align='center'
-                                style={{ minWidth: 170 }}
-                            >
-                                Driver
-                            </TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rows
-                            .map((row) => {
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {rows.map((row) => {
                                 return (
-                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                                    <TableRow hover role='checkbox' tabIndex={-1} key={row.code}>
                                         {columns.map((column) => {
                                             const value = row[column.id];
                                             return (
@@ -130,50 +126,49 @@ const BusRoute = () => {
                                                 </TableCell>
                                             );
                                         })}
-                                        <TableCell
-                                            key='action'
-                                            align='center'
-                                            style={{ minWidth: 170 }}
-                                        >
-                                            <Button variant="text" onClick={() => { detailHandler(row) }} color="primary">
+                                        <TableCell key='action' align='center' style={{ minWidth: 170 }}>
+                                            <Button
+                                                variant='text'
+                                                onClick={() => {
+                                                    detailHandler(row);
+                                                }}
+                                                color='primary'
+                                            >
                                                 Detail
                                             </Button>
                                         </TableCell>
                                     </TableRow>
                                 );
                             })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </div>
+            <Dialog
+                open={open}
+                onClose={closeHandler}
+                aria-labelledby='alert-dialog-title'
+                aria-describedby='alert-dialog-description'
+            >
+                <DialogTitle id='alert-dialog-title'>Driver Detail</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id='alert-dialog-description'>
+                        <div>
+                            {list.map((item) => (
+                                <div className='mt-2 ' key={item.id}>
+                                    <span className='flex-1 font-bold'>{item.name}: </span>
+                                    <span className='w-full break-all'>value</span>
+                                </div>
+                            ))}
+                        </div>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeHandler}>Disagree</Button>
+                </DialogActions>
+            </Dialog>
         </div>
-        <Dialog
-            open={open}
-            onClose={closeHandler}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-            <DialogTitle id="alert-dialog-title">
-                Driver Detail
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                    <div>
-                        {list.map((item) => (
-                            <div className='mt-2 ' key={item.id}>
-                                <span className='flex-1 font-bold'>{item.name}：</span>
-                                <span className='w-full break-all'>
-                                    value
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={closeHandler}>Disagree</Button>
-            </DialogActions>
-        </Dialog>
-    </div>;
+    );
 }
 
 export default BusRoute

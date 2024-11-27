@@ -29,7 +29,7 @@ const BusManagement = () => {
 
     return (
         <div className='p-2'>
-            <SearchInputBase placeholder='Search bus' />
+            {/* <SearchInputBase placeholder='Search bus' /> */}
 
             <div className='mt-2 grid grid-cols-1 gap-4'>
                 {

@@ -13,8 +13,8 @@ const View = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams(); // 获取 URL 参数
     const parentId = searchParams.get('id'); // 从 URL 中获取家长 ID
-    const parent = useSelector((state) =>
-        state.parent.parentList.find((p) => p._id === parentId) // 从 Redux 中找到对应家长
+    const parent = useSelector(
+        (state) => state.parent.parentList.find((p) => p._id === parentId) // 从 Redux 中找到对应家长
     );
 
     useEffect(() => {
@@ -24,7 +24,7 @@ const View = () => {
 
     const handleDelete = () => {
         if (window.confirm('Are you sure you want to delete this parent?')) {
-            // 调用删除接口，并在成功后返回列表页面
+            // 调用删除接口, 并在成功后返回列表页面
             dispatch(deleteParent(parentId)).then(() => navigate('/admin/parent-management'));
         }
     };
@@ -45,11 +45,11 @@ const View = () => {
     useEffect(() => {
         dispatch(setTitle({ title: 'View Parent', ifBack: true }));
     }, [dispatch]);
-    
-    if (!parent) return <p>Parent not found</p>; // 如果家长信息未找到，显示提示
+
+    if (!parent) return <p>Parent not found</p>; // 如果家长信息未找到, 显示提示
 
     return (
-        <div className="p-2">
+        <div className='p-2'>
             <BackTitle /> {/* 保留后退标题 */}
             <Card>
                 <CardContent>
@@ -73,7 +73,7 @@ const View = () => {
                     >
                         Edit
                     </Button>
-                    <Button startIcon={<DeleteIcon />} color="error" onClick={handleDelete}>
+                    <Button startIcon={<DeleteIcon />} color='error' onClick={handleDelete}>
                         Delete
                     </Button>
                 </CardActions>
