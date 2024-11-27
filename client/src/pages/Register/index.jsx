@@ -13,10 +13,9 @@ const Register = () => {
 
 
     const onRegisterSuccess = (data, token) => {
-
-        // 如果注册成功，则跳转到登录页面
+        // 如果注册成功, 则跳转到登录页面
         // 或者做一些什么操作
-        navigator(`/login`)
+        navigator(`/login`);
     }
 
     const handleClose = (event, reason) => {

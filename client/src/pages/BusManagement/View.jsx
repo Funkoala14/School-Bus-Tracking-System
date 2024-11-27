@@ -26,7 +26,7 @@ const View = () => {
         state.bus.busList.find((p) => p._id === id)
     );
 
-    // 页面加载时设置标题，并在 busInfo 不存在时触发数据加载
+    // 页面加载时设置标题, 并在 busInfo 不存在时触发数据加载
     useEffect(() => {
         if (!busInfo) {
             // Dispatch 动作以获取 bus 详细信息
@@ -66,29 +66,29 @@ const View = () => {
             <div>
                 {/* Bus 信息展示 */}
                 <div className="mt-2">
-                    <span className="flex-1 font-bold">Bus plate：</span>
+                    <span className="flex-1 font-bold">Bus plate: </span>
                     <span className="w-full break-all">{busInfo?.plate || 'N/A'}</span>
                 </div>
                 <div className="mt-2">
-                    <span className="flex-1 font-bold">Capacity：</span>
+                    <span className="flex-1 font-bold">Capacity: </span>
                     <span className="w-full break-all">{busInfo?.capacity || 'N/A'}</span>
                 </div>
                 <div className="mt-2">
-                    <span className="flex-1 font-bold">Year of production：</span>
+                    <span className="flex-1 font-bold">Year of production: </span>
                     <span className="w-full break-all">{busInfo?.year || 'N/A'}</span>
                 </div>
                 <div className="mt-2">
-                    <span className="flex-1 font-bold">Assigned driver：</span>
+                    <span className="flex-1 font-bold">Assigned driver: </span>
                     <span className="w-full break-all">
                         {busInfo?.assignedDriver?.firstName || 'N/A'} {busInfo?.assignedDriver?.lastName || ''}
                     </span>
                 </div>
                 <div className="mt-2">
-                    <span className="flex-1 font-bold">Assigned route：</span>
+                    <span className="flex-1 font-bold">Assigned route: </span>
                     <span className="w-full break-all">{busInfo?.route || 'N/A'}</span>
                 </div>
                 <div className="mt-2">
-                    <span className="flex-1 font-bold">Bus added time：</span>
+                    <span className="flex-1 font-bold">Bus added time: </span>
                     <span className="w-full break-all">
                         {moment(busInfo?.createdAt).format('YYYY-MM-DD hh:mm:ss')}
                     </span>

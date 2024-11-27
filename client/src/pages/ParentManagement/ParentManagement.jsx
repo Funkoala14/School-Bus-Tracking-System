@@ -16,7 +16,7 @@ const ParentManagement = () => {
     const { parentList } = useSelector((state) => state.parent);
 
     useEffect(() => {
-        // 设置页面标题，不启用后退功能
+        // 设置页面标题, 不启用后退功能
         dispatch(setTitle({ title: 'Parent Management', ifBack: false }));
         dispatch(fetchParents());
     }, [dispatch]);

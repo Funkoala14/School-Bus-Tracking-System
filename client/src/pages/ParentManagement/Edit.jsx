@@ -12,15 +12,15 @@ const Edit = () => {
     const dispatch = useDispatch();
     const { register, handleSubmit, setValue } = useForm();
     const [searchParams] = useSearchParams();
-    const parentId = searchParams.get('id'); // 获取当前家长 ID，判断是否编辑模式
+    const parentId = searchParams.get('id'); // 获取当前家长 ID, 判断是否编辑模式
 
     useEffect(() => {
         dispatch(setTitle({ title: parentId ? 'Edit Parent' : 'Add Parent', ifBack: true }));
 
-        // 如果是编辑模式，预填充数据（假设从 Redux 获取家长信息）
+        // 如果是编辑模式, 预填充数据（假设从 Redux 获取家长信息）
         if (parentId) {
-            // 在实际实现中，您可能需要从 Redux 获取数据，例如通过 useSelector
-            // 示例：const parent = useSelector(state => state.parent.parentList.find(p => p._id === parentId));
+            // 在实际实现中, 您可能需要从 Redux 获取数据, 例如通过 useSelector
+            // 示例: const parent = useSelector(state => state.parent.parentList.find(p => p._id === parentId));
             // 然后 setValue('fieldName', parent.fieldName);
         }
     }, [dispatch, parentId, setValue]);
