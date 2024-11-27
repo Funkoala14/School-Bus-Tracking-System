@@ -43,13 +43,8 @@ const View = () => {
 
     useEffect(() => {
         dispatch(setTitle({ title: 'View Student', ifBack: true }));
-<<<<<<< Updated upstream
     }, [dispatch]);
     
-=======
-    }, [])
-
->>>>>>> Stashed changes
     return (
         <>
             <>

@@ -15,26 +15,16 @@ const RouteManagement = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const routeList = useSelector(state => state.route.routes)
-    const list = Array.from({ length: 6 }).map((_, index) => ({
-        id: index,
-        name: `Route ${index + 1}`,
-    }));
 
     const visibilityHandler = (item) => {
         console.log('visibility');
         navigate(`/admin/route-management/view?id=${item._id}`);
     };
 
-<<<<<<< Updated upstream
-    useEffect(()=>{
-        dispatch(setTitle({ title: 'Route Management', ifBack: false }));
-    },[dispatch])
-=======
     useEffect(() => {
         dispatch(setTitle({ title: 'Route Management', ifBack: true }));
         dispatch(allRoutesThunk())
     }, [])
->>>>>>> Stashed changes
 
     return (
         <div className='p-2'>
