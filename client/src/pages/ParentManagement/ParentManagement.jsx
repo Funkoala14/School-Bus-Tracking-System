@@ -31,8 +31,7 @@ const ParentManagement = () => {
 
     return (
         <div className="p-2">
-            {/* 页面标题 */}
-            <SearchInputBase placeholder="Search parent" />
+            {/* <SearchInputBase placeholder="Search parent" /> */}
 
             <div className="mt-2 grid grid-cols-1 gap-4">
                 {Array.isArray(parentList) &&
