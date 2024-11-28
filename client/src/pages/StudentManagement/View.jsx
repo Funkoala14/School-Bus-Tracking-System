@@ -13,13 +13,14 @@ import DialogActions from '@mui/material/DialogActions';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTitle } from '../../store/titleSlice';
+import { Paper, Stack } from '@mui/material';
 const View = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const [open, setOpen] = useState(false);
     const { studentList, selectStudent } = useSelector((state) => state.admin);
-    console.log(selectStudent, 'pink')
+    console.log(selectStudent, 'pink');
     const dispatch = useDispatch();
 
     const editHandler = () => {
@@ -40,64 +41,67 @@ const View = () => {
         setOpen(false);
     };
 
-
     useEffect(() => {
         dispatch(setTitle({ title: 'View Student', ifBack: true }));
     }, [dispatch]);
-    
+
     return (
         <>
-            <>
-                <>
-                    <div className='mt-2'>
-                        <span className='flex-1 font-bold'>Student ID: </span>
-                        <span className='w-full break-all'>{selectStudent.studentId||''}</span>
-                    </div>
-                    <div className='mt-2'>
-                        <span className='flex-1 font-bold'>Full Name: </span>
-                        <span className='w-full break-all'>{selectStudent.firstName||'' + ' ' + selectStudent.lastName||''}</span>
-                    </div>
-                    <div className='mt-2'>
-                        <span className='flex-1 font-bold'>Parent Name: </span>
-                        <span className='w-full break-all'>{`${selectStudent?.parent?.firstName||''} ${selectStudent?.parent?.lastName||''}`}</span>
-                    </div>
-                    <div className='mt-2'>
-                        <span className='flex-1 font-bold'>Address: </span>
-                        <span className='w-full break-all'>{`${selectStudent?.address?.address||''} ${selectStudent?.address?.address||''}`}</span>
-                    </div>
-                    <div className='mt-2'>
-                        <span className='flex-1 font-bold'>Stop: </span>
-                        <span className='w-full break-all'>{`${selectStudent?.stop?.stopName||''} `}</span>
-                    </div>
-                    <div className='mt-2'>
-                        <span className='flex-1 font-bold'>Route: </span>
-                        <span className='w-full break-all'>{`${selectStudent?.route?.name||''} `}</span>
-                    </div>
-
-
-                </>
-                <div className='mt-4'>
-                    <div></div>
-                    <div className='flex gap-2'>
-                        <Button
-                            variant='outlined'
-                            color='primary'
-                            startIcon={<EditNoteIcon color='primary' />}
-                            onClick={editHandler}
-                        >
-                            Edit
-                        </Button>
-                        <Button
-                            variant='outlined'
-                            color='error'
-                            startIcon={<DeleteIcon color='error' />}
-                            onClick={deleteHandler}
-                        >
-                            Delete
-                        </Button>
-                    </div>
+            <Stack spacing={2}>
+                <div>
+                    <span className='flex-1 font-bold'>Student ID: </span>
+                    <span className='w-full break-all'>{selectStudent.studentId || ''}</span>
                 </div>
-            </>
+                <div>
+                    <span className='flex-1 font-bold'>Full Name: </span>
+                    <span className='w-full break-all'>
+                        {selectStudent.firstName || '' + ' ' + selectStudent.lastName || ''}
+                    </span>
+                </div>
+                <div>
+                    <span className='flex-1 font-bold'>Parent Name: </span>
+                    <span className='w-full break-all'>{selectStudent?.parent?.firstName || ''}</span>
+                </div>
+                <div>
+                    <span className='flex-1 font-bold'>Address: </span>
+                    <span className='w-full break-all'>{selectStudent?.address?.address || ''}</span>
+                </div>
+                <div>
+                    <span className='flex-1 font-bold'>Stop: </span>
+                    <span className='w-full break-all'>{selectStudent?.stop?.stopName || ''}</span>
+                </div>
+                <div>
+                    <span className='flex-1 font-bold'>Route: </span>
+                    <span className='w-full break-all'>
+                        {selectStudent?.route?.length > 0
+                            ? selectStudent.route.map((routeItem, index) => (
+                                  <span key={index}>
+                                      {routeItem.name}
+                                      {index < selectStudent.route.length - 1 && ', '}
+                                  </span>
+                              ))
+                            : 'No routes available'}
+                    </span>
+                </div>
+                <Stack spacing={2}>
+                    <Button
+                        variant='outlined'
+                        color='primary'
+                        startIcon={<EditNoteIcon color='primary' />}
+                        onClick={editHandler}
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        variant='outlined'
+                        color='error'
+                        startIcon={<DeleteIcon color='error' />}
+                        onClick={deleteHandler}
+                    >
+                        Delete
+                    </Button>
+                </Stack>
+            </Stack>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle id='scroll-dialog-title'>Confirm Deletion</DialogTitle>
                 <DialogContent>

@@ -5,6 +5,8 @@ import School from '../models/School.js';
 import Stop from '../models/Stop.js';
 import Student from '../models/Student.js';
 import User from '../models/User.js';
+import Parent from '../models/Parent.js';
+import Address from '../models/Address.js';
 
 // Get different role list
 export const getUserList = async (req, res) => {
@@ -141,7 +143,9 @@ export const postSchoolAddStudent = async (req, res) => {
     }
 };
 
-export const postEditStudentInfo = async (req, res) => {};
+export const postEditStudentInfo = async (req, res) => {
+    
+};
 
 export const postAssignStopToStudent = async (req, res) => {
     try {
@@ -161,3 +165,46 @@ export const postAssignStopToStudent = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', code: 500 });
     }
 };
+
+export const postRemoveStudent = async (req, res) => {
+    const { studentId } = req.body;
+    if (!studentId) return res.status(404).json({ message: 'Missing student id', code: 404 });
+    try {
+        const student = await Student.findByIdAndDelete(studentId);
+        if (!student) return res.status(404).json({ message: 'Student not found', code: 404 });
+        if(student.parent) {
+           await Parent.findByIdAndUpdate(student.parent, { $pull: { children: studentId } });
+        }
+        return res.status(200).json({
+            message: 'Student deleted successfully',
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
+    }
+}
+export const postRemoveParent = async (req, res) => {
+    const { parentId } = req.body;
+    if (!parentId) return res.status(404).json({ message: 'Missing parent id', code: 404 });
+    try {
+        const parent = await Parent.findByIdAndDelete(parentId);
+        if (!parent) return res.status(404).json({ message: 'Parent not found, id might be wrong', code: 404 });
+        if (parent.children && parent.children.length > 0) {
+            if(parent.address) {
+                await Address.findByIdAndDelete(parent.address);
+            }
+            await Promise.all(
+                parent.children.map((childId) => 
+                    Student.findByIdAndUpdate(childId, { $unset: { parent: null, address: null } }) // Unset the parent field
+                )
+            );
+        }
+        
+        return res.status(200).json({
+            message: 'Parent deleted successfully',
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
+    }
+}

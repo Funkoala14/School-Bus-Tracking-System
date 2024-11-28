@@ -41,18 +41,20 @@ const StudentManagement = () => {
                                     {student.firstName} {student.lastName}
                                 </Typography>
                                 <Typography variant='body2' className='mt-2'>
-                                    Student ID: {student.studentId}
+                                    <span className='font-bold'>Student ID: </span>
+                                    {student.studentId}
                                 </Typography>
                                 {student.parent && (
                                     <Typography variant='body2' className='mt-2'>
-                                        Parent: {student.parent.firstName} {student.parent.lastName}
+                                        <span className="font-bold">Parent: </span>
+                                        {student.parent.firstName} {student.parent.lastName}
                                     </Typography>
                                 )}
-                                {student.address && (
+                                {/* {student.address && (
                                     <Typography variant='body2' className='mt-2'>
                                         Address: {student.address.address}
                                     </Typography>
-                                )}
+                                )} */}
                             </CardContent>
                         </Card>
                     </div>

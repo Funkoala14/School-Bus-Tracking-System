@@ -32,7 +32,6 @@ const ParentManagement = () => {
     return (
         <div className="p-2">
             {/* <SearchInputBase placeholder="Search parent" /> */}
-
             <div className="mt-2 grid grid-cols-1 gap-4">
                 {Array.isArray(parentList) &&
                     parentList.map((parent) => (
