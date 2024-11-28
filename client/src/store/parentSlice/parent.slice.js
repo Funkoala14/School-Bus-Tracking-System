@@ -1,5 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getChildInfoThunk, getParentProfileThunk, fetchParents, addParent, updateParent, deleteParent } from './parent.thunk.js';
+import {
+    getChildInfoThunk,
+    getParentProfileThunk,
+    fetchParents,
+    addParent,
+    updateParent,
+    deleteParent,
+    addChildThunk,
+    addChildByParentThunk,
+    updateParentProfileThunk,
+} from './parent.thunk.js';
 
 const setPending = (state) => {
     state.loading = true;
@@ -35,6 +45,9 @@ const parentSlice = createSlice({
         clearParent: (state) => {
             state.selectedParent = null;
         },
+        clearError: (state) => {
+            state.error = null;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -50,6 +63,13 @@ const parentSlice = createSlice({
                 state.loading = false;
             })
             .addCase(getParentProfileThunk.rejected, setRejected)
+
+            .addCase(updateParentProfileThunk.pending, setPending)
+            .addCase(updateParentProfileThunk.fulfilled, (state, action) => {
+                state.profile = action.payload;
+                setFulfilled(state);
+            })
+            .addCase(updateParentProfileThunk.rejected, setRejected)
 
             // 获取家长列表
             .addCase(fetchParents.pending, setPending)
@@ -84,11 +104,31 @@ const parentSlice = createSlice({
                 state.parentList = state.parentList.filter((p) => p._id !== action.payload);
                 setFulfilled(state);
             })
-            .addCase(deleteParent.rejected, setRejected);
+            .addCase(deleteParent.rejected, setRejected)
+
+            // parent add child (admin)
+            .addCase(addChildThunk.pending, setPending)
+            .addCase(addChildThunk.fulfilled, (state, action) => {
+                const index = state.parentList.findIndex((p) => p._id === action.payload._id);
+                setFulfilled(state);
+                if (index !== -1) {
+                    state.parentList[index] = action.payload;
+                }
+                setFulfilled(state);
+            })
+            .addCase(addChildThunk.rejected, setRejected)
+
+            // parent add child (parent)
+            .addCase(addChildByParentThunk.pending, setPending)
+            .addCase(addChildByParentThunk.fulfilled, (state, action) => {
+                state.profile = action.payload;
+                state.childInfo = action.payload.children;
+                setFulfilled(state);
+            })
+            .addCase(addChildByParentThunk.rejected, setRejected);
     },
 });
 
-
-export const { selectParent, clearParent } = parentSlice.actions;
+export const { selectParent, clearParent, clearError } = parentSlice.actions;
 const parentReducer = parentSlice.reducer;
 export default parentReducer;

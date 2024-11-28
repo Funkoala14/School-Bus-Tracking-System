@@ -13,6 +13,10 @@ export const postAddStudent = async (req, res) => {
         if (student.lastName !== lastName) {
             return res.status(400).json({ message: "Student's last name doesn't match." });
         }
+        if(student.parent) {
+            return res.status(400).json({ message: "Student is already under other parent account." });
+        }
+        
         const parent = await Parent.findById(userId).lean().exec();
 
         if (parent.children.some((child) => child.equals(student._id))) {
@@ -120,10 +124,28 @@ export const getChildrenDetail = async (req, res) => {
 export const getParentProfile = async (req, res) => {
     const { userId } = req.user;
     try {
-        const parent = await Parent.findById(userId).select('-parent -password -__v').populate('address');
+        const parent = await Parent.findById(userId).select('-children -password -__v').populate('address');
         return res.status(200).json({
             message: 'success',
             data: parent,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
+    }
+};
+
+// update parent's profile
+export const postUpdateParentProfile = async (req, res) => {
+    const { id } = req.body;
+    try {
+        if(req.body.address) {
+            
+        }
+        const updatedParent = await Parent.findByIdAndUpdate(id, req.body, { new: true, runValidators: true }).select('-children -password -__v').populate('address');
+        return res.status(200).json({
+            message: 'success',
+            data: updatedParent,
         });
     } catch (error) {
         console.error(error);

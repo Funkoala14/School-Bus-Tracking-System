@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { get, post } from '../../services/api';
 import { showNotification } from '../notificationSlice/notification.slice';
 import { getParentProfileThunk } from '../parentSlice/parent.thunk';
+import { getDriverInfo } from '../driverSlice/driver.thunk';
 
 export const loginThunk = createAsyncThunk('auth/login', async ({ userName, password }, { rejectWithValue, dispatch }) => {
     try {
@@ -21,6 +22,7 @@ export const loginThunk = createAsyncThunk('auth/login', async ({ userName, pass
 
             case 'Driver':
                 path = 'tracker';
+                await dispatch(getDriverInfo());
                 break;
 
             default:

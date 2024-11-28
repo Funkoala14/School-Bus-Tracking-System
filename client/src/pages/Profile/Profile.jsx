@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Box, Grid2, Typography, Avatar } from '@mui/material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
@@ -15,14 +14,14 @@ const Profile = () => {
     const dispatch = useDispatch();
     const { childInfo } = useSelector((state) => state.parent);
     const { userName } = useSelector((state) => state.auth);
-    
+
     // const goBack = () => {
     //     navigate(-1);
     // };
 
     const goEditProfile = () => {
         navigate('/parent/profile/edit');
-    }
+    };
 
     useEffect(() => {
         dispatch(getChildInfoThunk());
@@ -94,9 +93,7 @@ const Profile = () => {
                     </Grid2>
                 </Box>
             </div>
-            {/* <div>
-                <UserInfo />
-            </div> */}
+            <UserInfo />
             {childInfo.length &&
                 childInfo.map((child) => (
                     <React.Fragment key={child.studentId}>
@@ -106,4 +103,4 @@ const Profile = () => {
         </div>
     );
 };
-export default Profile
+export default Profile;

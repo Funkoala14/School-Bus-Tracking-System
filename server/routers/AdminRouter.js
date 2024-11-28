@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { checkPermission, jwtValidation } from '../middleware/AuthMiddleware.js';
-import { getDriverList, getParentList, getStudentList, getUserList, postAssignStopToStudent, postSchoolAddStudent } from '../controllers/AdminController.js';
+import { getDriverList, getParentList, getStudentList, getUserList, postAssignStopToStudent, postRemoveParent, postRemoveStudent, postSchoolAddStudent } from '../controllers/AdminController.js';
 import { adminAddStudentValidation } from '../middleware/ValidationMiddleware.js';
 import { generateRouteSchedule } from '../controllers/RouteScheduleController.js';
 
@@ -13,7 +13,9 @@ adminRouter
     .get('/students', jwtValidation, checkPermission('Admin'), getStudentList)
     .post('/add-students', adminAddStudentValidation, checkPermission('Admin'), jwtValidation, postSchoolAddStudent)
     .post('/assign-stop', jwtValidation, checkPermission('Admin'), postAssignStopToStudent)
-    .post('/generate-schedule', jwtValidation, checkPermission('Admin'), generateRouteSchedule);
+    .post('/generate-schedule', jwtValidation, checkPermission('Admin'), generateRouteSchedule)
+    .delete('/delete-parent', jwtValidation, checkPermission('Admin'),postRemoveParent)
+    .delete('/delete-student', jwtValidation, checkPermission('Admin'),postRemoveStudent)
 
 
 export default adminRouter;

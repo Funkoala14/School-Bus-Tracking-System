@@ -4,10 +4,10 @@ import { useEffect, useMemo } from 'react';
 import { TextField, Button, Stack, Select, MenuItem, FormControl, InputLabel, CircularProgress } from '@mui/material';
 import BackTitle from '@components/BackTitle';
 import { useDispatch, useSelector } from 'react-redux';
-import GoogleMapsAutocomplete from '@components/GoogleMapsAutocomplete/GoogleMapsAutocomplete';
 import { selectRoute } from '../../store/routeSlice/route.slice';
 import { allRoutesThunk } from '../../store/routeSlice/route.thunk';
 import { setTitle } from '../../store/titleSlice';
+import { GoogleMapsAutocomplete } from '../../components/GoogleMapsAutocomplete/GoogleMapsAutocomplete';
 
 const Edit = () => {
     const navigate = useNavigate();
@@ -80,106 +80,103 @@ const Edit = () => {
     }
 
     return (
-        <div className='p-4'>
-            <BackTitle title={id ? 'Edit Student' : 'Add Student'} />
-            <div className='w-full p-4'>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <Stack spacing={2}>
-                        <TextField
-                            label='First Name'
-                            {...register('firstName', { required: 'First Name is required' })}
-                            error={!!errors?.firstName}
-                            helperText={errors?.firstName?.message}
-                        />
-                        <TextField
-                            label='Last Name'
-                            {...register('lastName', { required: 'Last Name is required' })}
-                            error={!!errors?.lastName}
-                            helperText={errors?.lastName?.message}
-                        />
-                        <TextField
-                            label='Student ID'
-                            {...register('studentId', { required: 'Student ID is required' })}
-                            error={!!errors?.studentId}
-                            helperText={errors?.studentId?.message}
-                        />
-                        {id && (
-                            <>
-                                <GoogleMapsAutocomplete
-                                    label='Address'
-                                    onPlaceSelected={(place) => {
-                                        console.log(place);
+        <div className='w-full p-4'>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <Stack spacing={2}>
+                    <TextField
+                        label='First Name'
+                        {...register('firstName', { required: 'First Name is required' })}
+                        error={!!errors?.firstName}
+                        helperText={errors?.firstName?.message}
+                    />
+                    <TextField
+                        label='Last Name'
+                        {...register('lastName', { required: 'Last Name is required' })}
+                        error={!!errors?.lastName}
+                        helperText={errors?.lastName?.message}
+                    />
+                    <TextField
+                        label='Student ID'
+                        {...register('studentId', { required: 'Student ID is required' })}
+                        error={!!errors?.studentId}
+                        helperText={errors?.studentId?.message}
+                    />
+                    {id && (
+                        <>
+                            <GoogleMapsAutocomplete
+                                label='Address'
+                                onPlaceSelected={(place) => {
+                                    console.log(place);
 
-                                        setValue('address', place.formatted_address);
-                                    }}
-                                    defaultValue={selectStudent?.address?.address || ''}
-                                    error={!!errors?.address}
-                                    helperText={errors?.address?.message || ' '}
+                                    setValue('address', place.formatted_address);
+                                }}
+                                defaultValue={selectStudent?.address?.address || ''}
+                                error={!!errors?.address}
+                                helperText={errors?.address?.message || ''}
+                            />
+
+                            {/* Route Select */}
+                            <FormControl fullWidth>
+                                <InputLabel>Route</InputLabel>
+                                <Controller
+                                    name='route'
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            {...field}
+                                            label='Route'
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                handleRouteChange(e);
+                                            }}
+                                        >
+                                            {routes.map((route) => (
+                                                <MenuItem key={route._id} value={route._id}>
+                                                    {route.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    )}
                                 />
+                            </FormControl>
 
-                                {/* Route Select */}
+                            {/* Stop Select */}
+                            {selectedRouteMemo && (
                                 <FormControl fullWidth>
-                                    <InputLabel>Route</InputLabel>
+                                    <InputLabel>Stop</InputLabel>
                                     <Controller
-                                        name='route'
+                                        name='stop'
                                         control={control}
                                         render={({ field }) => (
-                                            <Select
-                                                {...field}
-                                                label='Route'
-                                                onChange={(e) => {
-                                                    field.onChange(e);
-                                                    handleRouteChange(e);
-                                                }}
-                                            >
-                                                {routes.map((route) => (
-                                                    <MenuItem key={route._id} value={route._id}>
-                                                        {route.name}
+                                            <Select {...field} label='Stop'>
+                                                {selectedRouteMemo.stops.map((stop) => (
+                                                    <MenuItem key={stop._id} value={stop._id}>
+                                                        {stop.stopName}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
                                         )}
                                     />
                                 </FormControl>
+                            )}
+                        </>
+                    )}
 
-                                {/* Stop Select */}
-                                {selectedRouteMemo && (
-                                    <FormControl fullWidth>
-                                        <InputLabel>Stop</InputLabel>
-                                        <Controller
-                                            name='stop'
-                                            control={control}
-                                            render={({ field }) => (
-                                                <Select {...field} label='Stop'>
-                                                    {selectedRouteMemo.stops.map((stop) => (
-                                                        <MenuItem key={stop._id} value={stop._id}>
-                                                            {stop.stopName}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            )}
-                                        />
-                                    </FormControl>
-                                )}
-                            </>
-                        )}
-
-                        <Button
-                            type='submit'
-                            sx={{
-                                color: '#00E0A1',
-                                height: 40,
-                                borderRadius: 15,
-                            }}
-                            variant='outlined'
-                            color='primary'
-                            disabled={!isValid} // Disable submit button if form is invalid
-                        >
-                            Submit
-                        </Button>
-                    </Stack>
-                </form>
-            </div>
+                    <Button
+                        type='submit'
+                        sx={{
+                            color: '#00E0A1',
+                            height: 40,
+                            borderRadius: 15,
+                        }}
+                        variant='outlined'
+                        color='primary'
+                        disabled={!isValid} // Disable submit button if form is invalid
+                    >
+                        Submit
+                    </Button>
+                </Stack>
+            </form>
         </div>
     );
 };
