@@ -73,6 +73,9 @@ const View = () => {
             <Typography variant='body1'>
                 <strong>Email:</strong> {parent.email}
             </Typography>
+            <Typography variant='body1'>
+                <strong>Address:</strong> {parent.address?.address || 'N/A'}
+            </Typography>
             {/* 渲染子女信息 */}
             {parent?.children?.length > 0 ? (
                 <TableContainer component={Paper} className='mt-4'>

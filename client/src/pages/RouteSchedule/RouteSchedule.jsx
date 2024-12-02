@@ -48,7 +48,7 @@ const RouteSchedule = () => {
                     <PeopleAltIcon /> {info?.assignedBus?.capacity}
                 </div>
             </Box>
-            {info?.assignedBus?.assignedRoutes.length ? (
+            {Array.isArray(info?.assignedBus?.assignedRoutes) ? (
                 info?.assignedBus?.assignedRoutes?.map((route) => (
                     <div key={route._id} className='border border-gray-200 rounded-lg p-4'>
                         <div>

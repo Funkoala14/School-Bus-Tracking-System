@@ -1,147 +1,162 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
-import { TextField, Button, Stack } from '@mui/material';
-import BackTitle from '@components/BackTitle';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { useEffect, useState } from 'react';
+import { TextField, Button, Stack, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { Controller } from 'react-hook-form';
-import dayjs from 'dayjs';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setTitle } from '../../store/titleSlice';
+import { getDriverListThunk } from '../../store/driverSlice/driver.thunk';
+import { addBusThunk, updateBusThunk } from '../../store/busSlice/bus.thunk';
+import Loading from '../../components/Loading';
+
 const Edit = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
+    const [driver, setDriver] = useState('');
+    const [drivers, setDrivers] = useState([]);
     const id = searchParams.get('id');
-    const { register, handleSubmit, formState: { errors }, control, setValue } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        control,
+        setValue,
+    } = useForm({
+        defaultValues: {
+            assignedDriver: null,
+        },
+    });
+    const busInfo = useSelector((state) => state.bus.busList.find((p) => p._id === id));
+    const { driverList } = useSelector((state) => state.driver);
+    const { loading, error } = useSelector((state) => state.bus);
+    const { routes } = useSelector((state) => state.route);
 
     useEffect(() => {
-        if (id) {
-            console.log(id, 'edit');
-            // 模拟从后端获取数据
-            // 实际使用时替换为真实的 API 调用
-            const mockBusData = {
-                busPlate: '1234567890',
-                capacity: 50,
-                yearOfProduction: dayjs('2024-01-01'),
-                assignedDriver: 'John Doe',
-                assignedRoute: 'Route 1',
-                busAddedTime: dayjs('2024-01-01'),
+        if (driverList) {
+            const list = driverList.filter((driver) => !!!driver?.assignedBus);
+            if (busInfo?.assignedDriver) {
+                list.unshift(busInfo.assignedDriver);
             }
-
-            // 设置表单默认值
-            Object.keys(mockBusData).forEach(key => {
-                setValue(key, mockBusData[key]);
-            });
-        } else {
-            console.log('add');
+            setDrivers(list);
         }
-    }, [id]);
+    }, [driverList]);
 
-    const onSubmit = (data) => {
-        console.log(data, 'data');
+    const initializeState = () => {
+        setValue('plate', busInfo.plate);
+        setValue('capacity', busInfo.capacity);
+        setValue('year', busInfo.year);
+        setValue('assignedDriver', busInfo?.assignedDriver?._id || null);
+        const routeIds = busInfo?.assignedRoutes.map((route) => route._id);
+        setValue('assignedRoutes', routeIds || []);
+    };
+
+    useEffect(() => {
+        if (busInfo) {
+            initializeState();
+            console.log(busInfo);
+        }
+    }, [busInfo]);
+
+    const onSubmit = async (data) => {
+        if (id) {
+            await dispatch(updateBusThunk({ ...data, busId: id }));
+        } else {
+            console.log(data);
+            await dispatch(addBusThunk(data));
+        }
+        
+        if (!loading && !error) {
+            navigate(-1);
+        }
     };
 
     useEffect(() => {
         dispatch(setTitle({ title: id ? 'Edit Bus' : 'Add Bus', ifBack: true }));
+        dispatch(getDriverListThunk());
     }, [dispatch]);
 
-    return <div className='p-4'>
-        <BackTitle title={id ? 'Edit Bus' : 'Add Bus'} />
-        <div
-            className='w-full p-4'
-        >
+    if (loading) {
+        return <Loading />;
+    }
+    return (
+        <div className='p-4'>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Stack spacing={2}>
+                    <TextField label='Bus plate' {...register('plate', { required: 'Bus plate is required' })} error={!!errors.plate} />
                     <TextField
-                        label="Bus plate"
-                        {...register('busPlate', { required: "Bus plate is required" })}
-                        error={!!errors.busPlate}
-                    />
-                    <TextField
-                        label="Capacity"
-                        {...register('capacity', { required: "Capacity is required" })}
+                        label='Capacity'
+                        type='number'
+                        {...register('capacity', { required: 'Capacity is required' })}
                         error={!!errors.capacity}
                     />
+                    <FormControl fullWidth>
+                        <InputLabel>Assign Driver</InputLabel>
+                        <Controller
+                            name='assignedDriver'
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    {...field}
+                                    label='Assign Driver'
+                                    onChange={(e) => {
+                                        field.onChange(e);
+                                    }}
+                                >
+                                    <MenuItem value={null}></MenuItem>
+                                    {Array.isArray(drivers) &&
+                                        drivers.map((driver) => (
+                                            <MenuItem key={driver._id} value={driver._id}>
+                                                {driver.firstName} {driver.lastName}
+                                            </MenuItem>
+                                        ))}
+                                </Select>
+                            )}
+                        />
+                    </FormControl>
 
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={['DatePicker']}>
-                            <Controller
-                                name="yearOfProduction"
-                                control={control}
-                                rules={{ required: 'Year of production is required' }}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => {
-                                    console.log(error, 'error');
-                                    return (
-                                        <DatePicker
-                                            label="Year of production"
-                                            value={value || null} // 确保值为空时显示 placeholder
-                                            onChange={(date) => onChange(date)}
-                                            views={['year']}
-                                            slotProps={{
-                                                textField: {
-                                                    error: !!error,
-                                                }
-                                            }}
-                                        />
-                                    )
-                                }}
-                            />
-                        </DemoContainer>
-                    </LocalizationProvider>
-                    <TextField
-                        label="Assigned driver"
-                        {...register('assignedDriver', { required: "Assigned driver is required" })}
-                        error={!!errors.assignedDriver}
-                    />
-                    <TextField
-                        label="Assigned route"
-                        {...register('assignedRoute', { required: "Assigned route is required" })}
-                        error={!!errors.assignedRoute}
-                    />
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={['DatePicker']}>
-                            <Controller
-                                name="busAddedTime"
-                                control={control}
-                                rules={{ required: 'Bus added time is required' }}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => {
-                                    return (
-                                        <DatePicker
-                                            label="Bus added time"
-                                            value={value || null}
-                                            onChange={(date) => onChange(date)}
-                                            slotProps={{
-                                                textField: {
-                                                    error: !!error,
-                                                }
-                                            }}
-                                        />
-                                    )
-                                }}
-                            />
-                        </DemoContainer>
-                    </LocalizationProvider>
-
+                    <FormControl fullWidth>
+                        <InputLabel>Assign Routes</InputLabel>
+                        <Controller
+                            name='assignedRoutes'
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    multiple
+                                    {...field}
+                                    label='Assign Routes'
+                                    value={field.value || []}
+                                    onChange={(e) => {
+                                        field.onChange(e);
+                                    }}
+                                >
+                                    {Array.isArray(routes) &&
+                                        routes.map((route) => (
+                                            <MenuItem key={route._id} value={route._id}>
+                                                {route.name}
+                                            </MenuItem>
+                                        ))}
+                                </Select>
+                            )}
+                        />
+                    </FormControl>
 
                     <Button
-                        type="submit"
+                        type='submit'
                         sx={{
                             color: '#00E0A1',
                             height: 40,
                             borderRadius: 15,
                         }}
-                        variant="outlined"
-                        color="primary">
+                        variant='outlined'
+                        color='primary'
+                    >
                         Submit
                     </Button>
                 </Stack>
             </form>
         </div>
-    </div>;
+    );
 };
 
 export default Edit;

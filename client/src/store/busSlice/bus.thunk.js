@@ -24,79 +24,70 @@ export const fetchBuses = createAsyncThunk(
 );
 
 // 添加巴士
-export const addBus = createAsyncThunk(
-  'bus/addBus',
-  async (busData, { rejectWithValue, dispatch }) => {
+export const addBusThunk = createAsyncThunk('bus/addBus', async (busData, { rejectWithValue, dispatch }) => {
     try {
-      const { data } = await post('/admin/buses', busData);
-      dispatch(
-        showNotification({
-          message: 'Bus added successfully',
-          severity: 'success',
-        })
-      );
-      return data;
+        const { data, message } = await post('/bus/add', busData);
+        dispatch(
+            showNotification({
+                message,
+                severity: 'success',
+            })
+        );
+        return data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to add bus';
-      dispatch(
-        showNotification({
-          message: errorMessage,
-          severity: 'error',
-        })
-      );
-      return rejectWithValue(errorMessage);
+        const errorMessage = error.response?.data?.message || 'Failed to add bus';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
     }
-  }
-);
+});
 
 // 更新巴士信息
-export const updateBus = createAsyncThunk(
-  'bus/updateBus',
-  async (busData, { rejectWithValue, dispatch }) => {
+export const updateBusThunk = createAsyncThunk('bus/updateBus', async (busData, { rejectWithValue, dispatch }) => {
     try {
-      const { data } = await put(`/admin/buses/${busData._id}`, busData);
-      dispatch(
-        showNotification({
-          message: 'Bus updated successfully',
-          severity: 'success',
-        })
-      );
-      return data;
+        const { data, message } = await post('/bus/update', busData);
+        dispatch(
+            showNotification({
+                message: message,
+                severity: 'success',
+            })
+        );
+        return data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to update bus';
-      dispatch(
-        showNotification({
-          message: errorMessage,
-          severity: 'error',
-        })
-      );
-      return rejectWithValue(errorMessage);
+        const errorMessage = error.response?.data?.message || 'Failed to update bus';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
     }
-  }
-);
+});
 
 // 删除巴士
-export const deleteBus = createAsyncThunk(
-  'bus/deleteBus',
-  async (busId, { rejectWithValue, dispatch }) => {
+export const deleteBusThunk = createAsyncThunk('bus/deleteBus', async (busId, { rejectWithValue, dispatch }) => {
     try {
-      await del(`/admin/buses/${busId}`);
-      dispatch(
-        showNotification({
-          message: 'Bus deleted successfully',
-          severity: 'success',
-        })
-      );
-      return busId;
+        const {data, message} = await del(`/bus/delete?busId=${busId}`);
+        dispatch(
+            showNotification({
+                message,
+                severity: 'success',
+            })
+        );
+        return data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to delete bus';
-      dispatch(
-        showNotification({
-          message: errorMessage,
-          severity: 'error',
-        })
-      );
-      return rejectWithValue(errorMessage);
+        const errorMessage = error.response?.data?.message || 'Failed to delete bus';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
     }
-  }
-);
+});

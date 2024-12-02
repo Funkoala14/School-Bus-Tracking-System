@@ -150,7 +150,7 @@ export const deleteParent = createAsyncThunk('parent/deleteParent', async (paren
 // parent add child (admin)
 export const addChildThunk = createAsyncThunk('admin/parent/add-child', async (config, { rejectWithValue, dispatch }) => {
     try {
-        const { data, message } = await post('/parent/add-student', config);
+        const { data, message } = await post('/admin/add-student', config);
         dispatch(showNotification({ message, severity: 'success' }));
         return data;
     } catch (error) {
@@ -169,6 +169,24 @@ export const addChildThunk = createAsyncThunk('admin/parent/add-child', async (c
 export const addChildByParentThunk = createAsyncThunk('parent/add-child', async (config, { rejectWithValue, dispatch }) => {
     try {
         const { data, message } = await post('/parent/add-student', config);
+        dispatch(showNotification({ message, severity: 'success' }));
+        return data;
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Failed to delete parent';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
+    }
+});
+
+// parent remove child
+export const removeChildThunk = createAsyncThunk('parent/remove-child', async (config, { rejectWithValue, dispatch }) => {
+    try {
+        const { data, message } = await post('/parent/remove-student', config);
         dispatch(showNotification({ message, severity: 'success' }));
         return data;
     } catch (error) {

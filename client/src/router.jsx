@@ -99,7 +99,7 @@ const AppRouter = () => {
         if (!isLoggedIn) return <Navigate to='/login' />;
         if (role === 'Admin') return <Navigate to='/admin/home' />;
         if (role === 'Parent') return <Navigate to='/parent/home' />;
-        if (role === 'Driver') return <Navigate to='/driver/home' />;
+        if (role === 'Driver') return <Navigate to='/driver/tracker' />;
         return <Navigate to='/login' />;
     };
 

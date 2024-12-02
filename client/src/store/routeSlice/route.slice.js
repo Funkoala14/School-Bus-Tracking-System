@@ -1,5 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { allRoutesThunk } from './route.thunk';
+import {
+    addNewRouteThunk,
+    allRoutesThunk,
+    deleteRouteThunk,
+    deleteStopThunk,
+    generateNewScheduleThunk,
+    routeAddStopThunk,
+    updateStopsThunk,
+    updateStopThunk,
+} from './route.thunk';
 
 const setPending = (state) => {
     state.loading = true;
@@ -31,6 +40,7 @@ const routeSlice = createSlice({
         setNextStopData: (state, action) => {
             state.nextStopData = action.payload;
         },
+        clearError: () => {},
     },
     extraReducers: (builder) => {
         builder
@@ -39,7 +49,71 @@ const routeSlice = createSlice({
                 state.routes = action.payload;
                 state.loading = false;
             })
-            .addCase(allRoutesThunk.rejected, setRejected);
+            .addCase(allRoutesThunk.rejected, setRejected)
+
+            .addCase(generateNewScheduleThunk.pending, setPending)
+            .addCase(generateNewScheduleThunk.fulfilled, (state, action) => {
+                const index = state.routes.findIndex((r) => r._id === action.payload._id);
+                if (index !== -1) {
+                    state.routes[index] = action.payload; // Update the route data
+                }
+                state.loading = false;
+            })
+            .addCase(generateNewScheduleThunk.rejected, setRejected)
+
+            .addCase(routeAddStopThunk.pending, setPending)
+            .addCase(routeAddStopThunk.fulfilled, (state, action) => {
+                const index = state.routes.findIndex((r) => r._id === action.payload._id);
+                if (index !== -1) {
+                    state.routes[index] = action.payload; // Update the route data
+                }
+                state.loading = false;
+            })
+            .addCase(routeAddStopThunk.rejected, setRejected)
+
+            .addCase(updateStopThunk.pending, setPending)
+            .addCase(updateStopThunk.fulfilled, (state, action) => {
+                const index = state.routes.findIndex((r) => r._id === action.payload._id);
+                if (index !== -1) {
+                    state.routes[index] = action.payload; // Update the route data
+                }
+                state.loading = false;
+            })
+            .addCase(updateStopThunk.rejected, setRejected)
+
+            .addCase(updateStopsThunk.pending, setPending)
+            .addCase(updateStopsThunk.fulfilled, (state, action) => {
+                const index = state.routes.findIndex((r) => r._id === action.payload._id);
+                if (index !== -1) {
+                    state.routes[index] = action.payload; // Update the route data
+                }
+                state.loading = false;
+            })
+            .addCase(updateStopsThunk.rejected, setRejected)
+
+            .addCase(deleteStopThunk.pending, setPending)
+            .addCase(deleteStopThunk.fulfilled, (state, action) => {
+                const index = state.routes.findIndex((r) => r._id === action.payload._id);
+                if (index !== -1) {
+                    state.routes[index] = action.payload; // Update the route data
+                }
+                state.loading = false;
+            })
+            .addCase(deleteStopThunk.rejected, setRejected)
+
+            .addCase(deleteRouteThunk.pending, setPending)
+            .addCase(deleteRouteThunk.fulfilled, (state, action) => {
+                state.routes = action.payload;
+                state.loading = false;
+            })
+            .addCase(deleteRouteThunk.rejected, setRejected)
+
+            .addCase(addNewRouteThunk.pending, setPending)
+            .addCase(addNewRouteThunk.fulfilled, (state, action) => {
+                state.routes = action.payload;
+                state.loading = false;
+            })
+            .addCase(addNewRouteThunk.rejected, setRejected);
     },
 });
 
