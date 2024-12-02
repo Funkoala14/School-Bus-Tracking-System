@@ -8,9 +8,9 @@ const parentRouter = Router();
 parentRouter
     .get('/children-info', jwtValidation, getChildrenDetail)
     .post('/add-student', parentAddStudentValidation, jwtValidation, postAddStudent)
-    .post('/remove-student', jwtValidation, checkPermission('Parent'), postRemoveStudent)
+    .post('/remove-student', jwtValidation, postRemoveStudent)
     .post('/set-address', jwtValidation, checkPermission('Parent'), setAddressValidation, postSetAddress)
     .get('/profile', jwtValidation, getParentProfile)
-    .post('/update', jwtValidation, postUpdateParentProfile)
+    .post('/update', jwtValidation, postUpdateParentProfile);
 
 export default parentRouter;

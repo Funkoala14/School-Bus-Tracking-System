@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { TextField, Button, Stack, Card, CardContent, IconButton, Typography, Modal, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTitle } from '../../store/titleSlice';
-import { addParent, updateParent } from '../../store/parentSlice/parent.thunk';
+import { addParent, removeChildThunk, updateParent } from '../../store/parentSlice/parent.thunk';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddChildModal from '../../components/AddChildModal/AddChildModal';
 
@@ -34,7 +34,6 @@ const Edit = () => {
         (state) => state.parent.parentList.find((p) => p._id === parentId) // 从 Redux 中找到对应家长
     );
     const [isModalOpen, setModalOpen] = useState(false);
-    
 
     useEffect(() => {
         dispatch(setTitle({ title: parentId ? 'Edit Parent' : 'Add Parent', ifBack: true }));
@@ -43,7 +42,6 @@ const Edit = () => {
 
     const onSubmit = (data) => {
         const { firstName, lastName, phone } = data;
-        console.log(data);
         if (parentId) {
             dispatch(updateParent({ firstName, lastName, phone, id: parentId })).then(() => navigate(-1));
         } else {
@@ -63,6 +61,10 @@ const Edit = () => {
     const handleOpenModal = () => setModalOpen(true);
     const handleCloseModal = () => {
         setModalOpen(false);
+    };
+
+    const removeChild = (child) => {
+        dispatch(removeChildThunk({ studentId: child._id, parentId }));
     };
 
     useEffect(() => {
@@ -101,7 +103,7 @@ const Edit = () => {
                         error={!!errors?.phone}
                         helperText={errors?.phone?.message}
                     />
-                    <TextField disabled label='Address' {...register('address', { required: 'Phone number is required' })} />
+                    <TextField disabled label='Address' {...register('address')} />
 
                     {parent.children?.length > 0 ? (
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
@@ -110,7 +112,7 @@ const Edit = () => {
                                     <CardContent>
                                         <div className='flex justify-between items-center'>
                                             <span className='text-sm font-semibold text-gray-700'>Child {index + 1}:</span>
-                                            <IconButton aria-label='delete' color='error' onClick={() => remove(index)}>
+                                            <IconButton aria-label='delete' color='error' onClick={() => removeChild(child)}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </div>

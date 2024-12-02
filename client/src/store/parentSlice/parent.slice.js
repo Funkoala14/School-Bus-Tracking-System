@@ -9,6 +9,7 @@ import {
     addChildThunk,
     addChildByParentThunk,
     updateParentProfileThunk,
+    removeChildThunk,
 } from './parent.thunk.js';
 
 const setPending = (state) => {
@@ -112,7 +113,6 @@ const parentSlice = createSlice({
             .addCase(addChildThunk.pending, setPending)
             .addCase(addChildThunk.fulfilled, (state, action) => {
                 const index = state.parentList.findIndex((p) => p._id === action.payload._id);
-                setFulfilled(state);
                 if (index !== -1) {
                     state.parentList[index] = action.payload;
                 }
@@ -127,7 +127,17 @@ const parentSlice = createSlice({
                 state.childInfo = action.payload.children;
                 setFulfilled(state);
             })
-            .addCase(addChildByParentThunk.rejected, setRejected);
+            .addCase(addChildByParentThunk.rejected, setRejected)
+
+            .addCase(removeChildThunk.pending, setPending)
+            .addCase(removeChildThunk.fulfilled, (state, action) => {
+                const index = state.parentList.findIndex((p) => p._id === action.payload._id);
+                if (index !== -1) {
+                    state.parentList[index] = action.payload;
+                }
+                setFulfilled(state);
+            })
+            .addCase(removeChildThunk.rejected, setRejected);
     },
 });
 

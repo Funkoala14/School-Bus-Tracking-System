@@ -30,36 +30,31 @@ const ParentManagement = () => {
     },[dispatch])
 
     return (
-        <div className="p-2">
+        <div className='p-2'>
             {/* <SearchInputBase placeholder="Search parent" /> */}
-            <div className="mt-2 grid grid-cols-1 gap-4">
+            <div className='mt-2 grid grid-cols-1 gap-4'>
                 {Array.isArray(parentList) &&
                     parentList.map((parent) => (
-                        <div
-                            key={parent._id}
-                            className="col-span-3"
-                            onClick={() => visibilityHandler(parent)}
-                        >
+                        <div key={parent._id} className='col-span-3' onClick={() => visibilityHandler(parent)}>
                             <Card>
                                 <CardContent>
-                                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                                    <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
                                         {parent.firstName} {parent.lastName}
                                     </Typography>
-                                    <Typography variant="body2" className="mt-2">
-                                        phone: {parent.phone}
+                                    <Typography variant='body2' className='mt-2'>
+                                        Phone: {parent.phone}
                                     </Typography>
-                                    <Typography variant="body2" className="mt-2">
-                                        email: {parent.email}
+                                    <Typography variant='body2' className='mt-2'>
+                                        Email: {parent.email}
+                                    </Typography>
+                                    <Typography variant='body2' className='mt-2'>
+                                        Chidren:
                                     </Typography>
                                     {parent?.children &&
                                         parent?.children.map((item) => (
-                                            <Typography
-                                                key={item?.studentId}
-                                                variant="body2"
-                                                className="mt-2"
-                                            >
-                                                {`childrenName&id: ${item?.firstName} ${item?.lastName} (${item?.studentId})`}
-                                            </Typography>
+                                            <li className='text-sm' key={item?.studentId}>
+                                                {`${item?.firstName} ${item?.lastName} (${item?.studentId})`}
+                                            </li>
                                         ))}
                                 </CardContent>
                             </Card>
@@ -67,7 +62,7 @@ const ParentManagement = () => {
                     ))}
             </div>
             <SpeedDial
-                ariaLabel="Add Parent"
+                ariaLabel='Add Parent'
                 sx={{ position: 'fixed', bottom: 16, right: 16 }}
                 icon={<SpeedDialIcon sx={{ color: 'white' }} />}
                 onClick={() => navigate('/admin/parent-management/edit')}

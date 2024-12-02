@@ -88,11 +88,20 @@ export const postAdminAddStudentForParent = async (req, res) => {
     }
 };
 export const postRemoveStudent = async (req, res) => {
-    const { userId } = req.user;
+    const { userId, role } = req.user;
     try {
+        let parentId = '';
+        if (role !== 'Parent') {
+            if (!req.body?.parentId) {
+                return res.status(404).json({ message: 'Missing parent id', code: 404 });
+            }
+            parentId = req.body.parentId;
+        } else {
+            parentId = userId;
+        }
         const { studentId } = req.body;
         if (!studentId) return res.status(404).json({ message: 'Missing student id', code: 404 });
-        const parent = await Parent.findByIdAndUpdate(userId, { $pull: { children: studentId } }, { new: true });
+        const parent = await Parent.findByIdAndUpdate(parentId, { $pull: { children: studentId } }, { new: true }).select('-password -__v');
         if (!parent) return res.status(404).json({ message: 'Parent not found', code: 404 });
         const student = await Student.findByIdAndUpdate(studentId, { $unset: { parent: null } });
         if (!student) return res.status(404).json({ message: 'Student not found', code: 404 });
