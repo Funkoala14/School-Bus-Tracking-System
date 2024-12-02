@@ -87,8 +87,8 @@ const AppRouter = () => {
             { title: 'PROFILE', path: '/parent/profile', icon: <AssignmentIndIcon /> },
             { title: 'BUS TRACKER', path: '/parent/bus-tracker', icon: <DirectionsBusIcon /> },
             { title: 'BUS ROUTE', path: '/parent/bus-route', icon: <PinDropIcon /> },
-            { title: 'NOTIFICATION', path: '/parent/notification', icon: <NotificationsActiveIcon /> },
-            { title: 'REQUEST', path: '/parent/request', icon: <SendIcon /> },
+            // { title: 'NOTIFICATION', path: '/parent/notification', icon: <NotificationsActiveIcon /> },
+            // { title: 'REQUEST', path: '/parent/request', icon: <SendIcon /> },
         ],
         driverPaths: [
             { title: 'PROFILE', path: '/driver/profile', icon: <AssignmentIndIcon /> },
