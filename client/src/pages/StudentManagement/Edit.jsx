@@ -8,6 +8,7 @@ import { selectRoute } from '../../store/routeSlice/route.slice';
 import { allRoutesThunk } from '../../store/routeSlice/route.thunk';
 import { setTitle } from '../../store/titleSlice';
 import { GoogleMapsAutocomplete } from '../../components/GoogleMapsAutocomplete/GoogleMapsAutocomplete';
+import { addStudentThunk, updateStudentInfoThunk } from '../../store/adminSlice/admin.thunk';
 
 const Edit = () => {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const Edit = () => {
     const id = searchParams.get('id');
     const [address, setAddress] = useState();
     const {
+        watch,
         register,
         handleSubmit,
         control,
@@ -27,23 +29,25 @@ const Edit = () => {
             firstName: '',
             lastName: '',
             studentId: '',
-            route: '',
+            routes: [],
             stop: '',
         },
     });
-    const { selectStudent } = useSelector((state) => state.admin);
-    const { routes, loading, selectedRoute } = useSelector((state) => state.route);
+    const { routes, loading } = useSelector((state) => state.route);
+    const selectStudent = useSelector((state) => state.admin.studentList.find((s) => s._id === id));
+    const adminLoading = useSelector((state) => state.admin.loading);
+    const { error } = useSelector((state) => state.admin);
 
-    // Memoize selected route to optimize re-renders
+    const selectedRoutes = watch('routes') || [];
     const selectedRouteMemo = useMemo(() => {
-        return routes.find((route) => route._id === selectStudent?.route?._id);
-    }, [routes, selectStudent?.route?._id]);
+        if (!selectedRoutes.length) return null;
+        return routes.find((route) => selectedRoutes.includes(route._id));
+    }, [routes, selectedRoutes]);
 
     useEffect(() => {
         dispatch(setTitle({ title: id ? 'Edit Student' : 'Add Student', ifBack: true }));
         dispatch(allRoutesThunk());
         if (id && selectStudent) {
-            console.log(selectStudent);
             handleInitialStates();
         }
     }, [id, selectStudent, dispatch]);
@@ -52,9 +56,8 @@ const Edit = () => {
         setValue('firstName', selectStudent.firstName);
         setValue('lastName', selectStudent.lastName);
         setValue('studentId', selectStudent.studentId);
-        const routeIds = selectStudent?.route.map((route) => route._id);
-        setValue('assignedRoutes', routeIds || []);
-        setValue('route', selectStudent?.route?._id || []);
+        const routeIds = selectStudent?.route?.map((route) => route._id);
+        setValue('routes', routeIds || []);
         setValue('stop', selectStudent?.stop?._id || '');
         setValue('address', selectStudent?.address?.address || '');
 
@@ -70,10 +73,18 @@ const Edit = () => {
         }
     };
 
-    const onSubmit = (data) => {
-        console.log('Form Submitted:', { ...data, address });
-        // navigate(-1);
-        reset(); // Reset the form after submission
+    const onSubmit = async (data) => {
+        const { firstName, lastName, routes, stop, studentId } = data;
+        console.log('Form Submitted:', { firstName, lastName, studentId, routes, stop, id });
+        if (id) {
+            await dispatch(updateStudentInfoThunk({ firstName, lastName, studentId, routes, stop, id }));
+        } else {
+            await dispatch(addStudentThunk({ student: { firstName, lastName, studentId } }));
+        }
+        if (!adminLoading && !error) {
+            navigate(-1);
+            reset(); // Reset the form after submission
+        }
     };
 
     if (loading) {
@@ -111,12 +122,14 @@ const Edit = () => {
                             <FormControl fullWidth>
                                 <InputLabel>Route</InputLabel>
                                 <Controller
-                                    name='route'
+                                    name='routes'
                                     control={control}
                                     render={({ field }) => (
                                         <Select
                                             {...field}
+                                            multiple
                                             label='Route'
+                                            value={field.value || []}
                                             onChange={(e) => {
                                                 field.onChange(e);
                                                 handleRouteChange(e);

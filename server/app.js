@@ -23,6 +23,8 @@ app.use(
     cors({
         origin: config.FRONT_URL,
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
+        allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     })
 );
 
@@ -41,6 +43,11 @@ app.use('/api/driver', driverRouter);
 
 app.all('*', (_req, res) => {
     return res.status(404).json({ message: 'API Not Found' });
+});
+
+// Preflight requests handler (if necessary for OPTIONS requests)
+app.options('*', (_req, res) => {
+    res.sendStatus(204); // Respond with "No Content"
 });
 
 export default app;

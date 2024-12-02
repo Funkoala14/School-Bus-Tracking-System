@@ -97,8 +97,8 @@ const AppRouter = () => {
     const { isLoggedIn, role } = useSelector((state) => state.auth);
     const getHomeRote = () => {
         if (!isLoggedIn) return <Navigate to='/login' />;
-        if (role === 'Admin') return <Navigate to='/admin/home' />;
-        if (role === 'Parent') return <Navigate to='/parent/home' />;
+        if (role === 'Admin') return <Navigate to='/admin/route-management' />;
+        if (role === 'Parent') return <Navigate to='/parent/profile' />;
         if (role === 'Driver') return <Navigate to='/driver/tracker' />;
         return <Navigate to='/login' />;
     };
@@ -245,14 +245,14 @@ const AppRouter = () => {
                                 </PrivateRoute>
                             }
                         >
-                            <Route
+                            {/* <Route
                                 path='home'
                                 element={
                                     <MainLayout paths={paths.parentPaths}>
                                         <Home />
                                     </MainLayout>
                                 }
-                            />
+                            /> */}
                             <Route
                                 path='profile'
                                 element={

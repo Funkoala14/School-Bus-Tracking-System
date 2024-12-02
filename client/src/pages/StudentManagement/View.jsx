@@ -19,8 +19,8 @@ const View = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const [open, setOpen] = useState(false);
-    const { studentList, selectStudent } = useSelector((state) => state.admin);
-    console.log(selectStudent, 'pink');
+    const selectStudent = useSelector((state) => state.admin.studentList.find((s) => s._id === id));
+    const { studentList } = useSelector((state) => state.admin);
     const dispatch = useDispatch();
 
     const editHandler = () => {
@@ -47,7 +47,7 @@ const View = () => {
 
     return (
         <>
-            <Stack spacing={2}>
+            <Stack spacing={2} p={2}>
                 <div>
                     <span className='flex-1 font-bold'>Student ID: </span>
                     <span className='w-full break-all'>{selectStudent.studentId || ''}</span>
@@ -55,12 +55,14 @@ const View = () => {
                 <div>
                     <span className='flex-1 font-bold'>Full Name: </span>
                     <span className='w-full break-all'>
-                        {selectStudent.firstName || '' + ' ' + selectStudent.lastName || ''}
+                        {selectStudent.firstName} {selectStudent.lastName}
                     </span>
                 </div>
                 <div>
                     <span className='flex-1 font-bold'>Parent Name: </span>
-                    <span className='w-full break-all'>{selectStudent?.parent?.firstName || ''}</span>
+                    <span className='w-full break-all'>
+                        {selectStudent?.parent?.firstName} {selectStudent?.parent?.lastName}
+                    </span>
                 </div>
                 <div>
                     <span className='flex-1 font-bold'>Address: </span>
@@ -84,20 +86,10 @@ const View = () => {
                     </span>
                 </div>
                 <Stack spacing={2}>
-                    <Button
-                        variant='outlined'
-                        color='primary'
-                        startIcon={<EditNoteIcon color='primary' />}
-                        onClick={editHandler}
-                    >
+                    <Button variant='outlined' color='primary' startIcon={<EditNoteIcon color='primary' />} onClick={editHandler}>
                         Edit
                     </Button>
-                    <Button
-                        variant='outlined'
-                        color='error'
-                        startIcon={<DeleteIcon color='error' />}
-                        onClick={deleteHandler}
-                    >
+                    <Button variant='outlined' color='error' startIcon={<DeleteIcon color='error' />} onClick={deleteHandler}>
                         Delete
                     </Button>
                 </Stack>
