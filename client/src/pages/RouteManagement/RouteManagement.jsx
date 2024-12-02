@@ -9,16 +9,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setTitle } from '../../store/titleSlice';
 import { allRoutesThunk } from '../../store/routeSlice/route.thunk';
-import moment from 'moment';
+import Loading from '../../components/Loading';
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 
 const RouteManagement = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const routeList = useSelector((state) => state.route.routes);
+    const { routes, loading } = useSelector((state) => state.route);
 
     const visibilityHandler = (item) => {
         console.log('visibility');
         navigate(`/admin/route-management/view?id=${item._id}`);
+    };
+    const checkBus = (item) => {
+        if (!item.assignedBus) return;
+
+        console.log(123);
+        navigate(`/admin/bus-management/view?id=${item.assignedBus._id}`);
     };
 
     useEffect(() => {
@@ -26,31 +33,35 @@ const RouteManagement = () => {
         dispatch(allRoutesThunk());
     }, []);
 
-    return (
-        <div className='p-2'>
-            {/* <SearchInputBase placeholder='Search route' /> */}
+    if (loading) {
+        return <Loading />;
+    }
 
+    return (
+        <React.Fragment>
             <div className='mt-2 grid grid-cols-1 gap-4'>
-                {Array.isArray(routeList) &&
-                    routeList.map((item) => (
+                {Array.isArray(routes) &&
+                    routes.map((item) => (
                         <Card key={item._id} onClick={() => visibilityHandler(item)}>
-                            <CardContent>
+                            <CardContent className='flex flex-col gap-1'>
                                 <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
-                                    {item.name}
+                                    {item?.name}
                                 </Typography>
                                 <Typography variant='body2' className='mt-2'>
-                                    Stops
+                                    Direction: {item?.direction}
                                 </Typography>
-                                {item.stops.length >= 1 &&
-                                    item.stops.map((stop, i) => {
-                                        return (
-                                            <div key={stop._id}>
-                                                {i + 1}.{stop.stopName}
-                                            </div>
-                                        );
-                                    })}
                                 <Typography variant='body2' className='mt-2'>
-                                    Time: {moment(item.createdAt).format('YYYY-MM-DD hh:mm:ss')}
+                                    Stops: {item?.stops.length}
+                                </Typography>
+                                <Typography
+                                    variant='body2'
+                                    className='flex items-center gap-1'
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        checkBus(item);
+                                    }}
+                                >
+                                    <DirectionsBusIcon /> {item?.assignedBus?.plate || 'N/A'}
                                 </Typography>
                             </CardContent>
                         </Card>
@@ -65,7 +76,7 @@ const RouteManagement = () => {
                     navigate('/admin/route-management/edit');
                 }}
             ></SpeedDial>
-        </div>
+        </React.Fragment>
     );
 };
 

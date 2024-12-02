@@ -2,9 +2,9 @@ import React, { useRef, useEffect, useState } from 'react';
 import { TextField } from '@mui/material';
 import { Autocomplete } from '@react-google-maps/api';
 
-export const GoogleMapsAutocomplete = ({ label, onPlaceSelected, error, helperText, defaultValue }) => {
+export const GoogleMapsAutocomplete = ({ onPlaceSelected, defaultValue = { address: '' } }) => {
     const autocompleteRef = useRef(null);
-    const [address, setAddress] = useState(defaultValue || '');
+    const [address, setAddress] = useState(defaultValue || { address: '' });
 
     const handlePlaceChanged = () => {
         const place = autocompleteRef.current.getPlace();
@@ -43,27 +43,8 @@ export const GoogleMapsAutocomplete = ({ label, onPlaceSelected, error, helperTe
         }
     };
 
-    const validateAddress = () => {
-        const { street, city, state, zipcode, coordinates } = address;
-        if (!street || validator.isEmpty(street)) return createErrorResponse(ERROR_MESSAGES.missingStreet);
-        if (!city || validator.isEmpty(city)) return createErrorResponse(ERROR_MESSAGES.missingCity);
-        if (!state || validator.isEmpty(state)) return createErrorResponse(ERROR_MESSAGES.missingState);
-        if (!zipcode || validator.isEmpty(zipcode)) return createErrorResponse(ERROR_MESSAGES.missingZipcode);
-        if (!coordinates || !coordinates.lat || !coordinates.lng) {
-            return createErrorResponse(ERROR_MESSAGES.missingCoordinates);
-        }
-        return null;
-    };
-
     useEffect(() => {
         setAddress(defaultValue);
-        // if (defaultValue && autocompleteRef.current) {
-        //     // Programmatically trigger the autocomplete input to use the default value
-        //     autocompleteRef.current.setFields(['formatted_address']);
-        //     const input = autocompleteRef.current.getPlace();
-        //     input.name = defaultValue; // Setting the default address value
-        //     handlePlaceChanged(); // Trigger place changed to pass the default value
-        // }
     }, [defaultValue]); // Re-run when defaultValue changes
 
     return (
@@ -76,10 +57,8 @@ export const GoogleMapsAutocomplete = ({ label, onPlaceSelected, error, helperTe
             }}
         >
             <TextField
-                label={label}
-                error={error}
-                helperText={helperText}
-                onChange={(e) => setAddress(e.target.value)}
+                label={'Address'}
+                onChange={(e) => setAddress({ address: e.target.value })}
                 variant='outlined'
                 fullWidth
                 value={address?.address || ''}

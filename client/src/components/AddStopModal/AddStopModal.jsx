@@ -1,52 +1,49 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Box, TextField, Button, Typography, Stack, CircularProgress } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { addChildByParentThunk, addChildThunk } from '../../store/parentSlice/parent.thunk';
-import { clearError } from '../../store/parentSlice/parent.slice';
+import { GoogleMapsAutocomplete } from '../GoogleMapsAutocomplete/GoogleMapsAutocomplete';
+import { routeAddStopThunk, updateStopThunk } from '../../store/routeSlice/route.thunk';
 
-const AddChildModal = ({ open, onClose, parentId = null }) => {
-    const { role } = useSelector((state) => state.auth);
-    const { error, loading } = useSelector((state) => state.parent);
-
+const AddStopModal = ({ open, onClose, routeId, defaultValue = null }) => {
+    const { error, loading } = useSelector((state) => state.route);
+    const [address, setAddress] = useState({ address: '' });
     const dispatch = useDispatch();
     // Initialize the form with react-hook-form
     const {
         register,
         handleSubmit,
-        control,
         formState: { errors },
-        setError,
+        setValue,
         reset,
     } = useForm({
         defaultValues: {
-            studentId: '',
-            lastName: '',
+            stopName: '',
         },
     });
 
     const onSubmit = async (data) => {
-        switch (role) {
-            case 'Parent':
-                dispatch(addChildByParentThunk(data));
-                break;
-            case 'Admin':
-                dispatch(addChildThunk({...data, parentId}));
-                break;
+        if (defaultValue) {
+            dispatch(updateStopThunk({ ...defaultValue, ...data, address }));
+        } else {
+            dispatch(routeAddStopThunk({ routeId, ...data, address }));
         }
-
         if (!error) {
             handleClose();
         }
     };
 
     const handleClose = () => {
-        dispatch(clearError());
         onClose();
         reset();
     };
 
-    useEffect(() => {}, []);
+    useEffect(() => {
+        if (defaultValue) {
+            setAddress(defaultValue.address);
+            setValue('stopName', defaultValue.stopName);
+        }
+    }, [defaultValue]);
 
     return (
         <Modal open={open} onClose={handleClose}>
@@ -55,27 +52,23 @@ const AddChildModal = ({ open, onClose, parentId = null }) => {
                 width={'80%'}
             >
                 <Typography variant='h6' className='mb-4'>
-                    Add Child
+                    {defaultValue ? 'Edit ' : 'Add '}
+                    Stop
                 </Typography>
                 {loading ? (
                     <CircularProgress />
                 ) : (
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Stack spacing={2}>
-                            {/* Student ID Input */}
+                            {/* Stop Name Input */}
                             <TextField
-                                label='Student ID'
-                                {...register('studentId', { required: 'Student ID is required' })}
-                                error={!!errors?.studentId}
-                                helperText={errors?.studentId?.message}
+                                label='Stop Name'
+                                {...register('stopName', { required: 'Stop Name is required' })}
+                                error={!!errors?.stopName}
+                                helperText={errors?.stopName?.message}
                             />
-                            {/* Last Name Input */}
-                            <TextField
-                                label='Last Name'
-                                {...register('lastName', { required: 'Last Name is required' })}
-                                error={!!errors?.lastName}
-                                helperText={errors?.lastName?.message}
-                            />
+                            {/* Address Input */}
+                            <GoogleMapsAutocomplete label='Address' onPlaceSelected={setAddress} defaultValue={address} />
                         </Stack>
 
                         {/* Display error message */}
@@ -86,7 +79,7 @@ const AddChildModal = ({ open, onClose, parentId = null }) => {
                                 Cancel
                             </Button>
                             <Button type='submit' sx={{ color: '#fff' }} variant='contained'>
-                                Add
+                                {defaultValue ? 'Save' : 'Add'}
                             </Button>
                         </div>
                     </form>
@@ -96,4 +89,4 @@ const AddChildModal = ({ open, onClose, parentId = null }) => {
     );
 };
 
-export default AddChildModal;
+export default AddStopModal;

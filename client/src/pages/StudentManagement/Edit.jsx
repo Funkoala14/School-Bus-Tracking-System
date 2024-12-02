@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { TextField, Button, Stack, Select, MenuItem, FormControl, InputLabel, CircularProgress } from '@mui/material';
 import BackTitle from '@components/BackTitle';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +14,7 @@ const Edit = () => {
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const id = searchParams.get('id');
+    const [address, setAddress] = useState();
     const {
         register,
         handleSubmit,
@@ -26,7 +27,6 @@ const Edit = () => {
             firstName: '',
             lastName: '',
             studentId: '',
-            address: '',
             route: '',
             stop: '',
         },
@@ -52,9 +52,11 @@ const Edit = () => {
         setValue('firstName', selectStudent.firstName);
         setValue('lastName', selectStudent.lastName);
         setValue('studentId', selectStudent.studentId);
-        setValue('address', selectStudent?.address?.address || '');
-        setValue('route', selectStudent?.route?._id || '');
+        const routeIds = selectStudent?.route.map((route) => route._id);
+        setValue('assignedRoutes', routeIds || []);
+        setValue('route', selectStudent?.route?._id || []);
         setValue('stop', selectStudent?.stop?._id || '');
+        setValue('address', selectStudent?.address?.address || '');
 
         if (selectStudent.route && selectStudent.route._id) {
             dispatch(selectRoute(selectStudent.route)); // Dispatch route immediately
@@ -69,9 +71,8 @@ const Edit = () => {
     };
 
     const onSubmit = (data) => {
-        console.log('Form Submitted:', data);
-        alert('Form submitted successfully!');
-        navigate('/admin/student-management');
+        console.log('Form Submitted:', { ...data, address });
+        // navigate(-1);
         reset(); // Reset the form after submission
     };
 
@@ -101,19 +102,10 @@ const Edit = () => {
                         error={!!errors?.studentId}
                         helperText={errors?.studentId?.message}
                     />
+                    <TextField disabled label='Address' {...register('address')} />
                     {id && (
                         <>
-                            <GoogleMapsAutocomplete
-                                label='Address'
-                                onPlaceSelected={(place) => {
-                                    console.log(place);
-
-                                    setValue('address', place.formatted_address);
-                                }}
-                                defaultValue={selectStudent?.address?.address || ''}
-                                error={!!errors?.address}
-                                helperText={errors?.address?.message || ''}
-                            />
+                            {/* <GoogleMapsAutocomplete label='Address' onPlaceSelected={setAddress} defaultValue={address} /> */}
 
                             {/* Route Select */}
                             <FormControl fullWidth>

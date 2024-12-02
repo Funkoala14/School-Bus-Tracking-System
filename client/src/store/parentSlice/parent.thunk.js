@@ -150,7 +150,7 @@ export const deleteParent = createAsyncThunk('parent/deleteParent', async (paren
 // parent add child (admin)
 export const addChildThunk = createAsyncThunk('admin/parent/add-child', async (config, { rejectWithValue, dispatch }) => {
     try {
-        const { data, message } = await post('/parent/add-student', config);
+        const { data, message } = await post('/admin/add-student', config);
         dispatch(showNotification({ message, severity: 'success' }));
         return data;
     } catch (error) {

@@ -42,8 +42,10 @@ const Edit = () => {
     }, [dispatch]);
 
     const onSubmit = (data) => {
+        const { firstName, lastName, phone } = data;
+        console.log(data);
         if (parentId) {
-            dispatch(updateParent({ ...data, id: parentId })).then(() => navigate(-1));
+            dispatch(updateParent({ firstName, lastName, phone, id: parentId })).then(() => navigate(-1));
         } else {
             dispatch(addParent(data)).then(() => navigate(-1));
         }
@@ -99,15 +101,15 @@ const Edit = () => {
                         error={!!errors?.phone}
                         helperText={errors?.phone?.message}
                     />
+                    <TextField disabled label='Address' {...register('address', { required: 'Phone number is required' })} />
+
                     {parent.children?.length > 0 ? (
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
                             {parent.children.map((child, index) => (
                                 <Card key={child._id} className='shadow-md'>
                                     <CardContent>
                                         <div className='flex justify-between items-center'>
-                                            <span className='text-sm font-semibold text-gray-700'>
-                                                Child {index + 1}:
-                                            </span>
+                                            <span className='text-sm font-semibold text-gray-700'>Child {index + 1}:</span>
                                             <IconButton aria-label='delete' color='error' onClick={() => remove(index)}>
                                                 <DeleteIcon />
                                             </IconButton>
@@ -143,7 +145,7 @@ const Edit = () => {
                 </Stack>
             </form>
 
-            <AddChildModal open={isModalOpen} onClose={handleCloseModal} />
+            <AddChildModal open={isModalOpen} onClose={handleCloseModal} parentId={parentId} />
         </div>
     );
 };

@@ -43,9 +43,11 @@ const parentSlice = createSlice({
         },
         // 清空选择
         clearParent: (state) => {
+            state.loading = false;
             state.selectedParent = null;
         },
         clearError: (state) => {
+            state.loading = false;
             state.error = null;
         },
     },

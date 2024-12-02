@@ -49,7 +49,7 @@ export const getParentList = async (req, res) => {
 
     try {
         const school = await School.findOne({ code: schoolCode })
-            .populate({ path: 'parents', select: '-password -school -__v', populate: 'children' })
+            .populate([{ path: 'parents', select: '-password -school -__v', populate: [{ path: 'children' }, { path: 'address' }] }])
             .lean()
             .exec();
 

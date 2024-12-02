@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getDriverInfo } from './driver.thunk';
+import { getDriverInfo, getDriverListThunk } from './driver.thunk';
 
 const setPending = (state) => {
     state.loading = true;
@@ -17,6 +17,7 @@ const driverSlice = createSlice({
     name: 'driver',
     initialState: {
         info: [],
+        driverList: [],
         selectedRoute: null,
         loading: false,
     },
@@ -33,7 +34,14 @@ const driverSlice = createSlice({
                 state.info = action.payload;
                 state.loading = false;
             })
-            .addCase(getDriverInfo.rejected, setRejected);
+            .addCase(getDriverInfo.rejected, setRejected)
+
+            .addCase(getDriverListThunk.pending, setPending)
+            .addCase(getDriverListThunk.fulfilled, (state, action) => {
+                state.driverList = action.payload;
+                state.loading = false;
+            })
+            .addCase(getDriverListThunk.rejected, setRejected);
     },
 });
 export const { selectRoute } = driverSlice.actions;

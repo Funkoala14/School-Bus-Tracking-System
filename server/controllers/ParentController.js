@@ -1,3 +1,4 @@
+import { addressValidation } from '../middleware/ValidationMiddleware.js';
 import Address from '../models/Address.js';
 import Parent from '../models/Parent.js';
 import Student from '../models/Student.js';
@@ -6,34 +7,33 @@ export const postAddStudent = async (req, res) => {
     const { userId } = req.user;
     try {
         const { studentId, lastName } = req.body;
-        const student = await Student.findOne({ studentId }).exec();
+        const student = await Student.findOne({ studentId });
         if (!student) {
             return res.status(404).json({ message: 'Student not found', code: 404 });
         }
         if (student.lastName !== lastName) {
             return res.status(400).json({ message: "Student's last name doesn't match." });
         }
-        if(student.parent) {
-            return res.status(400).json({ message: "Student is already under other parent account." });
+        if (student.parent) {
+            return res.status(400).json({ message: 'Student is already under other parent account.' });
         }
-        
-        const parent = await Parent.findById(userId).lean().exec();
 
-        if (parent.children.some((child) => child.equals(student._id))) {
+        const parent = await Parent.findById(userId).lean();
+
+        if (parent?.children && parent.children.some((child) => child.equals(student._id))) {
             return res.status(400).json({ message: 'Student is already added to this parent.' });
         }
 
-        const updatedParent = await Parent.findOneAndUpdate(
-            { _id: userId }, // Find the parent by userId
+        const updatedParent = await Parent.findByIdAndUpdate(
+            userId, // Find the parent by userId
             { $addToSet: { children: student._id } }, // Use $addToSet to avoid duplicates
             { new: true } // Return the updated document
         )
             .select('userName children')
-            .populate('children')
-            .lean()
-            .exec();
+            .populate('children');
 
-        student.parent = parent._id;
+        student.parent = updatedParent._id;
+
         await student.save();
 
         return res.status(200).json({
@@ -46,6 +46,47 @@ export const postAddStudent = async (req, res) => {
     }
 };
 
+export const postAdminAddStudentForParent = async (req, res) => {
+    try {
+        const { studentId, lastName, parentId } = req.body;
+        const student = await Student.findOne({ studentId });
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found', code: 404 });
+        }
+        if (student.lastName !== lastName) {
+            return res.status(400).json({ message: "Student's last name doesn't match." });
+        }
+        if (student.parent) {
+            return res.status(400).json({ message: 'Student is already under other parent account.' });
+        }
+
+        const parent = await Parent.findById(parentId);
+
+        if (parent?.children && parent.children.some((child) => child.equals(student._id))) {
+            return res.status(400).json({ message: 'Student is already added to this parent.' });
+        }
+
+        const updatedParent = await Parent.findByIdAndUpdate(
+            parentId,
+            { $addToSet: { children: student._id } }, // Use $addToSet to avoid duplicates
+            { new: true } // Return the updated document
+        )
+            .select('userName children')
+            .populate('children');
+
+        student.parent = updatedParent._id;
+
+        await student.save();
+
+        return res.status(200).json({
+            message: 'Student added to parent successfully',
+            data: updatedParent,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
+    }
+};
 export const postRemoveStudent = async (req, res) => {
     const { userId } = req.user;
     try {
@@ -73,7 +114,7 @@ export const postSetAddress = async (req, res) => {
             .select('-__v -password')
             .populate('children')
             .exec();
-            
+
         const { children } = parent;
         if (children.length > 0) {
             children.map(async (child) => {
@@ -84,7 +125,7 @@ export const postSetAddress = async (req, res) => {
 
         return res.status(200).json({
             message: 'success',
-            data: {...parent, address},
+            data: { ...parent, address },
         });
     } catch (error) {}
 };
@@ -139,10 +180,19 @@ export const getParentProfile = async (req, res) => {
 export const postUpdateParentProfile = async (req, res) => {
     const { id } = req.body;
     try {
-        if(req.body.address) {
-            
+        const parent = await Parent.findById(id);
+        if (!parent) {
+            return res.status(404).json({ message: 'Parent not found', code: 404 });
         }
-        const updatedParent = await Parent.findByIdAndUpdate(id, req.body, { new: true, runValidators: true }).select('-children -password -__v').populate('address');
+        if (req.body.address) {
+            const addressError = addressValidation(req.body.address);
+            if (addressError) return addressError;
+            await Address.findByIdAndUpdate(parent.address, req.body.address, { new: true, runValidators: true });
+        }
+        const { address: _, ...parentUpdateData } = req.body;
+        const updatedParent = await Parent.findByIdAndUpdate(id, parentUpdateData, { new: true, runValidators: true })
+            .select('-password -__v')
+            .populate('address children');
         return res.status(200).json({
             message: 'success',
             data: updatedParent,

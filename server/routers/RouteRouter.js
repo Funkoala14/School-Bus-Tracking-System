@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { deleteRoute, deleteStop, getAllRoutes, postAddRoute, postAddStop, postAssignBus, postRemoveBus, postUpdateStop } from '../controllers/RouteController.js';
+import { deleteRoute, deleteStop, getAllRoutes, postAddRoute, postAddStop, postAssignBus, postRemoveBus, postUpdateRouteInfo, postUpdateStop, postUpdateStops } from '../controllers/RouteController.js';
 import { jwtValidation } from '../middleware/AuthMiddleware.js';
 import { addRouteValidation, addStopValidation, assignBusValidation, stopsValidation } from '../middleware/ValidationMiddleware.js';
 
@@ -12,7 +12,9 @@ routeRouter
     .post('/assign-bus', jwtValidation, assignBusValidation, postAssignBus)
     .post('/remove-bus', jwtValidation, assignBusValidation, postRemoveBus)
     .post('/add-stop', jwtValidation, addStopValidation, postAddStop)
-    .post('/update-stops', jwtValidation, stopsValidation, postUpdateStop)
+    .post('/update-stops', jwtValidation, stopsValidation, postUpdateStops)
+    .post('/update-stop', jwtValidation, postUpdateStop)
     .post('/delete-stop', jwtValidation, deleteStop)
+    .post('/update', jwtValidation, postUpdateRouteInfo);
 
 export default routeRouter;

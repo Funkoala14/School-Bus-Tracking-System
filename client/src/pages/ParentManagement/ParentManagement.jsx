@@ -43,7 +43,7 @@ const ParentManagement = () => {
                             <Card>
                                 <CardContent>
                                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                                        parentName: {parent.firstName} {parent.lastName}
+                                        {parent.firstName} {parent.lastName}
                                     </Typography>
                                     <Typography variant="body2" className="mt-2">
                                         phone: {parent.phone}

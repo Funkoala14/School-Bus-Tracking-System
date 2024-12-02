@@ -71,7 +71,6 @@ export const loginValidation = (req, res, next) => {
 
 export const addBusValidation = (req, res, next) => {
     try {
-        console.log(req.body);
         const { plate, capacity } = req.body;
         if (!plate || validator.isEmpty(plate)) return res.status(400).json({ message: 'Missing plate', code: 400 });
         if (!capacity) return res.status(400).json({ message: 'Missing capacity', code: 400 });
@@ -130,8 +129,6 @@ export const assignDriverValidation = (req, res, next) => {
 
 export const addRouteValidation = (req, res, next) => {
     try {
-        console.log(req.body);
-
         const { name, direction } = req.body;
         if (!name) return res.status(400).json({ message: 'Missing route name', code: 400 });
         if (!direction) return res.status(400).json({ message: 'Missing route direction', code: 400 });
@@ -200,7 +197,7 @@ const stopValidation = (stop, type = 'new') => {
     return null; // No errors
 };
 
-const addressValidation = (address) => {
+export const addressValidation = (address) => {
     console.log(address);
 
     const { street, city, state, zipcode, coordinates } = address;
@@ -208,13 +205,7 @@ const addressValidation = (address) => {
     if (!city || validator.isEmpty(city)) return createErrorResponse(ERROR_MESSAGES.missingCity);
     if (!state || validator.isEmpty(state)) return createErrorResponse(ERROR_MESSAGES.missingState);
     if (!zipcode || validator.isEmpty(zipcode)) return createErrorResponse(ERROR_MESSAGES.missingZipcode);
-    if (
-        !coordinates ||
-        !coordinates.lat ||
-        !coordinates.lng ||
-        validator.isEmpty(coordinates.lat) ||
-        validator.isEmpty(coordinates.lng)
-    ) {
+    if (!coordinates || !coordinates.lat || !coordinates.lng) {
         return createErrorResponse(ERROR_MESSAGES.missingCoordinates);
     }
     return null;
@@ -237,14 +228,14 @@ export const addStopValidation = (req, res, next) => {
 };
 
 export const stopsValidation = (req, res, next) => {
-    const { list } = req.body;
+    const { stops } = req.body;
 
-    if (!list || !Array.isArray(list) || list.length === 0) {
+    if (!stops || !Array.isArray(stops) || stops.length === 0) {
         return res.status(400).json({ message: 'List of stops is required and must be an array', code: 400 });
     }
 
     try {
-        for (const stop of list) {
+        for (const stop of stops) {
             const validationError = stopValidation(stop, 'update');
             if (validationError) {
                 return res.status(400).json(validationError);

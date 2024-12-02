@@ -7,7 +7,7 @@ import CircularProgressWithLabel from './components/CircularProgressWithLabel';
 import UserInfo from './components/UserInfo';
 import TimeLine from './components/TimeLine';
 import { useDispatch, useSelector } from 'react-redux';
-import { getChildInfoThunk } from '../../store/parentSlice/parent.thunk';
+import { getChildInfoThunk, getParentProfileThunk } from '../../store/parentSlice/parent.thunk';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -25,6 +25,7 @@ const Profile = () => {
 
     useEffect(() => {
         dispatch(getChildInfoThunk());
+        dispatch(getParentProfileThunk());
     }, [dispatch]);
 
     return (
