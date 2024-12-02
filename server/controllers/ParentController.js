@@ -161,8 +161,9 @@ export const getChildrenDetail = async (req, res) => {
                         path: 'route',
                         select: '-school -stop -__v',
                         populate: [
-                            { path: 'assignedBus', populate: 'assignedDriver' },
+                            { path: 'assignedBus', populate: {path:'assignedDriver', select: "-password"} },
                             { path: 'stops', populate: 'address' },
+                            { path: 'schedule', populate: 'stopTimes.stop' },
                         ],
                     },
                 ],
