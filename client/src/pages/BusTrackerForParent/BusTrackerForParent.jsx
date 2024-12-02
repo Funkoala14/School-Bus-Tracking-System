@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Typography, Container, Box, Button, CircularProgress } from '@mui/material';
+import { Typography, Container, Box, Button, CircularProgress, Snackbar } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { Phone } from '@mui/icons-material';
 import { getChildInfoThunk } from '../../store/parentSlice/parent.thunk';
@@ -81,7 +81,9 @@ const ParentLocationTracker = () => {
     }, [nextStop]);
 
     useEffect(() => {
-        if (childInfo) {
+        if (Array.isArray(childInfo) && childInfo.length) {
+            console.log(childInfo);
+
             const currentTime = new Date();
             const currentHour = currentTime.getHours();
 
@@ -115,12 +117,15 @@ const ParentLocationTracker = () => {
             )}
 
             <Box sx={{ position: 'relative', height: '100%' }}>
+                <Box className='absolute top-10 w-full bg-error p-4 shadow-lg rounded-xl'>
+                    <Typography variant='h6'>No Child, please add your child to account</Typography>
+                </Box>
                 <DirectionsMap stops={selectedRoute?.stops} parentTracking={true} defaultCenter={{}}></DirectionsMap>
                 {/* Display the time to destination */}
                 <Box className='absolute bottom-0 w-full bg-white p-4 shadow-lg rounded-t-xl'>
                     <div className='flex items-center justify-between'>
                         <div className='text-gray-800'>
-                            <Typography variant='h6'>{nextStop?.nextStop?.duration ||'0 min'} away</Typography>
+                            <Typography variant='h6'>{nextStop?.nextStop?.duration || '0 min'} away</Typography>
                             <Typography variant='body2' color='textSecondary'>
                                 Next Stop: {nextStop?.nextStop?.stopName || 'ETD'}
                             </Typography>
