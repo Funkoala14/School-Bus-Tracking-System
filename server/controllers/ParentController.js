@@ -101,7 +101,11 @@ export const postRemoveStudent = async (req, res) => {
         }
         const { studentId } = req.body;
         if (!studentId) return res.status(404).json({ message: 'Missing student id', code: 404 });
-        const parent = await Parent.findByIdAndUpdate(parentId, { $pull: { children: studentId } }, { new: true }).select('-password -__v');
+        const parent = await Parent.findByIdAndUpdate(
+            parentId,
+            { $pull: { children: studentId } },
+            { new: true }
+        ).select('-password -__v');
         if (!parent) return res.status(404).json({ message: 'Parent not found', code: 404 });
         const student = await Student.findByIdAndUpdate(studentId, { $unset: { parent: null } });
         if (!student) return res.status(404).json({ message: 'Student not found', code: 404 });
@@ -119,7 +123,11 @@ export const postSetAddress = async (req, res) => {
     const { userId } = req.user;
     try {
         const address = await new Address({ ...req.body });
-        const parent = await Parent.findByIdAndUpdate(userId, { $set: { address: address._id } }, { new: true, lean: true })
+        const parent = await Parent.findByIdAndUpdate(
+            userId,
+            { $set: { address: address._id } },
+            { new: true, lean: true }
+        )
             .select('-__v -password')
             .populate('children')
             .exec();
@@ -148,7 +156,7 @@ export const getChildrenDetail = async (req, res) => {
                 select: '-parent -address -__v',
                 populate: [
                     { path: 'school', select: '-__v' },
-                    { path: 'stop', select: '-__v' },
+                    { path: 'stop', select: '-__v', populate: 'address' },
                     {
                         path: 'route',
                         select: '-school -stop -__v',
