@@ -7,6 +7,9 @@ dotenv.config();
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [react()],
+    build: {
+        outDir: 'dist',
+    },
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'src'),
