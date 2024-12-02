@@ -16,6 +16,7 @@ const Edit = () => {
     const id = searchParams.get('id');
     const [address, setAddress] = useState();
     const {
+        watch,
         register,
         handleSubmit,
         control,
@@ -27,17 +28,18 @@ const Edit = () => {
             firstName: '',
             lastName: '',
             studentId: '',
-            route: '',
+            routes: [],
             stop: '',
         },
     });
     const { selectStudent } = useSelector((state) => state.admin);
-    const { routes, loading, selectedRoute } = useSelector((state) => state.route);
+    const { routes, loading } = useSelector((state) => state.route);
 
-    // Memoize selected route to optimize re-renders
+    const selectedRoutes = watch('routes') || [];
     const selectedRouteMemo = useMemo(() => {
-        return routes.find((route) => route._id === selectStudent?.route?._id);
-    }, [routes, selectStudent?.route?._id]);
+        if (!selectedRoutes.length) return null;
+        return routes.find((route) => selectedRoutes.includes(route._id));
+    }, [routes, selectedRoutes]);
 
     useEffect(() => {
         dispatch(setTitle({ title: id ? 'Edit Student' : 'Add Student', ifBack: true }));
@@ -53,8 +55,7 @@ const Edit = () => {
         setValue('lastName', selectStudent.lastName);
         setValue('studentId', selectStudent.studentId);
         const routeIds = selectStudent?.route.map((route) => route._id);
-        setValue('assignedRoutes', routeIds || []);
-        setValue('route', selectStudent?.route?._id || []);
+        setValue('routes', routeIds || []);
         setValue('stop', selectStudent?.stop?._id || '');
         setValue('address', selectStudent?.address?.address || '');
 
@@ -71,9 +72,10 @@ const Edit = () => {
     };
 
     const onSubmit = (data) => {
-        console.log('Form Submitted:', { ...data, address });
+        const { firstName, lastName, studentId, routes, stop } = data;
+        console.log('Form Submitted:', { ...data, address }, { firstName, lastName, studentId, routes, stop });
         // navigate(-1);
-        reset(); // Reset the form after submission
+        // reset(); // Reset the form after submission
     };
 
     if (loading) {
@@ -111,12 +113,14 @@ const Edit = () => {
                             <FormControl fullWidth>
                                 <InputLabel>Route</InputLabel>
                                 <Controller
-                                    name='route'
+                                    name='routes'
                                     control={control}
                                     render={({ field }) => (
                                         <Select
                                             {...field}
+                                            multiple
                                             label='Route'
+                                            value={field.value || []}
                                             onChange={(e) => {
                                                 field.onChange(e);
                                                 handleRouteChange(e);
