@@ -19,8 +19,8 @@ const View = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const [open, setOpen] = useState(false);
-    const { studentList, selectStudent } = useSelector((state) => state.admin);
-    console.log(selectStudent, 'pink');
+    const selectStudent = useSelector((state) => state.admin.studentList.find((s) => s._id === id));
+    const { studentList } = useSelector((state) => state.admin);
     const dispatch = useDispatch();
 
     const editHandler = () => {
