@@ -9,7 +9,9 @@ const DirectionsMap = ({ parentTracking = false, stops, defaultCenter }) => {
     const [destination, setDestination] = useState(null);
     const [waypoints, setWaypoints] = useState(null);
     const { nextStopData } = useSelector((state) => state.route);
-
+    const { childInfo } = useSelector((state) => state.parent);
+    console.log(childInfo);
+    
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -32,8 +34,10 @@ const DirectionsMap = ({ parentTracking = false, stops, defaultCenter }) => {
 
     useEffect(() => {
         if (parentTracking && nextStopData) {
-            console.log(1111, nextStopData);
-
+            console.log(1111, 'nextStopData', nextStopData);
+            if (!!!nextStopData.location) {
+                return setNextStopData(null);
+            }
             const { lat, lng } = nextStopData.location;
             setCurrentLocation({ lat: Number(lat), lng: Number(lng) });
         }
@@ -41,8 +45,6 @@ const DirectionsMap = ({ parentTracking = false, stops, defaultCenter }) => {
 
     useEffect(() => {
         if (stops && stops.length > 0) {
-            console.log('stops', stops);
-
             const firstStop = stops[0].address.coordinates;
             setOrigin({ name: stops[0].stopName, lat: Number(firstStop.lat), lng: Number(firstStop.lng) });
 
@@ -73,14 +75,27 @@ const DirectionsMap = ({ parentTracking = false, stops, defaultCenter }) => {
                     <Marker
                         zIndex={99}
                         position={{
-                            lat: Number(defaultCenter.lat || currentLocation.lat),
-                            lng: Number(defaultCenter.lng || currentLocation.lng),
+                            lat: Number(defaultCenter?.lat || currentLocation?.lat || 0),
+                            lng: Number(defaultCenter?.lng || currentLocation?.lng || 0),
                         }}
                         icon={{
                             url: 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/bus_share_taxi_pinlet.svg',
                             scaledSize: { width: 30, height: 30 },
                         }}
                     />
+                    {!!parentTracking && (
+                        <Marker
+                            zIndex={99}
+                            position={{
+                                lat: Number(childInfo[0]?.stop?.address?.coordinates?.lat || 0),
+                                lng: Number(childInfo[0]?.stop?.address?.coordinates?.lng || 0),
+                            }}
+                            icon={{
+                                url: 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/parking_pinlet.svg',
+                                scaledSize: { width: 30, height: 30 },
+                            }}
+                        />
+                    )}
                     <Directions
                         parentTracking={parentTracking}
                         defaultCenter={defaultCenter}
@@ -143,8 +158,6 @@ const Directions = ({ parentTracking, defaultCenter, origin, destination, waypoi
     // Use directions service to fetch routes
     useEffect(() => {
         if (!directionsService || !directionsRenderer || !origin) return;
-        console.log(origin, destination, waypoints);
-
         directionsService
             .route({
                 origin,
@@ -194,7 +207,7 @@ const Directions = ({ parentTracking, defaultCenter, origin, destination, waypoi
     }, [defaultCenter, waypoints, destination]);
 
     useEffect(() => {
-        if(parentTracking) return;
+        if (parentTracking) return;
         if (legs) {
             const tolerance = 0.001;
             for (let leg of legs) {
