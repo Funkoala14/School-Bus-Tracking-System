@@ -71,6 +71,9 @@ const RequestHistoryList = lazy(() => import('@pages/Request/HistoryList'));
 const NotFound = () => {
     return <div>Page not found</div>;
 };
+const Forbidden = () => {
+    return <div>No access permission</div>;
+};
 
 const AppRouter = () => {
     const paths = {
@@ -122,18 +125,14 @@ const AppRouter = () => {
                         <Route
                             path='admin'
                             element={
-                                <PrivateRoute allowedRoles={['Driver']}>
+                                <PrivateRoute allowedRoles={['Admin']}>
                                     <Outlet /> {/* Outlet to render nested routes */}
                                 </PrivateRoute>
                             }
                         >
                             <Route
-                                path='home'
-                                element={
-                                    <MainLayout paths={paths.adminPaths}>
-                                        <Home />
-                                    </MainLayout>
-                                }
+                                index // This matches the `/admin` route
+                                element={<Navigate to='route-management' replace />}
                             />
 
                             <Route
@@ -245,14 +244,10 @@ const AppRouter = () => {
                                 </PrivateRoute>
                             }
                         >
-                            {/* <Route
-                                path='home'
-                                element={
-                                    <MainLayout paths={paths.parentPaths}>
-                                        <Home />
-                                    </MainLayout>
-                                }
-                            /> */}
+                            <Route
+                                index // This matches the `/admin` route
+                                element={<Navigate to='profile' replace />}
+                            />
                             <Route
                                 path='profile'
                                 element={
@@ -322,6 +317,10 @@ const AppRouter = () => {
                             }
                         >
                             <Route
+                                index // This matches the `/admin` route
+                                element={<Navigate to='profile' replace />}
+                            />
+                            <Route
                                 path='profile'
                                 element={
                                     <MainLayout paths={paths.driverPaths}>
@@ -364,6 +363,7 @@ const AppRouter = () => {
                             />
                         </Route>
 
+                        <Route path='/forbidden' element={<Forbidden />} />
                         <Route path='*' element={<NotFound />} />
                     </Routes>
                 </motion.div>

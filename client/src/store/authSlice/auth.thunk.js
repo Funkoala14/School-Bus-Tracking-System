@@ -42,7 +42,7 @@ export const loginThunk = createAsyncThunk('auth/login', async ({ userName, pass
     }
 });
 
-const signupThunk = createAsyncThunk('auth/signup', async (credentials, { rejectWithValue }) => {
+export const signupThunk = createAsyncThunk('auth/signup', async (credentials, { rejectWithValue }) => {
     try {
         console.log('Sending credentials:', credentials);
         // Sending a request to the backend to register the user
@@ -56,10 +56,9 @@ const signupThunk = createAsyncThunk('auth/signup', async (credentials, { reject
     }
 });
 
-const verifyThunk = createAsyncThunk('auth/verify', async (_, { rejectWithValue }) => {
+export const verifyThunk = createAsyncThunk('auth/verify', async (_, { rejectWithValue }) => {
     try {
         const { data, message } = await get('/auth/verify');
-
         if (!data) {
             throw new Error(message || 'No token found');
         }
