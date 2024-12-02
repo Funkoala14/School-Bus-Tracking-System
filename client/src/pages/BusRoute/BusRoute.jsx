@@ -75,7 +75,7 @@ const BusRoute = () => {
                     aria-labelledby='alert-dialog-title'
                     aria-describedby='alert-dialog-description'
                 >
-                    <DialogTitle id='alert-dialog-title'>Route Schedule</DialogTitle>
+                    <DialogTitle id='alert-dialog-title'>Route Detail</DialogTitle>
                     <DialogContent>
                         <DialogContentText id='alert-dialog-description'>
                             <div className='flex-1 font-bold'>Driver Info: </div>
