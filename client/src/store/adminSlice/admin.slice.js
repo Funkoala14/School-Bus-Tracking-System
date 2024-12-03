@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { studentListThunk } from './admin.thunk';
+import { addStudentThunk, deleteStudentThunk, studentListThunk, updateStudentInfoThunk } from './admin.thunk';
 
 const setPending = (state) => {
     state.loading = true;
@@ -33,9 +33,33 @@ const adminSlice = createSlice({
             .addCase(studentListThunk.pending, setPending)
             .addCase(studentListThunk.fulfilled, (state, action) => {
                 state.studentList = action.payload;
-                state.loading = false;
+                setFulfilled(state);
             })
-            .addCase(studentListThunk.rejected, setRejected);
+            .addCase(studentListThunk.rejected, setRejected)
+
+            .addCase(addStudentThunk.pending, setPending)
+            .addCase(addStudentThunk.fulfilled, (state, action) => {
+                state.studentList = action.payload;
+                setFulfilled(state);
+            })
+            .addCase(addStudentThunk.rejected, setRejected)
+
+            .addCase(updateStudentInfoThunk.pending, setPending)
+            .addCase(updateStudentInfoThunk.fulfilled, (state, action) => {
+                const index = state.studentList.findIndex((s) => s._id === action.payload._id);
+                if (index !== -1) {
+                    state.studentList[index] = action.payload;
+                }
+                setFulfilled(state);
+            })
+            .addCase(updateStudentInfoThunk.rejected, setRejected)
+        
+            .addCase(deleteStudentThunk.pending, setPending)
+            .addCase(deleteStudentThunk.fulfilled, (state, action) => {
+                state.studentList = state.studentList.filter((s) => s._id !== action.payload);
+                setFulfilled(state);
+            })
+            .addCase(deleteStudentThunk.rejected, setRejected)
     },
 });
 

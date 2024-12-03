@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/en-nz';
 dayjs.locale('en-nz');
 createRoot(document.getElementById('root')).render(
-    <StrictMode>
+    // <StrictMode>
         <PersistGate loading={<Loading />} persistor={persistor}>
             <BrowserRouter>
                 <Provider store={store}>
@@ -19,5 +19,5 @@ createRoot(document.getElementById('root')).render(
                 </Provider>
             </BrowserRouter>
         </PersistGate>
-    </StrictMode>
+    // </StrictMode>
 );

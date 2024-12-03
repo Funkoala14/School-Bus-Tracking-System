@@ -5,6 +5,7 @@ import School from '../models/School.js';
 import Address from '../models/Address.js';
 import Stop from '../models/Stop.js';
 import validator from 'validator';
+import { addressValidation } from '../middleware/ValidationMiddleware.js';
 
 export const postAddRoute = async (req, res) => {
     const { schoolCode } = req.user;
@@ -39,9 +40,7 @@ export const postAddRoute = async (req, res) => {
         return res.status(200).json({
             message: 'Route added successfully',
             code: 200,
-            data: {
-                list: routes,
-            },
+            data: routes,
         });
     } catch (error) {
         console.error(error);
@@ -70,9 +69,7 @@ export const deleteRoute = async (req, res) => {
         return res.status(200).json({
             message: 'Route deleted successfully',
             code: 200,
-            data: {
-                list: routes,
-            },
+            data: routes,
         });
     } catch (error) {
         console.error(error);
@@ -89,12 +86,14 @@ export const postAssignBus = async (req, res) => {
 
         const updatedRoute = await Route.findByIdAndUpdate(routeId, { assignedBus: bus._id }, { new: true, lean: true })
             .select('-__v -school')
-            .populate('stops')
-            .populate({
-                path: 'assignedBus',
-                select: '-__v -school -assignedRoutes',
-                populate: { path: 'assignedDriver', select: '-password -__v -school -userName -assignedBus' },
-            });
+            .populate([
+                { path: 'stops' },
+                {
+                    path: 'assignedBus',
+                    select: '-__v -school -assignedRoutes',
+                    populate: { path: 'assignedDriver', select: '-password -__v -school -userName -assignedBus' },
+                },
+            ]);
         if (!updatedRoute) return res.status(404).json({ message: 'Route not found', code: 400 });
 
         return res.status(200).json({
@@ -116,12 +115,15 @@ export const postRemoveBus = async (req, res) => {
         if (!bus) return res.status(404).json({ message: 'Bus not found', code: 400 });
         const updatedRoute = await Route.findByIdAndUpdate(routeId, { $unset: { assignedBus: null } }, { new: true, lean: true })
             .select('-__v -school')
-            .populate('stops')
-            .populate({
-                path: 'assignedBus',
-                select: '-__v -school -assignedRoutes',
-                populate: { path: 'assignedDriver', select: '-password -__v -school -userName -assignedBus' },
-            });
+            .populate([
+                {
+                    path: 'assignedBus',
+                    select: '-__v -school -assignedRoutes',
+                    populate: { path: 'assignedDriver', select: '-password -__v -school -userName -assignedBus' },
+                },
+                { path: 'stops' },
+                { path: 'schedule' },
+            ]);
         if (!updatedRoute) return res.status(404).json({ message: 'Route not found', code: 400 });
 
         return res.status(200).json({
@@ -149,6 +151,7 @@ export const getAllRoutes = async (req, res) => {
                         sort: { order: 1 }, // Sort stops by order
                     },
                 },
+                { path: 'schedule', populate: { path: 'stopTimes.stop' } },
                 {
                     path: 'assignedBus',
                     select: '-__v -school -assignedRoutes',
@@ -194,7 +197,6 @@ export const postAddStop = async (req, res) => {
             route.stops.push(newStop); // Add before the last stop (school)
         } else {
             const lastStop = route.stops.at(-1);
-
             route.stops.splice(route.stops.length - 1, 0, newStop); // Add after all stops for inbound (school is last)
             const newLstStop = await Stop.findByIdAndUpdate(lastStop._id, { $set: { order: route.stops.length - 1 } }, { new: true });
             console.log('last', route.stops.length, newLstStop);
@@ -210,9 +212,7 @@ export const postAddStop = async (req, res) => {
         return res.status(200).json({
             message: 'Stop added successfully',
             code: 200,
-            data: {
-                list: populatedRoute.stops,
-            },
+            data: populatedRoute,
         });
     } catch (error) {
         console.error(error);
@@ -220,14 +220,14 @@ export const postAddStop = async (req, res) => {
     }
 };
 
-export const postUpdateStop = async (req, res) => {
+export const postUpdateStops = async (req, res) => {
     const session = await startSession();
     session.startTransaction();
 
     try {
-        const { list, routeId } = req.body;
+        const { stops, routeId } = req.body;
         let updatedStops = [];
-        const stopUpdates = list.map(async (stopData, i) => {
+        const stopUpdates = stops.map(async (stopData, i) => {
             const { _id, stopName, address } = stopData;
             if (address) {
                 const updatedAddress = await Address.findByIdAndUpdate(address._id, address, { new: true, session });
@@ -254,7 +254,22 @@ export const postUpdateStop = async (req, res) => {
 
         await session.commitTransaction();
 
-        return res.status(200).json({ message: 'Stops updated successfully', code: 200, data: updatedStops });
+        const updatedRoute = await Route.findById(routeId).populate([
+            {
+                path: 'stops',
+                populate: 'address',
+                options: {
+                    sort: { order: 1 }, // Sort stops by order
+                },
+            },
+            { path: 'schedule', populate: { path: 'stopTimes.stop' } },
+            {
+                path: 'assignedBus',
+                select: '-__v -school -assignedRoutes',
+                populate: { path: 'assignedDriver', select: '-password -__v -school -assignedBus -userName' },
+            },
+        ]);
+        return res.status(200).json({ message: 'Stops updated successfully', code: 200, data: updatedRoute });
     } catch (error) {
         await session.abortTransaction();
         console.error(error);
@@ -275,7 +290,7 @@ export const deleteStop = async (req, res) => {
 
         const deleteStop = await Stop.findByIdAndDelete(stopId, { new: true });
         if (!deleteStop) return res.status(404).json({ message: `Stop with id ${stopId} not found`, code: 404 });
-        const route  = await Route.findByIdAndUpdate(routeId, { $pull: { stops: stopId } }, { new: true }).populate({
+        const route = await Route.findByIdAndUpdate(routeId, { $pull: { stops: stopId } }, { new: true }).populate({
             path: 'stops',
             populate: 'address',
             options: {
@@ -292,12 +307,60 @@ export const deleteStop = async (req, res) => {
         await Promise.all(stopUpdates);
         await session.commitTransaction();
 
-        return res.status(200).json({ message: 'Stops deleted successfully', code: 200, data: route.stops });
+        return res.status(200).json({ message: 'Stops deleted successfully', code: 200, data: route });
     } catch (error) {
         await session.abortTransaction();
         console.error(error);
         return res.status(500).json({ message: 'Internal server error', code: 500 });
     } finally {
         session.endSession();
+    }
+};
+
+export const postUpdateStop = async (req, res) => {
+    const { _id } = req.body;
+    try {
+        const stop = Stop.findById(_id);
+        if (!stop) return res.status(404).json({ message: `Stop with id ${_id} not found`, code: 404 });
+        if (req.body.address) {
+            const addressError = addressValidation(req.body.address);
+            if (addressError) return addressError;
+            await Address.findByIdAndUpdate(stop.address, req.body.address, { new: true, runValidators: true });
+        }
+        const { stopName, order } = req.body;
+        const updatedStop = await Stop.findByIdAndUpdate(_id, { stopName, order }, { new: true });
+        const route = await Route.findById(updatedStop.route).populate({
+            path: 'stops',
+            populate: { path: 'address' },
+        });
+        return res.status(200).json({
+            message: 'Stop updated successfully',
+            code: 200,
+            data: route,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
+    }
+};
+
+export const postUpdateRouteInfo = async (req, res) => {
+    const { routeId, name, direction } = req.body;
+    try {
+        const updatedRoute = await Route.findByIdAndUpdate(routeId, { name, direction }, { new: true }).populate({
+            path: 'stops',
+            populate: { path: 'address' },
+        });
+        console.log(updatedRoute);
+        if (!updatedRoute) return res.status(404).json({ message: `Route with id ${routeId} not found`, code: 404 });
+
+        return res.status(200).json({
+            message: 'Stop updated successfully',
+            code: 200,
+            data: updatedRoute,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error', code: 500 });
     }
 };

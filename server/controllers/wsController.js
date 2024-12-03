@@ -2,6 +2,31 @@ import Bus from '../models/Bus.js';
 import LiveLocation from '../models/LiveLocation.js';
 import Route from '../models/Route.js';
 
+const updateLiveLocation = async (liveLocation, lat, lng, nextStop) => {
+    liveLocation.set({
+        lat,
+        lng,
+        nextStop: {
+            stopName: nextStop?.stopName || liveLocation.nextStop?.stopName,
+            duration: nextStop?.duration?.text || liveLocation.nextStop?.duration,
+            distance: nextStop?.distance?.text || liveLocation.nextStop?.distance,
+        },
+    });
+    await liveLocation.save();
+};
+
+const createLiveLocation = async (routeId, lat, lng, nextStop) => {
+    return LiveLocation.create({
+        route: routeId,
+        location: { lat, lng },
+        nextStop: {
+            stopName: nextStop?.stopName || '',
+            duration: nextStop?.duration?.text || '',
+            distance: nextStop?.distance?.text || '',
+        },
+    });
+};
+
 export default (io) => {
     io.on('connection', (socket) => {
         console.log('A client connected:', socket.id);
@@ -15,7 +40,7 @@ export default (io) => {
         // Listen for driver's live location updates
         socket.on('driverLocation', async (data) => {
             const { driverId, lat, lng, direction, nextStop } = data;
-            console.log(`Received location for driver ${driverId}: ${nextStop}`);
+            console.log(`Received location for driver ${driverId}: ${lat}, ${lng} nextStop ${nextStop}`);
             try {
                 const bus = await Bus.findOne({ assignedDriver: driverId }).populate('school');
                 if (!bus) {
@@ -29,20 +54,11 @@ export default (io) => {
 
                 // LiveLocation
                 if (liveLocation) {
-                    liveLocation.lat = lat;
-                    liveLocation.lng = lng;
-                    await liveLocation.save();
+                    await updateLiveLocation(liveLocation, lat, lng, nextStop);
                 } else {
-                    liveLocation = new LiveLocation({
-                        route: route._id,
-                        location: {
-                            lat,
-                            lng,
-                        },
-                        nextStop: { stopName: nextStop.stopName, duration: nextStop.duration.text, distance: nextStop.distance.text },
-                    });
-                    await liveLocation.save();
+                    await createLiveLocation(route._id, lat, lng, nextStop);
                 }
+                
             } catch (error) {
                 console.error(`Error handling location for driver ${driverId}:`, error);
                 socket.emit('serverReply', { message: `Error updating location for driver ${driverId}` });
@@ -77,7 +93,7 @@ export default (io) => {
 
         socket.on('parentTracking', async (data) => {
             const { parentId, routeId } = data;
-            console.log('parentTracking');
+            console.log('parentTracking parentId', parentId, ', routeId', routeId);
 
             try {
                 let liveLocation = await LiveLocation.findOne({ route: routeId });
@@ -91,7 +107,6 @@ export default (io) => {
                     // Send updated live location to the client
                     socket.emit('busLocation', change.fullDocument);
                 });
-                
             } catch (error) {
                 console.error(`Error handling tracking location for parent ${parentId}:`, error);
                 socket.emit('serverReply', { message: `Error handling tracking location for parent ${parentId}` });

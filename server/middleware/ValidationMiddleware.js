@@ -32,7 +32,9 @@ export const createUserValidation = (req, res, next) => {
         if (!validator.matches(userName, /^[a-zA-Z0-9_.-]+$/)) {
             return res
                 .status(400)
-                .json({ message: 'Username can only contain letters, numbers, underscores (_), dots (.), and hyphens (-).' });
+                .json({
+                    message: 'Username can only contain letters, numbers, underscores (_), dots (.), and hyphens (-).',
+                });
         }
         if (!validator.isEmail(email)) {
             return res.status(400).json({ message: 'Invalid email format' });
@@ -69,7 +71,6 @@ export const loginValidation = (req, res, next) => {
 
 export const addBusValidation = (req, res, next) => {
     try {
-        console.log(req.body);
         const { plate, capacity } = req.body;
         if (!plate || validator.isEmpty(plate)) return res.status(400).json({ message: 'Missing plate', code: 400 });
         if (!capacity) return res.status(400).json({ message: 'Missing capacity', code: 400 });
@@ -86,9 +87,12 @@ export const adminAddStudentValidation = (req, res, next) => {
         const { student } = req.body;
         if (!student) return res.status(400).json({ message: 'Missing student', code: 400 });
         const { studentId, firstName, lastName } = student;
-        if (!studentId || validator.isEmpty(studentId)) return res.status(400).json({ message: 'Missing studentId', code: 400 });
-        if (!firstName || validator.isEmpty(firstName)) return res.status(400).json({ message: 'Missing firstName', code: 400 });
-        if (!lastName || validator.isEmpty(lastName)) return res.status(400).json({ message: 'Missing lastName', code: 400 });
+        if (!studentId || validator.isEmpty(studentId))
+            return res.status(400).json({ message: 'Missing studentId', code: 400 });
+        if (!firstName || validator.isEmpty(firstName))
+            return res.status(400).json({ message: 'Missing firstName', code: 400 });
+        if (!lastName || validator.isEmpty(lastName))
+            return res.status(400).json({ message: 'Missing lastName', code: 400 });
         next();
     } catch (error) {
         console.error(error);
@@ -99,8 +103,10 @@ export const adminAddStudentValidation = (req, res, next) => {
 export const parentAddStudentValidation = (req, res, next) => {
     try {
         const { studentId, lastName } = req.body;
-        if (!studentId || validator.isEmpty(studentId)) return res.status(400).json({ message: 'Missing studentId', code: 400 });
-        if (!lastName || validator.isEmpty(lastName)) return res.status(400).json({ message: 'Missing lastName', code: 400 });
+        if (!studentId || validator.isEmpty(studentId))
+            return res.status(400).json({ message: 'Missing studentId', code: 400 });
+        if (!lastName || validator.isEmpty(lastName))
+            return res.status(400).json({ message: 'Missing lastName', code: 400 });
         next();
     } catch (error) {
         console.error(error);
@@ -112,7 +118,8 @@ export const assignDriverValidation = (req, res, next) => {
     try {
         const { busId, driverId } = req.body;
         if (!busId || validator.isEmpty(busId)) return res.status(400).json({ message: 'Missing bus id', code: 400 });
-        if (!driverId || validator.isEmpty(driverId)) return res.status(400).json({ message: 'Missing driver id', code: 400 });
+        if (!driverId || validator.isEmpty(driverId))
+            return res.status(400).json({ message: 'Missing driver id', code: 400 });
         next();
     } catch (error) {
         console.error(error);
@@ -122,8 +129,6 @@ export const assignDriverValidation = (req, res, next) => {
 
 export const addRouteValidation = (req, res, next) => {
     try {
-        console.log(req.body);
-        
         const { name, direction } = req.body;
         if (!name) return res.status(400).json({ message: 'Missing route name', code: 400 });
         if (!direction) return res.status(400).json({ message: 'Missing route direction', code: 400 });
@@ -137,7 +142,8 @@ export const addRouteValidation = (req, res, next) => {
 export const assignBusValidation = (req, res, next) => {
     try {
         const { routeId, busId } = req.body;
-        if (!routeId || validator.isEmpty(routeId)) return res.status(400).json({ message: 'Missing route id', code: 400 });
+        if (!routeId || validator.isEmpty(routeId))
+            return res.status(400).json({ message: 'Missing route id', code: 400 });
         if (!busId || validator.isEmpty(busId)) return res.status(400).json({ message: 'Missing bus id', code: 400 });
         next();
     } catch (error) {
@@ -191,15 +197,15 @@ const stopValidation = (stop, type = 'new') => {
     return null; // No errors
 };
 
-const addressValidation = (address) => {
+export const addressValidation = (address) => {
     console.log(address);
-    
+
     const { street, city, state, zipcode, coordinates } = address;
     if (!street || validator.isEmpty(street)) return createErrorResponse(ERROR_MESSAGES.missingStreet);
     if (!city || validator.isEmpty(city)) return createErrorResponse(ERROR_MESSAGES.missingCity);
     if (!state || validator.isEmpty(state)) return createErrorResponse(ERROR_MESSAGES.missingState);
     if (!zipcode || validator.isEmpty(zipcode)) return createErrorResponse(ERROR_MESSAGES.missingZipcode);
-    if (!coordinates || !coordinates.lat || !coordinates.lng || validator.isEmpty(coordinates.lat) || validator.isEmpty(coordinates.lng)) {
+    if (!coordinates || !coordinates.lat || !coordinates.lng) {
         return createErrorResponse(ERROR_MESSAGES.missingCoordinates);
     }
     return null;
@@ -208,8 +214,8 @@ const addressValidation = (address) => {
 export const addStopValidation = (req, res, next) => {
     try {
         const { routeId } = req.body;
-        if(!routeId) return res.status(400).json({ message: 'Missing route id', code: 400 });
-        
+        if (!routeId) return res.status(400).json({ message: 'Missing route id', code: 400 });
+
         const validationError = stopValidation(req.body, 'new');
         if (validationError) {
             return res.status(400).json(validationError);
@@ -222,19 +228,36 @@ export const addStopValidation = (req, res, next) => {
 };
 
 export const stopsValidation = (req, res, next) => {
-    const { list } = req.body;
+    const { stops } = req.body;
 
-    if (!list || !Array.isArray(list) || list.length === 0) {
+    if (!stops || !Array.isArray(stops) || stops.length === 0) {
         return res.status(400).json({ message: 'List of stops is required and must be an array', code: 400 });
     }
 
     try {
-        for (const stop of list) {
-            const validationError = stopValidation(stop, "update");
+        for (const stop of stops) {
+            const validationError = stopValidation(stop, 'update');
             if (validationError) {
                 return res.status(400).json(validationError);
             }
         }
+        next();
+    } catch (error) {
+        console.error(error);
+        return res.status(400).json({ message: 'Missing required info!', code: 400 });
+    }
+};
+
+export const updateParentProfileValidation = (req, res, next) => {
+    try {
+        const { id } = req.body;
+        if(!id) return res.status(400).json({ message: 'Missing id', code: 400 });
+
+        if (req.body.address) {
+            const addressError = addressValidation(address);
+            if (addressError) return addressError;
+        }
+        
         next();
     } catch (error) {
         console.error(error);

@@ -13,6 +13,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { setTitle } from '../../store/titleSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import { deleteBusThunk } from '../../store/busSlice/bus.thunk';
 
 const View = () => {
     const navigate = useNavigate();
@@ -22,18 +23,15 @@ const View = () => {
     const [open, setOpen] = useState(false);
 
     // 从 Redux 获取 bus 信息
-    const busInfo = useSelector((state) =>
-        state.bus.busList.find((p) => p._id === id)
-    );
+    const busInfo = useSelector((state) => state.bus.busList.find((p) => p._id === id));
+    const { error } = useSelector((state) => state.bus);
 
-    // 页面加载时设置标题，并在 busInfo 不存在时触发数据加载
     useEffect(() => {
-        if (!busInfo) {
-            // Dispatch 动作以获取 bus 详细信息
-            dispatch(fetchBusDetails(id)); // 请确保有 fetchBusDetails action
+        if (!busInfo && id) {
+            dispatch(fetchBusDetails(id));
         }
         dispatch(setTitle({ title: 'View Bus', ifBack: true }));
-    }, [busInfo, id, dispatch]);
+    }, [dispatch]);
 
     // 处理加载状态
     if (!busInfo) {
@@ -53,8 +51,11 @@ const View = () => {
     };
 
     const submitHandler = () => {
-        console.log('Deleting bus...');
         setOpen(false);
+        dispatch(deleteBusThunk(id));
+        if (!error) {
+            navigate(-1);
+        }
     };
 
     useEffect(() => {
@@ -62,67 +63,74 @@ const View = () => {
     }, [dispatch]);
 
     return (
-        <div className="p-2">
-            <div>
+        <div className='p-4'>
+            <div className='flex flex-col gap-2'>
                 {/* Bus 信息展示 */}
-                <div className="mt-2">
-                    <span className="flex-1 font-bold">Bus plate：</span>
-                    <span className="w-full break-all">{busInfo?.plate || 'N/A'}</span>
+                <div>
+                    <span className='flex-1 font-bold'>Plate: </span>
+                    <span className='w-full'>{busInfo?.plate || 'N/A'}</span>
                 </div>
-                <div className="mt-2">
-                    <span className="flex-1 font-bold">Capacity：</span>
-                    <span className="w-full break-all">{busInfo?.capacity || 'N/A'}</span>
+                <div>
+                    <span className='flex-1 font-bold'>Capacity: </span>
+                    <span className='w-full'>{busInfo?.capacity || 'N/A'}</span>
                 </div>
-                <div className="mt-2">
-                    <span className="flex-1 font-bold">Year of production：</span>
-                    <span className="w-full break-all">{busInfo?.year || 'N/A'}</span>
+                {/* <div>
+                    <span className='flex-1 font-bold'>Year of Production: </span>
+                    <span className='w-full'>{busInfo?.year || 'N/A'}</span>
+                </div> */}
+                <div>
+                    <span className='flex-1 font-bold'>Driver Info: </span>
+                    <Card className='p-1 flex flex-col gap-1'>
+                        <div className='list-item'>
+                            <span className='flex-1 text-gray-600'>Name: </span>
+                            <span className='w-full'>
+                                {busInfo?.assignedDriver?.firstName || 'N/A'} {busInfo?.assignedDriver?.lastName || ''}
+                            </span>
+                        </div>
+                        <div className='list-item'>
+                            <span className='flex-1 text-gray-600'>License: </span>
+                            <span className='w-full'>{busInfo?.assignedDriver?.license || 'N/A'}</span>
+                        </div>
+                        <div className='list-item'>
+                            <span className='flex-1 text-gray-600'>Phone Number: </span>
+                            <span className='w-full'>{busInfo?.assignedDriver?.phone || 'N/A'}</span>
+                        </div>
+                    </Card>
                 </div>
-                <div className="mt-2">
-                    <span className="flex-1 font-bold">Assigned driver：</span>
-                    <span className="w-full break-all">
-                        {busInfo?.assignedDriver?.firstName || 'N/A'} {busInfo?.assignedDriver?.lastName || ''}
-                    </span>
-                </div>
-                <div className="mt-2">
-                    <span className="flex-1 font-bold">Assigned route：</span>
-                    <span className="w-full break-all">{busInfo?.route || 'N/A'}</span>
-                </div>
-                <div className="mt-2">
-                    <span className="flex-1 font-bold">Bus added time：</span>
-                    <span className="w-full break-all">
-                        {moment(busInfo?.createdAt).format('YYYY-MM-DD hh:mm:ss')}
-                    </span>
+                <div className='mt-2'>
+                    <span className='flex-1 font-bold'>Routes: </span>
+                    {Array.isArray(busInfo?.assignedRoutes) ? (
+                        busInfo?.assignedRoutes.map((route, index) => (
+                            <li key={route._id} className='w-full'>
+                                {route.direction.toUpperCase()}
+                                {': '}
+                                {route.name}
+                            </li>
+                        ))
+                    ) : (
+                        <span className='w-full'>N/A</span>
+                    )}
                 </div>
             </div>
-            <div className="mt-4">
-                <div className="flex gap-2">
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        startIcon={<EditNoteIcon color="primary" />}
-                        onClick={editHandler}
-                    >
+            <div className='mt-4'>
+                <div className='flex gap-2'>
+                    <Button variant='outlined' color='primary' startIcon={<EditNoteIcon color='primary' />} onClick={editHandler}>
                         Edit
                     </Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        startIcon={<DeleteIcon color="error" />}
-                        onClick={deleteHandler}
-                    >
+                    <Button variant='outlined' color='error' startIcon={<DeleteIcon color='error' />} onClick={deleteHandler}>
                         Delete
                     </Button>
                 </div>
             </div>
             {/* 删除确认弹窗 */}
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle id="scroll-dialog-title">Confirm Deletion</DialogTitle>
+                <DialogTitle id='scroll-dialog-title'>Confirm Deletion</DialogTitle>
                 <DialogContent>
                     <div>Are you sure you want to delete this bus?</div>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={submitHandler} color="error">
+                    <Button onClick={submitHandler} color='error'>
                         Delete
                     </Button>
                 </DialogActions>

@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchBuses, addBus, updateBus, deleteBus } from './bus.thunk';
+import { fetchBuses, addBusThunk, updateBusThunk, deleteBusThunk } from './bus.thunk';
 
 const setPending = (state) => {
     state.loading = true;
@@ -40,27 +40,29 @@ const busSlice = createSlice({
                 setFulfilled(state);
             })
             .addCase(fetchBuses.rejected, setRejected)
-            .addCase(addBus.pending, setPending)
-            .addCase(addBus.fulfilled, (state, action) => {
-                state.busList.push(action.payload);
+            .addCase(addBusThunk.pending, setPending)
+            .addCase(addBusThunk.fulfilled, (state, action) => {
+                state.busList = action.payload;
                 setFulfilled(state);
             })
-            .addCase(addBus.rejected, setRejected)
-            .addCase(updateBus.pending, setPending)
-            .addCase(updateBus.fulfilled, (state, action) => {
+            .addCase(addBusThunk.rejected, setRejected)
+
+            .addCase(updateBusThunk.pending, setPending)
+            .addCase(updateBusThunk.fulfilled, (state, action) => {
                 const index = state.busList.findIndex((bus) => bus._id === action.payload._id);
                 if (index !== -1) {
                     state.busList[index] = action.payload;
                 }
                 setFulfilled(state);
             })
-            .addCase(updateBus.rejected, setRejected)
-            .addCase(deleteBus.pending, setPending)
-            .addCase(deleteBus.fulfilled, (state, action) => {
-                state.busList = state.busList.filter((bus) => bus._id !== action.payload);
+            .addCase(updateBusThunk.rejected, setRejected)
+
+            .addCase(deleteBusThunk.pending, setPending)
+            .addCase(deleteBusThunk.fulfilled, (state, action) => {
+                state.busList = action.payload;
                 setFulfilled(state);
             })
-            .addCase(deleteBus.rejected, setRejected);
+            .addCase(deleteBusThunk.rejected, setRejected);
     },
 });
 

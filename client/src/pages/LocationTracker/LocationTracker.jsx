@@ -105,7 +105,7 @@ const LocationTracker = () => {
                     lng: position.coords.longitude,
                 };
                 setCurrentLocation(location);
-                console.log('location', location);
+                console.log('bus curr location', location);
 
                 // Send the location data to the backend every 1 minute
                 const locationUpdateInterval = setInterval(() => {

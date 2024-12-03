@@ -1,19 +1,20 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { TextField, Button, Stack, Typography } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { signupThunk } from '../../store/authSlice/auth.thunk';
 
-function Parent(props) {
-    const { onRegisterSuccess } = props;
-    const { register, handleSubmit, formState: { errors }, } = useForm();
+const Parent = () => {
+    const dispatch = useDispatch();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
 
     const onSubmit = (data) => {
         console.log(data);
-
-        const res = {
-            token: '1234567890',
-        }
-        onRegisterSuccess(data, res?.token)
+        dispatch(signupThunk({...data, role: 'Parent'}));
     };
 
     return (
@@ -38,7 +39,7 @@ function Parent(props) {
                         />
                         <TextField
                             name='schoolCode'
-                            label='SchoolCode'
+                            label='School Code'
                             {...register('schoolCode', { required: 'SchoolCode is required' })}
                             error={!!errors?.schoolCode}
                         />
@@ -91,6 +92,6 @@ function Parent(props) {
             </div>
         </div>
     );
-}
+};
 
 export default Parent;

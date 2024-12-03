@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Typography, Container, Box, Button, CircularProgress } from '@mui/material';
+import { Typography, Container, Box, Button, CircularProgress, Snackbar } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { Phone } from '@mui/icons-material';
 import { getChildInfoThunk } from '../../store/parentSlice/parent.thunk';
@@ -40,6 +40,7 @@ const ParentLocationTracker = () => {
             });
 
             existingSocket.on('busLocation', (data) => {
+                console.log('get busLocation', data);
                 dispatch(setNextStopData(data));
             });
 
@@ -58,6 +59,7 @@ const ParentLocationTracker = () => {
                 setSocket(newSocket);
             });
             newSocket.on('busLocation', (data) => {
+                console.log('get busLocation', data);
                 dispatch(setNextStopData(data));
             });
             newSocket.on('disconnect', () => {
@@ -73,12 +75,15 @@ const ParentLocationTracker = () => {
     }, []);
 
     useEffect(() => {
-        console.log('nextStop', nextStop);
-        return () => {};
+        if (nextStop) {
+            console.log('nextStop', nextStop);
+        }
     }, [nextStop]);
 
     useEffect(() => {
-        if (childInfo) {
+        if (Array.isArray(childInfo) && childInfo.length) {
+            console.log(childInfo);
+
             const currentTime = new Date();
             const currentHour = currentTime.getHours();
 
@@ -103,7 +108,7 @@ const ParentLocationTracker = () => {
     }, [dispatch]);
 
     return (
-        <Container sx={{ height: 'calc(100vh - 6rem)', width: '100%', p: 0 }}>
+        <Container sx={{ height: 'calc(100vh)', width: '100%', p: 0 }}>
             {/* Display any error messages */}
             {error && (
                 <Typography variant='h6' color='error' gutterBottom>
@@ -112,41 +117,47 @@ const ParentLocationTracker = () => {
             )}
 
             <Box sx={{ position: 'relative', height: '100%' }}>
-                <DirectionsMap stops={selectedRoute?.stops} parentTracking={true} defaultCenter={currentLocation}></DirectionsMap>
+                <Box className='absolute top-10 w-full bg-error p-4 shadow-lg rounded-xl'>
+                    <Typography variant='h6'>No Child, please add your child to account</Typography>
+                </Box>
+                <DirectionsMap stops={selectedRoute?.stops} parentTracking={true} defaultCenter={{}}></DirectionsMap>
                 {/* Display the time to destination */}
-                {nextStop && (
-                    <Box className='absolute bottom-0 w-full bg-white p-4 shadow-lg rounded-t-xl'>
-                        <div className='flex items-center justify-between'>
-                            <div className='text-gray-800'>
-                                <Typography variant='h6'>{nextStop?.nextStop?.duration} away</Typography>
-                                <Typography variant='body2' color='textSecondary'>
-                                    Next Stop: {nextStop?.nextStop?.stopName}
-                                </Typography>
-                            </div>
-                            <div className='flex items-center space-x-2'>
-                                <Typography variant='body2' color='textSecondary'>
-                                    {}
-                                </Typography>
-                                <Typography variant='body2' color='textSecondary'>
-                                    ({nextStop?.nextStop?.distance} away)
-                                </Typography>
-                            </div>
+                <Box className='absolute bottom-0 w-full bg-white p-4 shadow-lg rounded-t-xl'>
+                    <div className='flex items-center justify-between'>
+                        <div className='text-gray-800'>
+                            <Typography variant='h6'>{nextStop?.nextStop?.duration || '0 min'} away</Typography>
+                            <Typography variant='body2' color='textSecondary'>
+                                Next Stop: {nextStop?.nextStop?.stopName || 'ETD'}
+                            </Typography>
                         </div>
+                        <div className='flex items-center space-x-2'>
+                            <Typography variant='body2' color='textSecondary'>
+                                {}
+                            </Typography>
+                            <Typography variant='body2' color='textSecondary'>
+                                ({nextStop?.nextStop?.distance || '0.0 mile'} away)
+                            </Typography>
+                        </div>
+                    </div>
 
-                        <div className='flex justify-between items-center mt-2'>
-                            <div className='text-gray-800'>
-                                <Typography variant='body2'>
-                                    Driver: {selectedRoute?.assignedBus.assignedDriver.firstName}{' '}
-                                    {selectedRoute?.assignedBus.assignedDriver.lastName}
-                                </Typography>
-                            </div>
-                            <Button variant='contained' color='primary' className='flex items-center space-x-2' startIcon={<Phone />}>
-                                {'Call '}
-                                {selectedRoute?.assignedBus.assignedDriver.phone}
-                            </Button>
+                    <div className='flex justify-between items-center mt-2'>
+                        <div className='text-gray-800'>
+                            <Typography variant='body2'>
+                                Driver: {selectedRoute?.assignedBus.assignedDriver.firstName}{' '}
+                                {selectedRoute?.assignedBus.assignedDriver.lastName}
+                            </Typography>
                         </div>
-                    </Box>
-                )}
+                        <Button
+                            variant='contained'
+                            color='primary'
+                            className='flex items-center space-x-2'
+                            startIcon={<Phone />}
+                        >
+                            {'Call '}
+                            {selectedRoute?.assignedBus.assignedDriver.phone}
+                        </Button>
+                    </div>
+                </Box>
             </Box>
         </Container>
     );

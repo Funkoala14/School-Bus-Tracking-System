@@ -30,7 +30,7 @@ const StudentManagement = () => {
 
     return (
         <div className='p-2'>
-            <SearchInputBase placeholder='Search student' />
+            {/* <SearchInputBase placeholder='Search student' /> */}
 
             <div className='mt-2 grid grid-cols-1 gap-4'>
                 {studentList.map((student) => (
@@ -41,18 +41,20 @@ const StudentManagement = () => {
                                     {student.firstName} {student.lastName}
                                 </Typography>
                                 <Typography variant='body2' className='mt-2'>
-                                    Student ID: {student.studentId}
+                                    <span className='font-bold'>Student ID: </span>
+                                    {student.studentId}
                                 </Typography>
                                 {student.parent && (
                                     <Typography variant='body2' className='mt-2'>
-                                        Parent: {student.parent.firstName} {student.parent.lastName}
+                                        <span className="font-bold">Parent: </span>
+                                        {student.parent.firstName} {student.parent.lastName}
                                     </Typography>
                                 )}
-                                {student.address && (
+                                {/* {student.address && (
                                     <Typography variant='body2' className='mt-2'>
                                         Address: {student.address.address}
                                     </Typography>
-                                )}
+                                )} */}
                             </CardContent>
                         </Card>
                     </div>

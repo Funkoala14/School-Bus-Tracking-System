@@ -29,37 +29,52 @@ const BusManagement = () => {
 
     return (
         <div className='p-2'>
-            <SearchInputBase placeholder='Search bus' />
+            {/* <SearchInputBase placeholder='Search bus' /> */}
 
             <div className='mt-2 grid grid-cols-1 gap-4'>
-                {
-                    Array.isArray(busList) && busList.map((item) => (
+                {Array.isArray(busList) &&
+                    busList.map((item) => (
                         <div key={item._id} className='col-span-3' onClick={() => visibilityHandler(item)}>
                             <Card>
                                 <CardContent>
-                                    <Typography variant='h5' sx={{ fontWeight: 'bold' }}>Plate: {item?.plate}</Typography>
-                                    <Typography variant='body2' className='mt-2'>Capacity: {item?.capacity}</Typography>
-                                    <Typography variant='body2' className='mt-2'>Year: {item?.year}</Typography>
-                                    <Typography variant='body2' className='mt-2'>Driver: {item?.assignedDriver.firstName} {item?.assignedDriver.lastName}</Typography>
-                                    <Typography variant='body2' className='mt-2'>Assigned route</Typography>
-                                    <Typography variant='body2' className='mt-2'>Time: {moment(item?.createdAt).format("YYYY-MM-DD hh:mm:ss")}</Typography>
+                                    <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
+                                        Plate: {item?.plate}
+                                    </Typography>
+                                    <Typography variant='body2' className='mt-2'>
+                                        Capacity: {item?.capacity}
+                                    </Typography>
+                                    {/* <Typography variant='body2' className='mt-2'>Year: {item?.year}</Typography> */}
+                                    <Typography variant='body2' className='mt-2'>
+                                        Driver:{' '}
+                                        {item?.assignedDriver
+                                            ? `${item?.assignedDriver?.firstName} ${item?.assignedDriver?.lastName}`
+                                            : 'N/A'}
+                                    </Typography>
+                                    <Typography variant='body2' className='mt-2'>
+                                        Assigned route
+                                    </Typography>
+                                    {Array.isArray(item?.assignedRoutes) &&
+                                        item?.assignedRoutes.map((route, index) => (
+                                            <li key={route._id} className='w-full text-sm'>
+                                                {route.direction.toUpperCase()}
+                                                {': '}
+                                                {route.name}
+                                            </li>
+                                        ))}
                                 </CardContent>
                             </Card>
                         </div>
-                    ))
-                }
+                    ))}
             </div>
             <SpeedDial
-                ariaLabel="SpeedDial openIcon example"
+                ariaLabel='SpeedDial openIcon example'
                 sx={{ position: 'fixed', bottom: 16, right: 16 }}
                 icon={<SpeedDialIcon sx={{ color: 'white' }} />}
                 translate='none'
                 onClick={() => {
                     navigate('/admin/bus-management/edit');
                 }}
-            >
-
-            </SpeedDial>
+            ></SpeedDial>
         </div>
     );
 };

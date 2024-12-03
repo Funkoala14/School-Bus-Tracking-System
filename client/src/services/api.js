@@ -29,8 +29,11 @@ api.interceptors.response.use(
     (error) => {
         // Handle errors in the response
         if (error.response) {
+            const status = error.response.status;
+            const message = error.response.data?.message || '';
+
             // monitor /verify
-            if (error.response.status === 401 && error.config.url === '/user/verify') {
+            if (status === 401 && message.includes('No token provided')) {
                 if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
                     window.location.href = '/login';
                 }

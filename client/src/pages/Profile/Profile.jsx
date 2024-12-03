@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Box, Grid2, Typography, Avatar } from '@mui/material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
@@ -8,24 +7,25 @@ import CircularProgressWithLabel from './components/CircularProgressWithLabel';
 import UserInfo from './components/UserInfo';
 import TimeLine from './components/TimeLine';
 import { useDispatch, useSelector } from 'react-redux';
-import { getChildInfoThunk } from '../../store/parentSlice/parent.thunk';
+import { getChildInfoThunk, getParentProfileThunk } from '../../store/parentSlice/parent.thunk';
 
 const Profile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { childInfo } = useSelector((state) => state.parent);
     const { userName } = useSelector((state) => state.auth);
-    
+
     // const goBack = () => {
     //     navigate(-1);
     // };
 
     const goEditProfile = () => {
         navigate('/parent/profile/edit');
-    }
+    };
 
     useEffect(() => {
         dispatch(getChildInfoThunk());
+        dispatch(getParentProfileThunk());
     }, [dispatch]);
 
     return (
@@ -94,10 +94,8 @@ const Profile = () => {
                     </Grid2>
                 </Box>
             </div>
-            {/* <div>
-                <UserInfo />
-            </div> */}
-            {childInfo.length &&
+            <UserInfo />
+            {Array.isArray(childInfo) &&
                 childInfo.map((child) => (
                     <React.Fragment key={child.studentId}>
                         <TimeLine child={child} />
@@ -106,4 +104,4 @@ const Profile = () => {
         </div>
     );
 };
-export default Profile
+export default Profile;

@@ -71,6 +71,9 @@ const RequestHistoryList = lazy(() => import('@pages/Request/HistoryList'));
 const NotFound = () => {
     return <div>Page not found</div>;
 };
+const Forbidden = () => {
+    return <div>No access permission</div>;
+};
 
 const AppRouter = () => {
     const paths = {
@@ -84,8 +87,8 @@ const AppRouter = () => {
             { title: 'PROFILE', path: '/parent/profile', icon: <AssignmentIndIcon /> },
             { title: 'BUS TRACKER', path: '/parent/bus-tracker', icon: <DirectionsBusIcon /> },
             { title: 'BUS ROUTE', path: '/parent/bus-route', icon: <PinDropIcon /> },
-            { title: 'NOTIFICATION', path: '/parent/notification', icon: <NotificationsActiveIcon /> },
-            { title: 'REQUEST', path: '/parent/request', icon: <SendIcon /> },
+            // { title: 'NOTIFICATION', path: '/parent/notification', icon: <NotificationsActiveIcon /> },
+            // { title: 'REQUEST', path: '/parent/request', icon: <SendIcon /> },
         ],
         driverPaths: [
             { title: 'PROFILE', path: '/driver/profile', icon: <AssignmentIndIcon /> },
@@ -97,9 +100,9 @@ const AppRouter = () => {
     const { isLoggedIn, role } = useSelector((state) => state.auth);
     const getHomeRote = () => {
         if (!isLoggedIn) return <Navigate to='/login' />;
-        if (role === 'Admin') return <Navigate to='/admin/home' />;
-        if (role === 'Parent') return <Navigate to='/parent/home' />;
-        if (role === 'Driver') return <Navigate to='/driver/home' />;
+        if (role === 'Admin') return <Navigate to='/admin/route-management' />;
+        if (role === 'Parent') return <Navigate to='/parent/profile' />;
+        if (role === 'Driver') return <Navigate to='/driver/tracker' />;
         return <Navigate to='/login' />;
     };
 
@@ -122,18 +125,14 @@ const AppRouter = () => {
                         <Route
                             path='admin'
                             element={
-                                <PrivateRoute allowedRoles={['Driver']}>
+                                <PrivateRoute allowedRoles={['Admin']}>
                                     <Outlet /> {/* Outlet to render nested routes */}
                                 </PrivateRoute>
                             }
                         >
                             <Route
-                                path='home'
-                                element={
-                                    <MainLayout paths={paths.adminPaths}>
-                                        <Home />
-                                    </MainLayout>
-                                }
+                                index // This matches the `/admin` route
+                                element={<Navigate to='route-management' replace />}
                             />
 
                             <Route
@@ -246,12 +245,8 @@ const AppRouter = () => {
                             }
                         >
                             <Route
-                                path='home'
-                                element={
-                                    <MainLayout paths={paths.parentPaths}>
-                                        <Home />
-                                    </MainLayout>
-                                }
+                                index // This matches the `/admin` route
+                                element={<Navigate to='profile' replace />}
                             />
                             <Route
                                 path='profile'
@@ -322,6 +317,10 @@ const AppRouter = () => {
                             }
                         >
                             <Route
+                                index // This matches the `/admin` route
+                                element={<Navigate to='profile' replace />}
+                            />
+                            <Route
                                 path='profile'
                                 element={
                                     <MainLayout paths={paths.driverPaths}>
@@ -364,6 +363,7 @@ const AppRouter = () => {
                             />
                         </Route>
 
+                        <Route path='/forbidden' element={<Forbidden />} />
                         <Route path='*' element={<NotFound />} />
                     </Routes>
                 </motion.div>

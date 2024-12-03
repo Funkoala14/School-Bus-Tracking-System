@@ -408,15 +408,45 @@ export const createRouteSchedule = async (routeId, stops, direction) => {
         }
 
         // Save the schedule to the database
-        const newSchedule = await Schedule.create({
-            route: routeId,
-            stopTimes: legTimes,
-            startTime: isInbound ? legTimes[0].arrivalTime : '16:00 PM',
-        });
-        const route = await Route.findById(routeId);
-        if (route.schedule) await Schedule.findByIdAndDelete(route.schedule);
-        await Route.findByIdAndUpdate(routeId, { $set: { schedule: newSchedule._id } });
-        return newSchedule;
+        const schedule = await Schedule.findOne({ route: routeId });
+        if (schedule) {
+            const updatedSchedule = await Schedule.findOneAndUpdate(
+                { route: routeId },
+                { stopTimes: legTimes, startTime: isInbound ? legTimes[0].arrivalTime : '16:00 PM' },
+                { new: true, lean: true }
+            );
+            const updatedRoute = await Route.findByIdAndUpdate(
+                routeId,
+                { $set: { schedule: updatedSchedule._id } },
+                { new: true, lean: true }
+            ).populate([
+                { path: 'stops' },
+                {
+                    path: 'schedule',
+                    populate: 'stopTimes.stop',
+                },
+            ]);
+            return updatedRoute;
+        } else {
+            const newSchedule = await Schedule.create({
+                route: routeId,
+                stopTimes: legTimes,
+                startTime: isInbound ? legTimes[0].arrivalTime : '16:00 PM',
+            });
+            const updatedRoute = await Route.findByIdAndUpdate(
+                routeId,
+                { $set: { schedule: newSchedule._id } },
+                { new: true, lean: true }
+            ).populate([
+                { path: 'stops' },
+                {
+                    path: 'schedule',
+                    populate: 'stopTimes.stop',
+                },
+            ]);
+            return updatedRoute;
+        }
+        
     } catch (error) {
         console.error('Error creating route schedule:', error);
         throw new Error(error.message);

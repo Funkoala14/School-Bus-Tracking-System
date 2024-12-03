@@ -1,8 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { get, post, put, del } from '../../services/api';
+import { get, post, put, del } from '../../services/api'; // 假设服务文件提供了 HTTP 方法
 import { showNotification } from '../notificationSlice/notification.slice';
 
-// 获取家长信息
 export const getChildInfoThunk = createAsyncThunk('/parent/children-info', async (_, { rejectWithValue, dispatch }) => {
     try {
         const { data, message } = await get('/parent/children-info');
@@ -19,7 +18,6 @@ export const getChildInfoThunk = createAsyncThunk('/parent/children-info', async
     }
 });
 
-// 获取家长档案
 export const getParentProfileThunk = createAsyncThunk('/parent/profile', async (_, { rejectWithValue, dispatch }) => {
     try {
         const { data, message } = await get('/parent/profile');
@@ -35,6 +33,29 @@ export const getParentProfileThunk = createAsyncThunk('/parent/profile', async (
         return rejectWithValue(errorMessage);
     }
 });
+
+export const updateParentProfileThunk = createAsyncThunk('/parent/update', async (config, { rejectWithValue, dispatch }) => {
+    try {
+        const { data, message } = await post('/parent/update', config);
+        dispatch(
+            showNotification({
+                message: message,
+                severity: 'success',
+            })
+        );
+        return data;
+    } catch (error) {
+        const errorMessage = error.response?.data?.message;
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
+    }
+});
+
 
 // 获取家长列表
 export const fetchParents = createAsyncThunk('parent/fetchParents', async (_, { rejectWithValue, dispatch }) => {
@@ -78,35 +99,38 @@ export const addParent = createAsyncThunk('parent/addParent', async (parentData,
 });
 
 // 更新家长信息
-export const updateParent = createAsyncThunk('parent/updateParent', async (parentData, { rejectWithValue, dispatch }) => {
-    try {
-        const { data } = await put(`/admin/parents/${parentData._id}`, parentData);
-        dispatch(
-            showNotification({
-                message: 'Parent updated successfully',
-                severity: 'success',
-            })
-        );
-        return data;
-    } catch (error) {
-        const errorMessage = error.response?.data?.message || 'Failed to update parent';
-        dispatch(
-            showNotification({
-                message: errorMessage,
-                severity: 'error',
-            })
-        );
-        return rejectWithValue(errorMessage);
+export const updateParent = createAsyncThunk(
+    'parent/updateParent',
+    async (config, { rejectWithValue, dispatch }) => {
+        try {
+            const { data, message } = await post('/parent/update', config);
+            dispatch(
+                showNotification({
+                    message: message,
+                    severity: 'success',
+                })
+            );
+            return data;
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Failed to update parent';
+            dispatch(
+                showNotification({
+                    message: errorMessage,
+                    severity: 'error',
+                })
+            );
+            return rejectWithValue(errorMessage);
+        }
     }
-});
+);
 
 // 删除家长
 export const deleteParent = createAsyncThunk('parent/deleteParent', async (parentId, { rejectWithValue, dispatch }) => {
     try {
-        await del(`/admin/parents/${parentId}`);
+        const { message } = await post("/admin/delete-parent", { parentId });
         dispatch(
             showNotification({
-                message: 'Parent deleted successfully',
+                message,
                 severity: 'success',
             })
         );
@@ -123,3 +147,56 @@ export const deleteParent = createAsyncThunk('parent/deleteParent', async (paren
     }
 });
 
+// parent add child (admin)
+export const addChildThunk = createAsyncThunk('admin/parent/add-child', async (config, { rejectWithValue, dispatch }) => {
+    try {
+        const { data, message } = await post('/admin/add-student', config);
+        dispatch(showNotification({ message, severity: 'success' }));
+        return data;
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Failed to delete parent';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
+    }
+});
+
+// parent add child (parent)
+export const addChildByParentThunk = createAsyncThunk('parent/add-child', async (config, { rejectWithValue, dispatch }) => {
+    try {
+        const { data, message } = await post('/parent/add-student', config);
+        dispatch(showNotification({ message, severity: 'success' }));
+        return data;
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Failed to delete parent';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
+    }
+});
+
+// parent remove child
+export const removeChildThunk = createAsyncThunk('parent/remove-child', async (config, { rejectWithValue, dispatch }) => {
+    try {
+        const { data, message } = await post('/parent/remove-student', config);
+        dispatch(showNotification({ message, severity: 'success' }));
+        return data;
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Failed to delete parent';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
+    }
+});
