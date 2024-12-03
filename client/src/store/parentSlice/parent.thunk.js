@@ -127,10 +127,10 @@ export const updateParent = createAsyncThunk(
 // 删除家长
 export const deleteParent = createAsyncThunk('parent/deleteParent', async (parentId, { rejectWithValue, dispatch }) => {
     try {
-        await del(`/admin/parents/${parentId}`);
+        const { message } = await post("/admin/delete-parent", { parentId });
         dispatch(
             showNotification({
-                message: 'Parent deleted successfully',
+                message,
                 severity: 'success',
             })
         );

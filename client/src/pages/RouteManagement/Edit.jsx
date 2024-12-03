@@ -129,9 +129,6 @@ const EditRoute = () => {
                                                                     <Edit />
                                                                 </IconButton>
                                                                 <IconButton
-                                                                    disabled={
-                                                                        direction === 'inbound' ? index !== 0 : index !== stops.length - 1
-                                                                    }
                                                                     edge='end'
                                                                     aria-label='delete'
                                                                     onClick={() => handleDeleteStop(stop)}

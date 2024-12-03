@@ -44,6 +44,7 @@ export const postCreateUser = async (req, res) => {
                     lastName,
                     role,
                 });
+                await school.updateOne({ $push: { parents: user._id } });
                 break;
             case 'Driver':
                 user = await Driver.create({
@@ -56,6 +57,7 @@ export const postCreateUser = async (req, res) => {
                     lastName,
                     role,
                 });
+                await school.updateOne({ $push: { drivers: user._id } });
                 break;
         }
 
@@ -81,7 +83,7 @@ export const postCreateUser = async (req, res) => {
         return res.status(201).json({
             message: 'User created successfully',
             code: 201,
-            data: {...user, userId: user._id},
+            data: { ...user, userId: user._id },
         });
     } catch (error) {
         console.error(error);
