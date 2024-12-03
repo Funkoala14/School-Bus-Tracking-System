@@ -49,3 +49,26 @@ export const addStudentThunk = createAsyncThunk('admin/add-students', async (con
         return rejectWithValue(errorMessage);
     }
 });
+
+
+export const deleteStudentThunk = createAsyncThunk('student/delete', async (studentId, { rejectWithValue, dispatch }) => {
+    try {
+        const { message } = await post("/admin/delete-student", { studentId });
+        dispatch(
+            showNotification({
+                message,
+                severity: 'success',
+            })
+        );
+        return studentId;
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Failed to delete parent';
+        dispatch(
+            showNotification({
+                message: errorMessage,
+                severity: 'error',
+            })
+        );
+        return rejectWithValue(errorMessage);
+    }
+});

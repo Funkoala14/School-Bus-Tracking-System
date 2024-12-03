@@ -6,9 +6,11 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
-function Driver(props) {
-    const { onRegisterSuccess } = props;
+import { signupThunk } from '../../store/authSlice/auth.thunk';
+import { useDispatch } from 'react-redux';
+
+const Driver = () => {
+    const dispatch = useDispatch();
     const { register, handleSubmit, formState: { errors }, control } = useForm();
 
     const onSubmit = (data) => {
@@ -16,11 +18,7 @@ function Driver(props) {
             ...data,
             licenseExpireDate: data.licenseExpireDate.format('DD/MM/YYYY'),
         }
-
-        const res = {
-            token: '1234567890',
-        }
-        onRegisterSuccess(newData, res?.token)
+        dispatch(signupThunk({...newData, role: 'Driver'}));
     };
 
     return (

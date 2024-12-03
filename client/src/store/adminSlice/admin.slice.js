@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addStudentThunk, studentListThunk, updateStudentInfoThunk } from './admin.thunk';
+import { addStudentThunk, deleteStudentThunk, studentListThunk, updateStudentInfoThunk } from './admin.thunk';
 
 const setPending = (state) => {
     state.loading = true;
@@ -53,6 +53,13 @@ const adminSlice = createSlice({
                 setFulfilled(state);
             })
             .addCase(updateStudentInfoThunk.rejected, setRejected)
+        
+            .addCase(deleteStudentThunk.pending, setPending)
+            .addCase(deleteStudentThunk.fulfilled, (state, action) => {
+                state.studentList = state.studentList.filter((s) => s._id !== action.payload);
+                setFulfilled(state);
+            })
+            .addCase(deleteStudentThunk.rejected, setRejected)
     },
 });
 

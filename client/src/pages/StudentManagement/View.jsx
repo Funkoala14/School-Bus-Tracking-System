@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTitle } from '../../store/titleSlice';
 import { Paper, Stack } from '@mui/material';
+import { deleteStudentThunk } from '../../store/adminSlice/admin.thunk';
 const View = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -37,7 +38,7 @@ const View = () => {
     };
 
     const submitHandler = () => {
-        console.log('submit');
+        dispatch(deleteStudentThunk(id)).then(() => navigate(-1));
         setOpen(false);
     };
 

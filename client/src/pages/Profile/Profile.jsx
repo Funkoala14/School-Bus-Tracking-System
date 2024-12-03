@@ -95,7 +95,7 @@ const Profile = () => {
                 </Box>
             </div>
             <UserInfo />
-            {childInfo.length &&
+            {Array.isArray(childInfo) &&
                 childInfo.map((child) => (
                     <React.Fragment key={child.studentId}>
                         <TimeLine child={child} />

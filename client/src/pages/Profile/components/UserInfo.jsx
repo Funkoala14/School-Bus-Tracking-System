@@ -92,7 +92,7 @@ const UserInfo = () => {
                         fontSize: '18px',
                     }}
                 >
-                    {profile?.address.address}
+                    {profile?.address?.address}
                 </Typography>
             </Stack>
         </Stack>

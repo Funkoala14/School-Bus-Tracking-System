@@ -17,8 +17,8 @@ adminRouter
     .post('/add-students',jwtValidation, adminAddStudentValidation, checkPermission('Admin'),  postSchoolAddStudent)
     .post('/assign-stop', jwtValidation, checkPermission('Admin'), postAssignStopToStudent)
     .post('/generate-schedule', jwtValidation, checkPermission('Admin'), generateRouteSchedule)
-    .delete('/delete-parent', jwtValidation, checkPermission('Admin'), postRemoveParent)
-    .delete('/delete-student', jwtValidation, checkPermission('Admin'), postRemoveStudent);
+    .post('/delete-parent', jwtValidation, checkPermission('Admin'), postRemoveParent)
+    .post('/delete-student', jwtValidation, checkPermission('Admin'), postRemoveStudent);
 
 
 export default adminRouter;

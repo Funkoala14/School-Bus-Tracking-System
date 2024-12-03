@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginThunk, logoutThunk } from './auth.thunk';
+import { loginThunk, logoutThunk, signupThunk } from './auth.thunk';
 
 const setPending = (state) => {
     state.loading = true;
@@ -56,6 +56,10 @@ const authSlice = createSlice({
             .addCase(loginThunk.pending, setPending)
             .addCase(loginThunk.fulfilled, setFulfilled)
             .addCase(loginThunk.rejected, setRejected)
+
+            .addCase(signupThunk.pending, setPending)
+            .addCase(signupThunk.fulfilled, setFulfilled)
+            .addCase(signupThunk.rejected, setRejected)
 
             .addCase(logoutThunk.fulfilled, setRejected);
     },
