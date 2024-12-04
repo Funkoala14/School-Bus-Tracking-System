@@ -8,12 +8,14 @@ import UserInfo from './components/UserInfo';
 import TimeLine from './components/TimeLine';
 import { useDispatch, useSelector } from 'react-redux';
 import { getChildInfoThunk, getParentProfileThunk } from '../../store/parentSlice/parent.thunk';
+import Loading from '../../components/Loading';
 
 const Profile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { childInfo } = useSelector((state) => state.parent);
     const { userName } = useSelector((state) => state.auth);
+    const { profile , loading } = useSelector((state) => state.parent);
 
     // const goBack = () => {
     //     navigate(-1);
@@ -27,6 +29,10 @@ const Profile = () => {
         dispatch(getChildInfoThunk());
         dispatch(getParentProfileThunk());
     }, [dispatch]);
+
+    if(loading) {
+        return <Loading />
+    }
 
     return (
         <div className='h-full w-full'>
