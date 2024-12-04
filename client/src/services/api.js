@@ -33,9 +33,11 @@ api.interceptors.response.use(
             const message = error.response.data?.message || '';
 
             // monitor /verify
-            if (status === 401 && message.includes('No token provided')) {
-                if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-                    window.location.href = '/login';
+            if (status === 401) {
+                if (message.includes('No token provided') || message.includes('Token expired')) {
+                    if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+                        window.location.href = '/login';
+                    }
                 }
             }
 
