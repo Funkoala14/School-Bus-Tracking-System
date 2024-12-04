@@ -10,8 +10,7 @@ const DirectionsMap = ({ parentTracking = false, stops, defaultCenter }) => {
     const [waypoints, setWaypoints] = useState(null);
     const { nextStopData } = useSelector((state) => state.route);
     const { childInfo } = useSelector((state) => state.parent);
-    console.log(childInfo);
-    
+
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -83,7 +82,7 @@ const DirectionsMap = ({ parentTracking = false, stops, defaultCenter }) => {
                             scaledSize: { width: 30, height: 30 },
                         }}
                     />
-                    {!!parentTracking && (
+                    {!!parentTracking && childInfo && (
                         <Marker
                             zIndex={99}
                             position={{
