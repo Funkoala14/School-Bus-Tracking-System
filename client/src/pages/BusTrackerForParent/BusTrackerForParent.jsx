@@ -108,7 +108,7 @@ const ParentLocationTracker = () => {
     }, [dispatch]);
 
     return (
-        <Container sx={{ height: 'calc(100vh)', width: '100%', p: 0 }}>
+        <Container sx={{ height: 'calc(100vh - 6rem)', width: '100%', p: 0 }}>
             {/* Display any error messages */}
             {error && (
                 <Typography variant='h6' color='error' gutterBottom>
