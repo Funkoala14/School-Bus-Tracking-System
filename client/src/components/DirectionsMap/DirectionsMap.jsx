@@ -3,7 +3,7 @@ import { APIProvider, Map, Marker, useMap, useMapsLibrary } from '@vis.gl/react-
 import { useDispatch, useSelector } from 'react-redux';
 import { setNextStopData } from '../../store/routeSlice/route.slice';
 
-const DirectionsMap = ({ parentTracking = false, stops, defaultCenter }) => {
+const DirectionsMap = ({ parentTracking = false, stops, defaultCenter, setError }) => {
     const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 }); // Stores the current location of the bus
     const [origin, setOrigin] = useState(null);
     const [destination, setDestination] = useState(null);
