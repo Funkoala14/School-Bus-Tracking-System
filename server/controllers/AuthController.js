@@ -123,7 +123,7 @@ export const postUserLogin = async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
-            sameSite: 'Lax',
+            sameSite: 'None',
         });
         return res.status(200).json({
             message: 'success',
