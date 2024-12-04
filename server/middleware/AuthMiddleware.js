@@ -6,6 +6,7 @@ export const jwtValidation = (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token || validator.isEmpty(token)) {
+        console.log('No token provided');
         return res.status(401).json({ message: 'No token provided', code: 401 });
     }
 
@@ -27,6 +28,7 @@ export const jwtValidation = (req, res, next) => {
         console.log('req.user: ', req.user);
         next();
     } catch (error) {
+        console.error(error);
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({ message: 'Token expired', code: 401 });
         } else if (error.name === 'JsonWebTokenError') {
