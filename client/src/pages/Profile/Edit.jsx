@@ -17,7 +17,8 @@ const Edit = () => {
     const [isModalOpen, setModalOpen] = useState(false);
     const { childInfo, profile, error, loading } = useSelector((state) => state.parent);
     const { userId } = useSelector((state) => state.auth);
-    const [address, setAddress] = useState();
+    const [address, setAddress] = useState({ address: '' });
+
     const {
         register,
         handleSubmit,
@@ -30,14 +31,13 @@ const Edit = () => {
             id: userId,
             firstName: '',
             lastName: '',
-            address: {},
             phone: '',
             email: '',
         },
     });
 
     const handleInitialStates = () => {
-        setAddress(profile.address);
+        setAddress({ ...profile.address });
         setValue('firstName', profile.firstName);
         setValue('lastName', profile.lastName);
         setValue('phone', profile?.phone || '');
@@ -49,6 +49,7 @@ const Edit = () => {
     };
 
     const onSubmit = (data) => {
+        console.log(address);
         dispatch(updateParentProfileThunk({ ...data, address }));
         if (!error) {
             navigate(-1);

@@ -204,7 +204,7 @@ export const postAddStop = async (req, res) => {
 
         await route.save();
 
-        const populatedRoute = await Route.findById(route._id).populate({
+        const populatedRoute = await Route.findByIdAndUpdate(route._id, { $unset: { schedule: '' } }).populate({
             path: 'stops',
             populate: { path: 'address' },
         });
@@ -254,7 +254,7 @@ export const postUpdateStops = async (req, res) => {
 
         await session.commitTransaction();
 
-        const updatedRoute = await Route.findById(routeId).populate([
+        const updatedRoute = await Route.findByIdAndUpdate(routeId, { $unset: { schedule: '' } }).populate([
             {
                 path: 'stops',
                 populate: 'address',
@@ -290,7 +290,11 @@ export const deleteStop = async (req, res) => {
 
         const deleteStop = await Stop.findByIdAndDelete(stopId, { new: true });
         if (!deleteStop) return res.status(404).json({ message: `Stop with id ${stopId} not found`, code: 404 });
-        const route = await Route.findByIdAndUpdate(routeId, { $pull: { stops: stopId } }, { new: true }).populate({
+        const route = await Route.findByIdAndUpdate(
+            routeId,
+            { $pull: { stops: stopId }, $unset: { schedule: '' } },
+            { new: true }
+        ).populate({
             path: 'stops',
             populate: 'address',
             options: {
@@ -326,6 +330,7 @@ export const postUpdateStop = async (req, res) => {
             const addressError = addressValidation(req.body.address);
             if (addressError) return addressError;
             await Address.findByIdAndUpdate(stop.address, req.body.address, { new: true, runValidators: true });
+            await Route.findByIdAndUpdate(stop.route, {$unset: { schedule: '' } });
         }
         const { stopName, order } = req.body;
         const updatedStop = await Stop.findByIdAndUpdate(_id, { stopName, order }, { new: true });

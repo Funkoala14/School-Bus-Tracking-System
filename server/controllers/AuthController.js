@@ -44,7 +44,11 @@ export const postCreateUser = async (req, res) => {
                     lastName,
                     role,
                 });
-                await school.updateOne({ $push: { parents: user._id } });
+                await School.findByIdAndUpdate(
+                    school._id,
+                    { $push: { parents: user._id } },
+                    { new: true } 
+                );
                 break;
             case 'Driver':
                 user = await Driver.create({
@@ -57,7 +61,11 @@ export const postCreateUser = async (req, res) => {
                     lastName,
                     role,
                 });
-                await school.updateOne({ $push: { drivers: user._id } });
+                await School.findByIdAndUpdate(
+                    school._id,
+                    { $push: { drivers: user._id } },
+                    { new: true } 
+                );
                 break;
         }
 

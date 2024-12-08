@@ -120,7 +120,7 @@ const ParentLocationTracker = () => {
                 <Box className='absolute top-10 w-full bg-error p-4 shadow-lg rounded-xl'>
                     <Typography variant='h6'>No Child, please add your child to account</Typography>
                 </Box>
-                <DirectionsMap stops={selectedRoute?.stops} parentTracking={true} defaultCenter={{}}></DirectionsMap>
+                <DirectionsMap stops={selectedRoute?.stops} parentTracking={true} defaultCenter={{}} setError={setError}></DirectionsMap>
                 {/* Display the time to destination */}
                 <Box className='absolute bottom-0 w-full bg-white p-4 shadow-lg rounded-t-xl'>
                     <div className='flex items-center justify-between'>

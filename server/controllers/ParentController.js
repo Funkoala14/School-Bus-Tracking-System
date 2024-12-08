@@ -198,14 +198,23 @@ export const getParentProfile = async (req, res) => {
 export const postUpdateParentProfile = async (req, res) => {
     const { id } = req.body;
     try {
-        const parent = await Parent.findById(id);
+        const parent = await Parent.findById(id).populate('children');
         if (!parent) {
             return res.status(404).json({ message: 'Parent not found', code: 404 });
         }
         if (req.body.address) {
+            console.log(req.body.address);
             const addressError = addressValidation(req.body.address);
             if (addressError) return addressError;
-            await Address.findByIdAndUpdate(parent.address, req.body.address, { new: true, runValidators: true });
+            if (parent.address) {
+                await Address.findByIdAndUpdate(parent.address, req.body.address, { new: true, runValidators: true });
+            } else {
+                const newAddress = await Address.create(req.body.address);
+                await Parent.findByIdAndUpdate(id, { $set: { address: newAddress._id } });
+                if (Array.isArray(parent.children) && parent.children.length) {
+                    parent.children.map(async (child) => await Student.findByIdAndUpdate(child._id, { $set: { address: newAddress._id } }));
+                }
+            }
         }
         const { address: _, ...parentUpdateData } = req.body;
         const updatedParent = await Parent.findByIdAndUpdate(id, parentUpdateData, { new: true, runValidators: true })
