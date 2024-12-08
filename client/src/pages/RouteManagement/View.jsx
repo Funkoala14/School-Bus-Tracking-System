@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setTitle } from '../../store/titleSlice';
 import { deleteRouteThunk, generateNewScheduleThunk } from '../../store/routeSlice/route.thunk';
 import Loading from '../../components/Loading';
-import { Directions } from '@mui/icons-material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const View = () => {
     const navigate = useNavigate();
@@ -75,8 +75,8 @@ const View = () => {
                 <div className='view-container'>
                     {Array.isArray(route?.schedule?.stopTimes) && route?.schedule?.stopTimes.length === route.stops.length
                         ? route.schedule.stopTimes.map((stop) => (
-                              <label className='stop-item w-full flex justify-between align' key={stop.stop._id}>
-                                  <span className='text-gray-500'>{stop.stop.stopName}</span>
+                              <label className='stop-item w-full flex justify-between align' key={stop?.stop?._id}>
+                                  <span className='text-gray-500'>{stop?.stop?.stopName}</span>
                                   <span className='shrink-0'>{stop?.arrivalTime}</span>
                               </label>
                           ))
@@ -96,7 +96,8 @@ const View = () => {
                     <Button variant='outlined' color='error' startIcon={<DeleteIcon color='error' />} onClick={deleteHandler}>
                         Delete Route
                     </Button>
-                    <Button
+                    <LoadingButton
+                        loading={loading}
                         disabled={!route.stops.length}
                         className='w-full shrink-0'
                         variant='outlined'
@@ -104,7 +105,7 @@ const View = () => {
                         onClick={generateSchedule}
                     >
                         Generate Route Schedule
-                    </Button>
+                    </LoadingButton>
                 </div>
             </div>
             <Dialog open={open} onClose={handleClose}>

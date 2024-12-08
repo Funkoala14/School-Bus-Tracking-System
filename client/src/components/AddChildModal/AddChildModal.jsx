@@ -3,6 +3,7 @@ import { Modal, Box, TextField, Button, Typography, Stack, CircularProgress } fr
 import { useForm, Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { addChildByParentThunk, addChildThunk } from '../../store/parentSlice/parent.thunk';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { clearError } from '../../store/parentSlice/parent.slice';
 
 const AddChildModal = ({ open, onClose, parentId = null }) => {
@@ -85,9 +86,9 @@ const AddChildModal = ({ open, onClose, parentId = null }) => {
                             <Button onClick={handleClose} color='secondary' variant='outlined'>
                                 Cancel
                             </Button>
-                            <Button type='submit' sx={{ color: '#fff' }} variant='contained'>
+                            <LoadingButton loading={loading} type='submit' sx={{ color: '#fff' }} variant='contained'>
                                 Add
-                            </Button>
+                            </LoadingButton>
                         </div>
                     </form>
                 )}

@@ -17,6 +17,7 @@ import styles from './Login.module.scss';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginThunk } from '../../store/authSlice/auth.thunk';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -31,6 +32,7 @@ const Login = () => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
+    const { loading } = useSelector(state => state.auth);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -163,9 +165,10 @@ const Login = () => {
                     </FormControl>
 
                     {/* Submit Button */}
-                    <Button
+                    <LoadingButton
                         type='submit'
                         variant='contained'
+                        loading={loading}
                         sx={{
                             color: 'white',
                             width: '60%',
@@ -176,7 +179,7 @@ const Login = () => {
                         }}
                     >
                         Login
-                    </Button>
+                    </LoadingButton>
                     <Button
                         variant='outlined'
                         sx={{

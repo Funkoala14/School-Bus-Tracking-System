@@ -15,7 +15,7 @@ const Edit = () => {
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const id = searchParams.get('id');
-    const [address, setAddress] = useState();
+    const [address, setAddress] = useState({ address: '' });
     const {
         watch,
         register,

@@ -36,6 +36,7 @@ api.interceptors.response.use(
             if (status === 401) {
                 if (message.includes('No token provided') || message.includes('Token expired')) {
                     if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+                        localStorage.clear();
                         window.location.href = '/login';
                     }
                 }
